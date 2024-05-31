@@ -1,22 +1,15 @@
 package main
 
 import (
-	"context"
 	"cykl/midi"
 	"cykl/sequencer"
+	"cykl/ui"
 	"log"
-	"os"
-	"os/signal"
-	"syscall"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 func main() {
-	ctx, cancel := signal.NotifyContext(
-		context.Background(),
-		os.Interrupt, syscall.SIGTERM,
-	)
-	defer cancel()
-
 	midi, err := midi.New()
 	if err != nil {
 		log.Fatal(err)
@@ -24,7 +17,9 @@ func main() {
 	defer midi.Close()
 
 	seq := sequencer.New(midi)
-	seq.TogglePlay()
 
-	<-ctx.Done()
+	p := tea.NewProgram(ui.New(seq))
+	if _, err := p.Run(); err != nil {
+		log.Fatal(err)
+	}
 }
