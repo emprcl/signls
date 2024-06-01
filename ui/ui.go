@@ -1,8 +1,9 @@
 package ui
 
 import (
-	"cykl/sequencer"
 	"time"
+
+	"cykl/sequencer"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -86,11 +87,28 @@ func (m mainModel) View() string {
 }
 
 func (m mainModel) renderSeq() string {
+	trackUi := []string{}
+	for _, track := range m.seq.Tracks {
+		trackUi = append(trackUi,
+			lipgloss.NewStyle().
+				MarginBottom(1).
+				Render(m.renderTrack(track)),
+		)
+	}
+	return lipgloss.JoinVertical(lipgloss.Left, trackUi...)
+}
+
+func (m mainModel) renderTrack(track *sequencer.Track) string {
 	lines := []string{}
 	for row := 0; row < 4; row++ {
 		steps := []string{}
 		for col := 0; col < 4; col++ {
-			if m.seq.Playing && m.seq.CurrentStep() == col+row*4 {
+			step := col + row*4
+			if step >= track.Steps {
+				steps = append(steps, " ")
+				break
+			}
+			if m.seq.Playing && track.CurrentStep() == step {
 				steps = append(steps, "░░")
 			} else {
 				steps = append(steps, "██")

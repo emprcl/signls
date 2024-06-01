@@ -9,11 +9,11 @@ const (
 )
 
 type Sequencer struct {
-	midi midi.Midi
+	midi   midi.Midi
+	Tracks []*Track
 
 	Clock   *clock
 	Playing bool
-	Pulse   int
 }
 
 // New creates a new sequencer and starts the clock.
@@ -21,6 +21,10 @@ func New(midi midi.Midi) *Sequencer {
 	seq := &Sequencer{
 		midi:    midi,
 		Playing: false,
+		Tracks: []*Track{
+			NewTrack(midi),
+			NewTrack(midi),
+		},
 	}
 
 	seq.Clock = newClock(defaultTempo, func() {
@@ -38,17 +42,17 @@ func (s *Sequencer) TogglePlay() {
 	}
 }
 
-func (s *Sequencer) CurrentStep() int {
-	return s.Pulse / 6
-}
-
 func (s *Sequencer) reset() {
-	s.Pulse = 0
+	for _, track := range s.Tracks {
+		track.Reset()
+	}
 }
 
 func (s *Sequencer) tick() {
 	if !s.Playing {
 		return
 	}
-	s.Pulse = (s.Pulse + 1) % (16 * 6)
+	for _, track := range s.Tracks {
+		track.Tick()
+	}
 }
