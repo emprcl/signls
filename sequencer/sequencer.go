@@ -9,10 +9,9 @@ const (
 )
 
 type Sequencer struct {
-	midi   midi.Midi
-	Tracks []*Track
-
+	midi    midi.Midi
 	Clock   *clock
+	Tracks  []*Track
 	Playing bool
 }
 
