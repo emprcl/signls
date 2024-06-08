@@ -11,11 +11,27 @@ const (
 
 type Chord []uint8
 
+type trigger interface {
+	IsStepActive(steps int, step int) bool
+}
+
+type euclideanTrigger struct {
+	number int
+	offset int
+}
+
+func (t euclideanTrigger) IsStepActive(steps int, step int) bool {
+	position := (step + t.offset) % steps
+	interval := steps / t.number
+	return position%interval == 0
+}
+
 type Track struct {
 	midi      midi.Midi
 	tick      chan struct{}
 	done      chan struct{}
 	triggered map[int][]Chord
+	rythm     trigger
 	chord     Chord
 	pulse     int
 	Steps     int
@@ -26,10 +42,14 @@ type Track struct {
 
 func NewTrack(midi midi.Midi, channel uint8) *Track {
 	t := &Track{
-		midi:     midi,
-		Steps:    16,
-		chord:    Chord{defaultNote},
-		length:   4 * pulsesPerStep,
+		midi:  midi,
+		Steps: 16,
+		chord: Chord{defaultNote + 5},
+		rythm: euclideanTrigger{
+			number: 5 - int(channel),
+			offset: int(channel),
+		},
+		length:   pulsesPerStep,
 		velocity: defaultVelocity,
 		channel:  channel,
 	}
@@ -73,7 +93,10 @@ func (t *Track) start() {
 }
 
 func (t *Track) shouldTrigger() bool {
-	return (t.pulse % pulsesPerStep) == 0
+	if (t.pulse % pulsesPerStep) != 0 {
+		return false
+	}
+	return t.rythm.IsStepActive(t.Steps, t.CurrentStep())
 }
 
 func (t *Track) trigger() {
