@@ -29,7 +29,7 @@ func NewTrack(midi midi.Midi, channel uint8) *Track {
 		midi:     midi,
 		Steps:    16,
 		chord:    Chord{defaultNote},
-		length:   pulsesPerStep,
+		length:   4 * pulsesPerStep,
 		velocity: defaultVelocity,
 		channel:  channel,
 	}
@@ -77,26 +77,38 @@ func (t *Track) shouldTrigger() bool {
 }
 
 func (t *Track) trigger() {
-	if chords, shouldStop := t.triggered[t.pulse]; shouldStop {
-		for _, chord := range chords {
-			for _, note := range chord {
-				t.midi.NoteOff(0, t.channel, note)
-			}
-		}
-		delete(t.triggered, t.pulse)
-	}
+	t.stopTriggeredSteps()
 
 	if t.shouldTrigger() {
-		t.note()
+		t.triggerStep()
 	}
 
 	t.pulse = (t.pulse + 1) % (pulsesPerStep * t.Steps)
 }
 
-func (t *Track) note() {
-	for _, note := range t.chord {
-		t.midi.NoteOn(0, t.channel, note, t.velocity)
+func (t *Track) stopTriggeredSteps() {
+	if chords, shouldStop := t.triggered[t.pulse]; shouldStop {
+		for _, chord := range chords {
+			t.chordOff(chord)
+		}
+		delete(t.triggered, t.pulse)
 	}
+}
+
+func (t *Track) triggerStep() {
+	t.chordOn(t.chord)
 	stopPulse := (t.pulse + t.length) % (pulsesPerStep * t.Steps)
 	t.triggered[stopPulse] = append(t.triggered[stopPulse], t.chord)
+}
+
+func (t *Track) chordOn(c Chord) {
+	for _, note := range c {
+		t.midi.NoteOn(0, t.channel, note, t.velocity)
+	}
+}
+
+func (t *Track) chordOff(c Chord) {
+	for _, note := range c {
+		t.midi.NoteOff(0, t.channel, note)
+	}
 }
