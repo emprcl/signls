@@ -22,7 +22,6 @@ func New(midi midi.Midi) *Sequencer {
 		Playing: false,
 		Tracks: []*Track{
 			NewTrack(midi, 0),
-			NewTrack(midi, 1),
 		},
 	}
 

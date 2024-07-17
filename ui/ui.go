@@ -116,5 +116,27 @@ func (m mainModel) renderTrack(track *sequencer.Track) string {
 		}
 		lines = append(lines, lipgloss.JoinHorizontal(lipgloss.Left, steps...))
 	}
-	return lipgloss.JoinVertical(lipgloss.Left, lines...)
+	rack1 := lipgloss.NewStyle().
+		MarginRight(2).
+		Render(lipgloss.JoinVertical(
+			lipgloss.Left,
+			"┌T eucld",
+			lipgloss.JoinVertical(lipgloss.Left, lines...),
+			"│stp  16",
+			"│not   4",
+			"│off   0",
+			"│",
+			"│chn   0",
+			"│vel 100",
+			"│len 1/4",
+			"│",
+			"├N scale",
+			"A",
+			"│scl dor",
+			"│spr   0",
+			"│spr   0",
+			"└───",
+		))
+
+	return lipgloss.JoinHorizontal(lipgloss.Left, rack1, rack1, rack1, rack1, rack1, rack1, rack1)
 }
