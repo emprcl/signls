@@ -1,5 +1,16 @@
 package sequencer
 
+// Emitters
+// - Never
+// - Once on start
+// - Every x pulses
+// - Euclidean
+//
+// Triggers
+// - Never (blocks signals)
+// - Always
+// - Fixed note
+// - Random notes arpegiated (param range, algo)
 type Node interface {
 	Emit(g *Grid)
 	Trigger(g *Grid)
@@ -27,7 +38,7 @@ func (g *Grid) RunEmitters() {
 func (g *Grid) RunTriggers() {
 	for y := 0; y < g.h; y++ {
 		for x := 0; x < g.w; x++ {
-			g.nodes[y][x].Emit(g)
+			g.nodes[y][x].Trigger(g)
 		}
 	}
 }
