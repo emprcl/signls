@@ -59,6 +59,8 @@ func (g *Grid) RunSignalsAndEmitters() {
 		for x := 0; x < g.w; x++ {
 			if g.nodes[y][x] == nil {
 				continue
+			} else if _, ok := g.nodes[y][x].(Trigger); ok {
+				continue
 			}
 			g.nodes[y][x].Update(g, x, y)
 		}
@@ -69,6 +71,8 @@ func (g *Grid) RunTriggers() {
 	for y := 0; y < g.h; y++ {
 		for x := 0; x < g.w; x++ {
 			if g.nodes[y][x] == nil {
+				continue
+			} else if _, ok := g.nodes[y][x].(Trigger); !ok {
 				continue
 			}
 			g.nodes[y][x].Update(g, x, y)
