@@ -3,14 +3,14 @@ package ui
 import (
 	"time"
 
-	"cykl/sequencer"
+	"cykl/core"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
 const (
-	// We don't need to refresh the ui as often as the sequencer.
+	// We don't need to refresh the ui as often as the grid.
 	// It saves some cpu. Right now we run it at 30 fps.
 	refreshFrequency = 33 * time.Millisecond
 )
@@ -19,16 +19,16 @@ const (
 type tickMsg time.Time
 
 type mainModel struct {
-	seq    *sequencer.Sequencer
+	grid   *core.Grid
 	width  int
 	height int
 }
 
-// New creates a new mainModel that hols the ui state. It takes a new sequencer.
-// Check teh sequencer package.
-func New(seq *sequencer.Sequencer) tea.Model {
+// New creates a new mainModel that hols the ui state. It takes a new grid.
+// Check the core package.
+func New(grid *core.Grid) tea.Model {
 	model := mainModel{
-		seq: seq,
+		grid: grid,
 	}
 	return model
 }
@@ -57,7 +57,6 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case " ":
-			m.seq.TogglePlay()
 			return m, nil
 		case "q":
 			return m, tea.Quit
@@ -70,7 +69,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m mainModel) View() string {
 	mainView := lipgloss.JoinVertical(
 		lipgloss.Left,
-		m.renderSeq(),
+		m.renderGrid(),
 	)
 
 	// Cleanup gibber
@@ -86,57 +85,14 @@ func (m mainModel) View() string {
 	)
 }
 
-func (m mainModel) renderSeq() string {
-	trackUi := []string{}
-	for _, track := range m.seq.Tracks {
-		trackUi = append(trackUi,
-			lipgloss.NewStyle().
-				MarginBottom(1).
-				Render(m.renderTrack(track)),
-		)
-	}
-	return lipgloss.JoinVertical(lipgloss.Left, trackUi...)
-}
-
-func (m mainModel) renderTrack(track *sequencer.Track) string {
-	lines := []string{}
-	for row := 0; row < 4; row++ {
-		steps := []string{}
-		for col := 0; col < 4; col++ {
-			step := col + row*4
-			if step >= track.Steps {
-				steps = append(steps, " ")
-				break
-			}
-			if m.seq.Playing && track.CurrentStep() == step {
-				steps = append(steps, "░░")
-			} else {
-				steps = append(steps, "██")
-			}
+func (m mainModel) renderGrid() string {
+	var lines []string
+	for _, line := range m.grid.Nodes() {
+		var nodes []string
+		for _, node := range line {
+			nodes = append(nodes, renderNode(node))
 		}
-		lines = append(lines, lipgloss.JoinHorizontal(lipgloss.Left, steps...))
+		lines = append(lines, lipgloss.JoinHorizontal(lipgloss.Left, nodes...))
 	}
-	rack1 := lipgloss.NewStyle().
-		MarginRight(2).
-		Render(lipgloss.JoinVertical(
-			lipgloss.Left,
-			"┌T eucld",
-			lipgloss.JoinVertical(lipgloss.Left, lines...),
-			"│stp  16",
-			"│not   4",
-			"│off   0",
-			"│",
-			"│chn   0",
-			"│vel 100",
-			"│len 1/4",
-			"│",
-			"├N scale",
-			"A",
-			"│scl dor",
-			"│spr   0",
-			"│spr   0",
-			"└───",
-		))
-
-	return lipgloss.JoinHorizontal(lipgloss.Left, rack1, rack1, rack1, rack1, rack1, rack1, rack1)
+	return lipgloss.JoinVertical(lipgloss.Left, lines...)
 }

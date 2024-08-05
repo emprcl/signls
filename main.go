@@ -1,8 +1,8 @@
 package main
 
 import (
+	"cykl/core"
 	"cykl/midi"
-	"cykl/sequencer"
 	"cykl/ui"
 	"log"
 
@@ -16,9 +16,9 @@ func main() {
 	}
 	defer midi.Close()
 
-	seq := sequencer.New(midi)
+	grid := core.NewGrid(45, 25, midi)
 
-	p := tea.NewProgram(ui.New(seq))
+	p := tea.NewProgram(ui.New(grid))
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
 	}

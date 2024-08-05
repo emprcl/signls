@@ -1,4 +1,4 @@
-package sequencer
+package core
 
 import "time"
 
@@ -11,7 +11,7 @@ const (
 )
 
 // clock contains a clock state.
-// We use the standard time.ticker as the sequencer clock, ticking at the
+// We use the standard time.ticker as the clock, ticking at the
 // standard midi 6 pulses per 16th note (one step).
 // The update chan is used to pass new tempo values and recreate a new ticker.
 //
