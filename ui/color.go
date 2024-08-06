@@ -4,7 +4,8 @@ import "github.com/charmbracelet/lipgloss"
 
 const (
 	primaryColor   = lipgloss.Color("197")
-	secondaryColor = lipgloss.Color("240")
+	secondaryColor = lipgloss.Color("246")
 
-	signalColor = lipgloss.Color("120")
+	gridColor   = lipgloss.Color("233")
+	signalColor = lipgloss.Color("15")
 )
