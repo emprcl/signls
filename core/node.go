@@ -21,10 +21,16 @@ type Trigger interface {
 
 type Signal struct {
 	direction uint8
+	updated   bool
 }
 
 func (s *Signal) Update(g *Grid, x, y int) {
-	g.Move(x, y, s.direction)
+	if s.updated {
+		s.updated = false
+	} else {
+		g.Move(x, y, s.direction)
+		s.updated = true
+	}
 }
 
 type OnceEmitter struct {

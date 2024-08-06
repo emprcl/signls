@@ -3,7 +3,7 @@ package core
 import "time"
 
 const (
-	pulsesPerStep       int     = 6
+	pulsesPerStep       int     = 1
 	stepsPerQuarterNote int     = 4
 	tempoMin            float64 = 1.0
 	tempoMax            float64 = 300.0
