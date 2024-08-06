@@ -43,21 +43,21 @@ func (s *Signal) Reset() {
 }
 
 type BasicEmitter struct {
-	Direction  uint8
-	shouldEmit bool
-	updated    bool
+	Direction uint8
+	Activated bool
+	updated   bool
 }
 
 func (e *BasicEmitter) Emit() {
-	e.shouldEmit = true
+	e.Activated = true
 	e.updated = true
 }
 
 func (e *BasicEmitter) Update(g *Grid, x, y int) {
-	if e.shouldEmit && !e.updated {
+	if e.Activated && !e.updated {
 		g.Emit(x, y, e.Direction)
 		e.updated = true
-		e.shouldEmit = false
+		e.Activated = false
 	} else if e.updated {
 		e.updated = false
 	}

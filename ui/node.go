@@ -9,21 +9,27 @@ import (
 var (
 	gridStyle    = lipgloss.NewStyle().Foreground(gridColor)
 	signalStyle  = lipgloss.NewStyle().Foreground(signalColor)
-	emitterStyle = lipgloss.NewStyle().Background(secondaryColor).Foreground(primaryColor)
+	emitterStyle = lipgloss.NewStyle().Foreground(primaryColor)
 )
 
 func renderNode(node core.Node) string {
 	switch node.(type) {
 	case *core.BasicEmitter:
+		var emitter string
 		switch node.(*core.BasicEmitter).Direction {
 		case 0:
-			return emitterStyle.Render("▀▀")
+			emitter = "▀▀"
 		case 1:
-			return emitterStyle.Render(" █")
+			emitter = " █"
 		case 2:
-			return emitterStyle.Render("▄▄")
+			emitter = "▄▄"
 		case 3:
-			return emitterStyle.Render("█ ")
+			emitter = "█ "
+		}
+		if node.(*core.BasicEmitter).Activated {
+			return emitterStyle.Background(signalColor).Render(emitter)
+		} else {
+			return emitterStyle.Background(secondaryColor).Render(emitter)
 		}
 	case *core.Signal:
 		switch node.(*core.Signal).Direction {
