@@ -26,7 +26,13 @@ func renderNode(node core.Node) string {
 			return emitterStyle.Render("█ ")
 		}
 	case *core.Signal:
-		return signalStyle.Render("≡≡")
+		switch node.(*core.Signal).Direction {
+		case 0, 2:
+			return signalStyle.Render("▒▒")
+		case 1, 3:
+			return signalStyle.Render("▒▒")
+		}
+
 	}
 	return gridStyle.Render("··")
 }

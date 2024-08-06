@@ -13,6 +13,7 @@ package core
 // - Random notes arpegiated (param range, algo)
 type Node interface {
 	Update(g *Grid, x, y int)
+	Reset()
 }
 
 type Trigger interface {
@@ -37,18 +38,31 @@ func (s *Signal) Update(g *Grid, x, y int) {
 	}
 }
 
+func (s *Signal) Reset() {
+	s.updated = false
+}
+
 type BasicEmitter struct {
 	Direction  uint8
 	shouldEmit bool
+	updated    bool
 }
 
 func (e *BasicEmitter) Emit() {
 	e.shouldEmit = true
+	e.updated = true
 }
 
 func (e *BasicEmitter) Update(g *Grid, x, y int) {
-	if e.shouldEmit {
+	if e.shouldEmit && !e.updated {
 		g.Emit(x, y, e.Direction)
+		e.updated = true
+		e.shouldEmit = false
+	} else if e.updated {
+		e.updated = false
 	}
-	e.shouldEmit = false
+}
+
+func (e *BasicEmitter) Reset() {
+	e.updated = false
 }
