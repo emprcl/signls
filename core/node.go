@@ -19,8 +19,12 @@ type Trigger interface {
 	Trig()
 }
 
+type Emitter interface {
+	Emit()
+}
+
 type Signal struct {
-	direction uint8
+	Direction uint8
 	updated   bool
 }
 
@@ -28,23 +32,23 @@ func (s *Signal) Update(g *Grid, x, y int) {
 	if s.updated {
 		s.updated = false
 	} else {
-		g.Move(x, y, s.direction)
+		g.Move(x, y, s.Direction)
 		s.updated = true
 	}
 }
 
-type OnceEmitter struct {
-	direction  uint8
+type BasicEmitter struct {
+	Direction  uint8
 	shouldEmit bool
 }
 
-func (e *OnceEmitter) Update(g *Grid, x, y int) {
-	if e.shouldEmit {
-		g.Emit(x, y, e.direction)
-	}
-	e.shouldEmit = false
+func (e *BasicEmitter) Emit() {
+	e.shouldEmit = true
 }
 
-func (e *OnceEmitter) Direction() uint8 {
-	return e.direction
+func (e *BasicEmitter) Update(g *Grid, x, y int) {
+	if e.shouldEmit {
+		g.Emit(x, y, e.Direction)
+	}
+	e.shouldEmit = false
 }

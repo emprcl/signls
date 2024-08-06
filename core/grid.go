@@ -23,7 +23,11 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 		grid.nodes[i] = make([]Node, width)
 	}
 
-	grid.AddOnceEmitter(3, 3, 1)
+	// Basic test case
+	grid.AddBasicEmitter(3, 3, 1, true)
+	grid.AddBasicEmitter(15, 3, 2, false)
+	grid.AddBasicEmitter(15, 15, 3, false)
+	grid.AddBasicEmitter(3, 15, 0, false)
 
 	grid.clock = newClock(120., func() {
 		grid.Update()
@@ -36,16 +40,16 @@ func (g *Grid) Nodes() [][]Node {
 	return g.nodes
 }
 
-func (g *Grid) AddOnceEmitter(x, y int, direction uint8) {
-	g.nodes[y][x] = &OnceEmitter{
-		direction:  direction,
-		shouldEmit: true,
+func (g *Grid) AddBasicEmitter(x, y int, direction uint8, emitOnPlay bool) {
+	g.nodes[y][x] = &BasicEmitter{
+		Direction:  direction,
+		shouldEmit: emitOnPlay,
 	}
 }
 
 func (g *Grid) AddSignal(x, y int, direction uint8) {
 	g.nodes[y][x] = &Signal{
-		direction: direction,
+		Direction: direction,
 	}
 }
 
@@ -106,15 +110,18 @@ func (g *Grid) Move(x, y int, direction uint8) {
 		newX -= 1
 	}
 
-	if newX >= g.w || newY >= g.h {
+	if newX >= g.w || newY >= g.h ||
+		newX < 0 || newY < 0 {
 		g.nodes[y][x] = nil
 		return
 	}
 
-	if t, ok := g.nodes[newY][newX].(Trigger); ok {
-		t.Trig()
-	} else if g.nodes[newY][newX] == nil {
+	if g.nodes[newY][newX] == nil {
 		g.nodes[newY][newX] = g.nodes[y][x]
+	} else if t, ok := g.nodes[newY][newX].(Trigger); ok {
+		t.Trig()
+	} else if t, ok := g.nodes[newY][newX].(*BasicEmitter); ok {
+		t.Emit()
 	}
 
 	g.nodes[y][x] = nil
