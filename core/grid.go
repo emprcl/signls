@@ -10,6 +10,8 @@ type Grid struct {
 	nodes [][]Node
 	h     int
 	w     int
+
+	Playing bool
 }
 
 func NewGrid(width, height int, midi midi.Midi) *Grid {
@@ -28,6 +30,31 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 	grid.AddBasicEmitter(15, 3, 2, false)
 	grid.AddBasicEmitter(15, 15, 3, false)
 	grid.AddBasicEmitter(3, 15, 0, false)
+
+	grid.AddBasicEmitter(4, 4, 1, true)
+	grid.AddBasicEmitter(14, 4, 2, false)
+	grid.AddBasicEmitter(14, 14, 3, false)
+	grid.AddBasicEmitter(4, 14, 0, false)
+
+	grid.AddBasicEmitter(5, 5, 1, true)
+	grid.AddBasicEmitter(13, 5, 2, false)
+	grid.AddBasicEmitter(13, 13, 3, false)
+	grid.AddBasicEmitter(5, 13, 0, false)
+
+	grid.AddBasicEmitter(6, 6, 1, true)
+	grid.AddBasicEmitter(12, 6, 2, false)
+	grid.AddBasicEmitter(12, 12, 3, false)
+	grid.AddBasicEmitter(6, 12, 0, false)
+
+	grid.AddBasicEmitter(7, 7, 1, true)
+	grid.AddBasicEmitter(11, 7, 2, false)
+	grid.AddBasicEmitter(11, 11, 3, false)
+	grid.AddBasicEmitter(7, 11, 0, false)
+
+	grid.AddBasicEmitter(8, 8, 1, true)
+	grid.AddBasicEmitter(10, 8, 2, false)
+	grid.AddBasicEmitter(10, 10, 3, false)
+	grid.AddBasicEmitter(8, 10, 0, false)
 
 	grid.clock = newClock(60., func() {
 		grid.Update()
@@ -55,6 +82,9 @@ func (g *Grid) AddSignal(x, y int, direction uint8) {
 }
 
 func (g *Grid) Update() {
+	if !g.Playing {
+		return
+	}
 	g.RunSignalsAndEmitters()
 	g.RunTriggers()
 	g.RunResets()

@@ -57,6 +57,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case " ":
+			m.grid.Playing = !m.grid.Playing
 			return m, nil
 		case "q":
 			return m, tea.Quit
