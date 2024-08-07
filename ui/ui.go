@@ -13,15 +13,20 @@ const (
 	// We don't need to refresh the ui as often as the grid.
 	// It saves some cpu. Right now we run it at 30 fps.
 	refreshFrequency = 33 * time.Millisecond
+
+	controlsHeight = 4
 )
 
 // tickMsg is a message that triggers ui rrefresh
 type tickMsg time.Time
 
 type mainModel struct {
-	grid   *core.Grid
-	width  int
-	height int
+	grid    *core.Grid
+	cursorX int
+	cursorY int
+	width   int
+	height  int
+	pulse   uint64
 }
 
 // New creates a new mainModel that hols the ui state. It takes a new grid.
@@ -49,10 +54,13 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
-		m.grid.Resize(m.width/2, m.height)
+		m.grid.Resize(m.width/2, m.height-controlsHeight)
 		return m, nil
 
 	case tickMsg:
+		if m.grid.Playing {
+			m.pulse++
+		}
 		return m, tick()
 
 	case tea.KeyMsg:
@@ -60,7 +68,20 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case " ":
 			m.grid.Playing = !m.grid.Playing
 			return m, nil
+		case "up":
+			m.cursorY = max(m.cursorY-1, 0)
+			return m, nil
+		case "down":
+			m.cursorY = min(m.cursorY+1, m.grid.Height)
+			return m, nil
+		case "left":
+			m.cursorX = max(m.cursorX-1, 0)
+			return m, nil
+		case "right":
+			m.cursorX = min(m.cursorX+1, m.grid.Width)
+			return m, nil
 		case "q":
+			m.View() // ensure buffer cleanup
 			return m, tea.Quit
 		}
 	}
@@ -89,12 +110,13 @@ func (m mainModel) View() string {
 
 func (m mainModel) renderGrid() string {
 	var lines []string
-	for _, line := range m.grid.Nodes() {
+	for i, line := range m.grid.Nodes() {
 		var nodes []string
-		for _, node := range line {
-			nodes = append(nodes, renderNode(node))
+		for j, node := range line {
+			nodes = append(nodes, m.renderNode(node, i, j))
 		}
 		lines = append(lines, lipgloss.JoinHorizontal(lipgloss.Left, nodes...))
 	}
+	lines = append(lines, m.renderControl())
 	return lipgloss.JoinVertical(lipgloss.Left, lines...)
 }

@@ -5,21 +5,21 @@ import (
 )
 
 type Grid struct {
-	midi  midi.Midi
-	clock *clock
-	nodes [][]Node
-	h     int
-	w     int
+	midi   midi.Midi
+	clock  *clock
+	nodes  [][]Node
+	Height int
+	Width  int
 
 	Playing bool
 }
 
 func NewGrid(width, height int, midi midi.Midi) *Grid {
 	grid := &Grid{
-		midi:  midi,
-		nodes: make([][]Node, height),
-		h:     height,
-		w:     width,
+		midi:   midi,
+		nodes:  make([][]Node, height),
+		Height: height,
+		Width:  width,
 	}
 	for i := range grid.nodes {
 		grid.nodes[i] = make([]Node, width)
@@ -91,8 +91,8 @@ func (g *Grid) Update() {
 }
 
 func (g *Grid) RunSignalsAndEmitters() {
-	for y := 0; y < g.h; y++ {
-		for x := 0; x < g.w; x++ {
+	for y := 0; y < g.Height; y++ {
+		for x := 0; x < g.Width; x++ {
 			if g.nodes[y][x] == nil {
 				continue
 			} else if _, ok := g.nodes[y][x].(Trigger); ok {
@@ -104,8 +104,8 @@ func (g *Grid) RunSignalsAndEmitters() {
 }
 
 func (g *Grid) RunTriggers() {
-	for y := 0; y < g.h; y++ {
-		for x := 0; x < g.w; x++ {
+	for y := 0; y < g.Height; y++ {
+		for x := 0; x < g.Width; x++ {
 			if g.nodes[y][x] == nil {
 				continue
 			} else if _, ok := g.nodes[y][x].(Trigger); !ok {
@@ -117,8 +117,8 @@ func (g *Grid) RunTriggers() {
 }
 
 func (g *Grid) RunResets() {
-	for y := 0; y < g.h; y++ {
-		for x := 0; x < g.w; x++ {
+	for y := 0; y < g.Height; y++ {
+		for x := 0; x < g.Width; x++ {
 			if g.nodes[y][x] == nil {
 				continue
 			}
@@ -153,7 +153,7 @@ func (g *Grid) Move(x, y int, direction uint8) {
 		newX -= 1
 	}
 
-	if newX >= g.w || newY >= g.h ||
+	if newX >= g.Width || newY >= g.Height ||
 		newX < 0 || newY < 0 {
 		g.nodes[y][x] = nil
 		return
@@ -176,13 +176,13 @@ func (g *Grid) Resize(newWidth, newHeight int) {
 		newNodes[i] = make([]Node, newWidth)
 	}
 
-	minWidth := g.w
-	if newWidth < g.w {
+	minWidth := g.Width
+	if newWidth < g.Width {
 		minWidth = newWidth
 	}
 
-	minHeight := g.h
-	if newHeight < g.h {
+	minHeight := g.Height
+	if newHeight < g.Height {
 		minHeight = newHeight
 	}
 
@@ -192,7 +192,7 @@ func (g *Grid) Resize(newWidth, newHeight int) {
 		}
 	}
 
-	g.w = newWidth
-	g.h = newHeight
+	g.Width = newWidth
+	g.Height = newHeight
 	g.nodes = newNodes
 }

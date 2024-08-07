@@ -8,11 +8,15 @@ import (
 
 var (
 	gridStyle    = lipgloss.NewStyle().Foreground(gridColor)
+	cursorStyle  = lipgloss.NewStyle().Foreground(signalColor)
 	signalStyle  = lipgloss.NewStyle().Foreground(signalColor)
 	emitterStyle = lipgloss.NewStyle().Foreground(primaryColor)
 )
 
-func renderNode(node core.Node) string {
+func (m mainModel) renderNode(node core.Node, i, j int) string {
+	if j == m.cursorX && i == m.cursorY {
+		return signalStyle.Render("██")
+	}
 	switch node.(type) {
 	case *core.BasicEmitter:
 		var emitter string
@@ -40,5 +44,8 @@ func renderNode(node core.Node) string {
 		}
 
 	}
-	return gridStyle.Render("├┤")
+	if (i+j)%2 == 0 {
+		return "  "
+	}
+	return gridStyle.Render("░░")
 }
