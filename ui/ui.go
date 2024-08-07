@@ -49,6 +49,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
+		m.grid.Resize(m.width/2, m.height)
 		return m, nil
 
 	case tickMsg:

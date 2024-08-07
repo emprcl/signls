@@ -169,3 +169,30 @@ func (g *Grid) Move(x, y int, direction uint8) {
 
 	g.nodes[y][x] = nil
 }
+
+func (g *Grid) Resize(newWidth, newHeight int) {
+	newNodes := make([][]Node, newHeight)
+	for i := range newNodes {
+		newNodes[i] = make([]Node, newWidth)
+	}
+
+	minWidth := g.w
+	if newWidth < g.w {
+		minWidth = newWidth
+	}
+
+	minHeight := g.h
+	if newHeight < g.h {
+		minHeight = newHeight
+	}
+
+	for y := 0; y < minHeight; y++ {
+		for x := 0; x < minWidth; x++ {
+			newNodes[y][x] = g.nodes[y][x]
+		}
+	}
+
+	g.w = newWidth
+	g.h = newHeight
+	g.nodes = newNodes
+}
