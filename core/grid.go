@@ -56,6 +56,11 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 	grid.AddBasicEmitter(10, 10, 3, false)
 	grid.AddBasicEmitter(8, 10, 0, false)
 
+	grid.AddBasicEmitter(20, 3, 1, true)
+	grid.AddBasicEmitter(21, 3, 2, false)
+	grid.AddBasicEmitter(21, 4, 3, false)
+	grid.AddBasicEmitter(20, 4, 0, false)
+
 	grid.clock = newClock(60., func() {
 		grid.Update()
 	})
@@ -75,6 +80,13 @@ func (g *Grid) AddBasicEmitter(x, y int, direction uint8, emitOnPlay bool) {
 }
 
 func (g *Grid) AddSignal(x, y int, direction uint8) {
+	if g.nodes[y][x] != nil {
+		if t, ok := g.nodes[y][x].(Emitter); ok {
+			t.Emit()
+		}
+		// TODO: mutualise code with move
+		return
+	}
 	g.nodes[y][x] = &Signal{
 		Direction: direction,
 		updated:   true,
