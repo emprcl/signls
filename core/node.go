@@ -13,6 +13,7 @@ package core
 // - Random notes arpegiated (param range, algo)
 type Node interface {
 	Update(g *Grid, x, y int)
+	Direction() uint8
 	Reset()
 }
 
@@ -25,7 +26,7 @@ type Emitter interface {
 }
 
 type Signal struct {
-	Direction uint8
+	direction uint8
 	updated   bool
 }
 
@@ -33,9 +34,13 @@ func (s *Signal) Update(g *Grid, x, y int) {
 	if s.updated {
 		s.updated = false
 	} else {
-		g.Move(x, y, s.Direction)
+		g.Move(x, y, s.direction)
 		s.updated = true
 	}
+}
+
+func (s *Signal) Direction() uint8 {
+	return s.direction
 }
 
 func (s *Signal) Reset() {
@@ -43,8 +48,8 @@ func (s *Signal) Reset() {
 }
 
 type BasicEmitter struct {
-	Direction uint8
 	Activated bool
+	direction uint8
 	updated   bool
 }
 
@@ -55,12 +60,16 @@ func (e *BasicEmitter) Emit() {
 
 func (e *BasicEmitter) Update(g *Grid, x, y int) {
 	if e.Activated && !e.updated {
-		g.Emit(x, y, e.Direction)
+		g.Emit(x, y, e.direction)
 		e.updated = true
 		e.Activated = false
 	} else if e.updated {
 		e.updated = false
 	}
+}
+
+func (e *BasicEmitter) Direction() uint8 {
+	return e.direction
 }
 
 func (e *BasicEmitter) Reset() {

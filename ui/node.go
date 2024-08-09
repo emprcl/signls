@@ -20,7 +20,7 @@ func (m mainModel) renderNode(node core.Node, i, j int) string {
 	switch node.(type) {
 	case *core.BasicEmitter:
 		var emitter string
-		switch node.(*core.BasicEmitter).Direction {
+		switch node.(*core.BasicEmitter).Direction() {
 		case 0:
 			emitter = "▀▀"
 		case 1:
@@ -36,7 +36,7 @@ func (m mainModel) renderNode(node core.Node, i, j int) string {
 			return emitterStyle.Background(secondaryColor).Render(emitter)
 		}
 	case *core.Signal:
-		switch node.(*core.Signal).Direction {
+		switch node.(*core.Signal).Direction() {
 		case 0, 2:
 			return signalStyle.Render("██")
 		case 1, 3:
@@ -44,6 +44,8 @@ func (m mainModel) renderNode(node core.Node, i, j int) string {
 		}
 
 	}
+
+	// grid display
 	if (i+j)%2 == 0 {
 		return "  "
 	}

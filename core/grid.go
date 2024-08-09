@@ -74,7 +74,7 @@ func (g *Grid) Nodes() [][]Node {
 
 func (g *Grid) AddBasicEmitter(x, y int, direction uint8, emitOnPlay bool) {
 	g.nodes[y][x] = &BasicEmitter{
-		Direction: direction,
+		direction: direction,
 		Activated: emitOnPlay,
 	}
 }
@@ -88,7 +88,7 @@ func (g *Grid) AddSignal(x, y int, direction uint8) {
 		return
 	}
 	g.nodes[y][x] = &Signal{
-		Direction: direction,
+		direction: direction,
 		updated:   true,
 	}
 }
@@ -175,7 +175,7 @@ func (g *Grid) Move(x, y int, direction uint8) {
 		g.nodes[newY][newX] = g.nodes[y][x]
 	} else if t, ok := g.nodes[newY][newX].(Trigger); ok {
 		t.Trig()
-	} else if t, ok := g.nodes[newY][newX].(*BasicEmitter); ok {
+	} else if t, ok := g.nodes[newY][newX].(Emitter); ok {
 		t.Emit()
 	}
 

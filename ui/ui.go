@@ -81,7 +81,6 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.cursorX = min(m.cursorX+1, m.grid.Width)
 			return m, nil
 		case "q":
-			m.View() // ensure buffer cleanup
 			return m, tea.Quit
 		}
 	}
