@@ -1,5 +1,14 @@
 package core
 
+type Direction uint8
+
+const (
+	UP Direction = iota
+	RIGHT
+	DOWN
+	LEFT
+)
+
 // Emitters
 // - Never
 // - Once on start
@@ -13,7 +22,7 @@ package core
 // - Random notes arpegiated (param range, algo)
 type Node interface {
 	Update(g *Grid, x, y int)
-	Direction() uint8
+	Direction() Direction
 	Activated() bool
 	Reset()
 }
@@ -27,7 +36,7 @@ type Emitter interface {
 }
 
 type Signal struct {
-	direction uint8
+	direction Direction
 	updated   bool
 }
 
@@ -40,7 +49,7 @@ func (s *Signal) Update(g *Grid, x, y int) {
 	}
 }
 
-func (s *Signal) Direction() uint8 {
+func (s *Signal) Direction() Direction {
 	return s.direction
 }
 
@@ -53,7 +62,7 @@ func (s *Signal) Reset() {
 }
 
 type BasicEmitter struct {
-	direction uint8
+	direction Direction
 	activated bool
 	updated   bool
 }
@@ -73,7 +82,7 @@ func (e *BasicEmitter) Update(g *Grid, x, y int) {
 	}
 }
 
-func (e *BasicEmitter) Direction() uint8 {
+func (e *BasicEmitter) Direction() Direction {
 	return e.direction
 }
 

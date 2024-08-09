@@ -26,40 +26,40 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 	}
 
 	// Basic test case
-	grid.AddBasicEmitter(3, 3, 1, true)
-	grid.AddBasicEmitter(15, 3, 2, false)
-	grid.AddBasicEmitter(15, 15, 3, false)
-	grid.AddBasicEmitter(3, 15, 0, false)
+	grid.AddBasicEmitter(3, 3, RIGHT, true)
+	grid.AddBasicEmitter(15, 3, DOWN, false)
+	grid.AddBasicEmitter(15, 15, LEFT, false)
+	grid.AddBasicEmitter(3, 15, UP, false)
 
-	grid.AddBasicEmitter(4, 4, 1, true)
-	grid.AddBasicEmitter(14, 4, 2, false)
-	grid.AddBasicEmitter(14, 14, 3, false)
-	grid.AddBasicEmitter(4, 14, 0, false)
+	grid.AddBasicEmitter(4, 4, RIGHT, true)
+	grid.AddBasicEmitter(14, 4, DOWN, false)
+	grid.AddBasicEmitter(14, 14, LEFT, false)
+	grid.AddBasicEmitter(4, 14, UP, false)
 
-	grid.AddBasicEmitter(5, 5, 1, true)
-	grid.AddBasicEmitter(13, 5, 2, false)
-	grid.AddBasicEmitter(13, 13, 3, false)
-	grid.AddBasicEmitter(5, 13, 0, false)
+	grid.AddBasicEmitter(5, 5, RIGHT, true)
+	grid.AddBasicEmitter(13, 5, DOWN, false)
+	grid.AddBasicEmitter(13, 13, LEFT, false)
+	grid.AddBasicEmitter(5, 13, UP, false)
 
-	grid.AddBasicEmitter(6, 6, 1, true)
-	grid.AddBasicEmitter(12, 6, 2, false)
-	grid.AddBasicEmitter(12, 12, 3, false)
-	grid.AddBasicEmitter(6, 12, 0, false)
+	grid.AddBasicEmitter(6, 6, RIGHT, true)
+	grid.AddBasicEmitter(12, 6, DOWN, false)
+	grid.AddBasicEmitter(12, 12, LEFT, false)
+	grid.AddBasicEmitter(6, 12, UP, false)
 
-	grid.AddBasicEmitter(7, 7, 1, true)
-	grid.AddBasicEmitter(11, 7, 2, false)
-	grid.AddBasicEmitter(11, 11, 3, false)
-	grid.AddBasicEmitter(7, 11, 0, false)
+	grid.AddBasicEmitter(7, 7, RIGHT, true)
+	grid.AddBasicEmitter(11, 7, DOWN, false)
+	grid.AddBasicEmitter(11, 11, LEFT, false)
+	grid.AddBasicEmitter(7, 11, UP, false)
 
-	grid.AddBasicEmitter(8, 8, 1, true)
-	grid.AddBasicEmitter(10, 8, 2, false)
-	grid.AddBasicEmitter(10, 10, 3, false)
-	grid.AddBasicEmitter(8, 10, 0, false)
+	grid.AddBasicEmitter(8, 8, RIGHT, true)
+	grid.AddBasicEmitter(10, 8, DOWN, false)
+	grid.AddBasicEmitter(10, 10, LEFT, false)
+	grid.AddBasicEmitter(8, 10, UP, false)
 
-	grid.AddBasicEmitter(20, 3, 1, true)
-	grid.AddBasicEmitter(21, 3, 2, false)
-	grid.AddBasicEmitter(21, 4, 3, false)
-	grid.AddBasicEmitter(20, 4, 0, false)
+	grid.AddBasicEmitter(20, 3, RIGHT, true)
+	grid.AddBasicEmitter(21, 3, DOWN, false)
+	grid.AddBasicEmitter(21, 4, LEFT, false)
+	grid.AddBasicEmitter(20, 4, UP, false)
 
 	grid.clock = newClock(60., func() {
 		grid.Update()
@@ -72,14 +72,14 @@ func (g *Grid) Nodes() [][]Node {
 	return g.nodes
 }
 
-func (g *Grid) AddBasicEmitter(x, y int, direction uint8, emitOnPlay bool) {
+func (g *Grid) AddBasicEmitter(x, y int, direction Direction, emitOnPlay bool) {
 	g.nodes[y][x] = &BasicEmitter{
 		direction: direction,
 		activated: emitOnPlay,
 	}
 }
 
-func (g *Grid) AddSignal(x, y int, direction uint8) {
+func (g *Grid) AddSignal(x, y int, direction Direction) {
 	if g.nodes[y][x] != nil {
 		if t, ok := g.nodes[y][x].(Emitter); ok {
 			t.Emit()
@@ -139,7 +139,7 @@ func (g *Grid) RunResets() {
 	}
 }
 
-func (g *Grid) Emit(x, y int, direction uint8) {
+func (g *Grid) Emit(x, y int, direction Direction) {
 	switch direction {
 	case 0:
 		g.AddSignal(x, y-1, direction)
@@ -152,16 +152,16 @@ func (g *Grid) Emit(x, y int, direction uint8) {
 	}
 }
 
-func (g *Grid) Move(x, y int, direction uint8) {
+func (g *Grid) Move(x, y int, direction Direction) {
 	newX, newY := x, y
 	switch direction {
-	case 0:
+	case UP:
 		newY -= 1
-	case 1:
+	case RIGHT:
 		newX += 1
-	case 2:
+	case DOWN:
 		newY += 1
-	case 3:
+	case LEFT:
 		newX -= 1
 	}
 
