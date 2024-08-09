@@ -30,7 +30,7 @@ func (m mainModel) renderNode(node core.Node, i, j int) string {
 		case 3:
 			emitter = "█ "
 		}
-		if node.(*core.BasicEmitter).Activated {
+		if node.(*core.BasicEmitter).Activated() {
 			return emitterStyle.Background(signalColor).Render(emitter)
 		} else {
 			return emitterStyle.Background(secondaryColor).Render(emitter)

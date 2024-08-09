@@ -14,6 +14,7 @@ package core
 type Node interface {
 	Update(g *Grid, x, y int)
 	Direction() uint8
+	Activated() bool
 	Reset()
 }
 
@@ -43,26 +44,30 @@ func (s *Signal) Direction() uint8 {
 	return s.direction
 }
 
+func (s *Signal) Activated() bool {
+	return true
+}
+
 func (s *Signal) Reset() {
 	s.updated = false
 }
 
 type BasicEmitter struct {
-	Activated bool
 	direction uint8
+	activated bool
 	updated   bool
 }
 
 func (e *BasicEmitter) Emit() {
-	e.Activated = true
+	e.activated = true
 	e.updated = true
 }
 
 func (e *BasicEmitter) Update(g *Grid, x, y int) {
-	if e.Activated && !e.updated {
+	if e.activated && !e.updated {
 		g.Emit(x, y, e.direction)
 		e.updated = true
-		e.Activated = false
+		e.activated = false
 	} else if e.updated {
 		e.updated = false
 	}
@@ -70,6 +75,10 @@ func (e *BasicEmitter) Update(g *Grid, x, y int) {
 
 func (e *BasicEmitter) Direction() uint8 {
 	return e.direction
+}
+
+func (e *BasicEmitter) Activated() bool {
+	return e.activated
 }
 
 func (e *BasicEmitter) Reset() {

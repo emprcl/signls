@@ -75,7 +75,7 @@ func (g *Grid) Nodes() [][]Node {
 func (g *Grid) AddBasicEmitter(x, y int, direction uint8, emitOnPlay bool) {
 	g.nodes[y][x] = &BasicEmitter{
 		direction: direction,
-		Activated: emitOnPlay,
+		activated: emitOnPlay,
 	}
 }
 
