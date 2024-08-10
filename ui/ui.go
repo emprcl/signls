@@ -72,13 +72,13 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.cursorY = max(m.cursorY-1, 0)
 			return m, nil
 		case "down":
-			m.cursorY = min(m.cursorY+1, m.grid.Height)
+			m.cursorY = min(m.cursorY+1, m.grid.Height-1)
 			return m, nil
 		case "left":
 			m.cursorX = max(m.cursorX-1, 0)
 			return m, nil
 		case "right":
-			m.cursorX = min(m.cursorX+1, m.grid.Width)
+			m.cursorX = min(m.cursorX+1, m.grid.Width-1)
 			return m, nil
 		case "q":
 			return m, tea.Quit
