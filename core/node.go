@@ -10,10 +10,13 @@ const (
 )
 
 // Emitters
-// - Never
-// - Once on start
-// - Every x pulses
-// - Euclidean
+//   - Emit on startup
+//   - Emit every x
+//   - Emit after x activation
+//   - Random emit all port
+//   - Emit on all port
+//   - Emit on a random port
+//   - Emit on one of the port round robin
 //
 // Triggers
 // - Never (blocks signals)
