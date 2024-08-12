@@ -89,18 +89,18 @@ func (s *Signal) Color() string {
 	return "15"
 }
 
-type BasicEmitter struct {
+type SimultaneousEmitter struct {
 	direction Direction
 	activated bool
 	updated   bool
 }
 
-func (e *BasicEmitter) Emit() {
+func (e *SimultaneousEmitter) Emit() {
 	e.activated = true
 	e.updated = true
 }
 
-func (e *BasicEmitter) Update(g *Grid, x, y int) {
+func (e *SimultaneousEmitter) Update(g *Grid, x, y int) {
 	if e.activated && !e.updated {
 		g.Emit(x, y, e.direction)
 		e.updated = true
@@ -110,22 +110,22 @@ func (e *BasicEmitter) Update(g *Grid, x, y int) {
 	}
 }
 
-func (e *BasicEmitter) Direction() Direction {
+func (e *SimultaneousEmitter) Direction() Direction {
 	return e.direction
 }
 
-func (e *BasicEmitter) Activated() bool {
+func (e *SimultaneousEmitter) Activated() bool {
 	return e.activated
 }
 
-func (e *BasicEmitter) Symbol() string {
+func (e *SimultaneousEmitter) Symbol() string {
 	return "S"
 }
 
-func (e *BasicEmitter) Color() string {
-	return "93"
+func (e *SimultaneousEmitter) Color() string {
+	return "165"
 }
 
-func (e *BasicEmitter) Reset() {
+func (e *SimultaneousEmitter) Reset() {
 	e.updated = false
 }
