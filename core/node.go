@@ -9,6 +9,21 @@ const (
 	LEFT
 )
 
+func (d Direction) Symbol() string {
+	switch d {
+	case 0:
+		return "↑"
+	case 1:
+		return "→"
+	case 2:
+		return "↓"
+	case 3:
+		return "←"
+	default:
+		return "↑"
+	}
+}
+
 // Emitters
 //   - Emit on startup
 //   - Emit every x
@@ -25,8 +40,10 @@ const (
 // - Random notes arpegiated (param range, algo)
 type Node interface {
 	Update(g *Grid, x, y int)
-	Direction() Direction
 	Activated() bool
+	Direction() Direction
+	Symbol() string
+	Color() string
 	Reset()
 }
 
@@ -64,6 +81,14 @@ func (s *Signal) Reset() {
 	s.updated = false
 }
 
+func (s *Signal) Symbol() string {
+	return " "
+}
+
+func (s *Signal) Color() string {
+	return "15"
+}
+
 type BasicEmitter struct {
 	direction Direction
 	activated bool
@@ -91,6 +116,14 @@ func (e *BasicEmitter) Direction() Direction {
 
 func (e *BasicEmitter) Activated() bool {
 	return e.activated
+}
+
+func (e *BasicEmitter) Symbol() string {
+	return "S"
+}
+
+func (e *BasicEmitter) Color() string {
+	return "93"
 }
 
 func (e *BasicEmitter) Reset() {

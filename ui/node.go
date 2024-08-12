@@ -2,52 +2,54 @@ package ui
 
 import (
 	"cykl/core"
+	"fmt"
 
 	"github.com/charmbracelet/lipgloss"
 )
 
 var (
-	gridStyle    = lipgloss.NewStyle().Foreground(gridColor)
-	cursorStyle  = lipgloss.NewStyle().Foreground(signalColor)
-	signalStyle  = lipgloss.NewStyle().Foreground(signalColor)
-	emitterStyle = lipgloss.NewStyle().Foreground(primaryColor)
+	gridStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("234"))
+	cursorStyle = lipgloss.NewStyle().
+			Background(lipgloss.Color("15"))
+	signalStyle = lipgloss.NewStyle().
+			Background(lipgloss.Color("15"))
+	emitterStyle = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color("15"))
+	activeEmitterStyle = lipgloss.NewStyle().
+				Bold(true).
+				Background(lipgloss.Color("15")).
+				Foreground(lipgloss.Color("0"))
 )
 
 func (m mainModel) renderNode(node core.Node, i, j int) string {
+	// render cursor
 	if j == m.cursorX && i == m.cursorY {
-		return signalStyle.Render("██")
+		return cursorStyle.Render("  ")
 	}
+
+	// render grid
+	if node == nil {
+		if (i+j)%2 == 0 {
+			return "  "
+		}
+		return gridStyle.Render("░░")
+	}
+
+	// render node
 	switch node.(type) {
-	case *core.BasicEmitter:
-		var emitter string
-		switch node.(*core.BasicEmitter).Direction() {
-		case 0:
-			emitter = "▀▀"
-		case 1:
-			emitter = " █"
-		case 2:
-			emitter = "▄▄"
-		case 3:
-			emitter = "█ "
-		}
-		if node.(*core.BasicEmitter).Activated() {
-			return emitterStyle.Background(signalColor).Render(emitter)
-		} else {
-			return emitterStyle.Background(secondaryColor).Render(emitter)
-		}
 	case *core.Signal:
-		switch node.(*core.Signal).Direction() {
-		case 0, 2:
-			return signalStyle.Render("██")
-		case 1, 3:
-			return signalStyle.Render("██")
+		return activeEmitterStyle.Render("  ")
+	default:
+		symbol := fmt.Sprintf("%s%s", node.Symbol(), node.Direction().Symbol())
+
+		if node.Activated() {
+			return activeEmitterStyle.Render(symbol)
+		} else {
+			return emitterStyle.
+				Background(lipgloss.Color(node.Color())).
+				Render(symbol)
 		}
-
 	}
-
-	// grid display
-	if (i+j)%2 == 0 {
-		return "  "
-	}
-	return gridStyle.Render("░░")
 }
