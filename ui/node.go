@@ -11,9 +11,7 @@ var (
 	gridStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("234"))
 	cursorStyle = lipgloss.NewStyle().
-			Background(lipgloss.Color("15"))
-	signalStyle = lipgloss.NewStyle().
-			Background(lipgloss.Color("15"))
+			Background(lipgloss.Color("34"))
 	emitterStyle = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color("15"))
@@ -26,7 +24,11 @@ var (
 func (m mainModel) renderNode(node core.Node, i, j int) string {
 	// render cursor
 	if j == m.cursorX && i == m.cursorY {
-		return cursorStyle.Render("  ")
+		if m.pulse/20%2 == 0 {
+			return cursorStyle.Render("  ")
+		} else {
+			return cursorStyle.Render("..")
+		}
 	}
 
 	// render grid
