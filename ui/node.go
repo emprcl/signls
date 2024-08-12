@@ -47,7 +47,9 @@ func (m mainModel) renderNode(node core.Node, i, j int) string {
 		symbol := fmt.Sprintf("%s%s", node.Symbol(), node.Direction().Symbol())
 
 		if node.Activated() {
-			return activeEmitterStyle.Render(symbol)
+			return activeEmitterStyle.
+				Foreground(lipgloss.Color(node.Color())).
+				Render(symbol)
 		} else {
 			return emitterStyle.
 				Background(lipgloss.Color(node.Color())).
