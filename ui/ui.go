@@ -130,6 +130,12 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter":
 			m.insert = !m.insert
 			return m, nil
+		case "ctrl+up":
+			m.grid.SetTempo(m.grid.Tempo() + 1)
+			return m, nil
+		case "ctrl+down":
+			m.grid.SetTempo(m.grid.Tempo() - 1)
+			return m, nil
 		case "n":
 			m.grid.Update()
 			return m, nil

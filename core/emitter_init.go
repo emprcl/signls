@@ -75,6 +75,10 @@ func (e *InitEmitter) Symbol() string {
 	return "I"
 }
 
+func (e *InitEmitter) Name() string {
+	return "E Initial"
+}
+
 func (e *InitEmitter) Color() string {
 	return "165"
 }

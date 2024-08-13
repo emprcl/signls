@@ -19,6 +19,7 @@ type Node interface {
 	Direction() Direction
 	SetDirection(dir Direction)
 	Symbol() string
+	Name() string
 	Color() string
 }
 

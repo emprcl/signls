@@ -4,6 +4,10 @@ import (
 	"cykl/midi"
 )
 
+const (
+	defaultTempo = 120.
+)
+
 type Grid struct {
 	midi   midi.Midi
 	clock  *clock
@@ -37,7 +41,7 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 	grid.AddNode(NewInitEmitter(RIGHT), 7, 3)
 	grid.AddNode(NewSimpleEmitter(LEFT), 9, 3)
 
-	grid.clock = newClock(60., func() {
+	grid.clock = newClock(defaultTempo, func() {
 		if !grid.Playing {
 			return
 		}
@@ -52,6 +56,21 @@ func (g *Grid) TogglePlay() {
 		g.Pulse = 0
 	}
 	g.Playing = !g.Playing
+}
+
+func (g *Grid) SetTempo(tempo float64) {
+	g.clock.setTempo(tempo)
+}
+
+func (g *Grid) Tempo() float64 {
+	return g.clock.tempo
+}
+
+func (g *Grid) QuarterNote() bool {
+	if !g.Playing {
+		return false
+	}
+	return g.Pulse/uint64(pulsesPerStep)%uint64(stepsPerQuarterNote) == 0
 }
 
 func (g *Grid) Nodes() [][]Node {

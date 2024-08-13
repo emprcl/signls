@@ -74,6 +74,10 @@ func (e *SimpleEmitter) Symbol() string {
 	return "S"
 }
 
+func (e *SimpleEmitter) Name() string {
+	return "E Simple"
+}
+
 func (e *SimpleEmitter) Color() string {
 	return "177"
 }

@@ -28,6 +28,10 @@ func (s *Signal) Symbol() string {
 	return " "
 }
 
+func (s *Signal) Name() string {
+	return "Signal"
+}
+
 func (s *Signal) Color() string {
 	return "15"
 }
