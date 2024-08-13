@@ -3,7 +3,8 @@ package core
 type Direction uint8
 
 const (
-	UP Direction = iota
+	NONE Direction = iota
+	UP
 	RIGHT
 	DOWN
 	LEFT
@@ -26,13 +27,15 @@ func DirectionFromString(dir string) Direction {
 
 func (d Direction) Symbol() string {
 	switch d {
-	case 0:
+	case NONE:
+		return "•"
+	case UP:
 		return "↑"
-	case 1:
+	case RIGHT:
 		return "→"
-	case 2:
+	case DOWN:
 		return "↓"
-	case 3:
+	case LEFT:
 		return "←"
 	default:
 		return "↑"
@@ -41,13 +44,15 @@ func (d Direction) Symbol() string {
 
 func (d Direction) NextPosition(x, y int) (int, int) {
 	switch d {
-	case 0:
+	case NONE:
+		return x, y
+	case UP:
 		return x, y - 1
-	case 1:
+	case RIGHT:
 		return x + 1, y
-	case 2:
+	case DOWN:
 		return x, y + 1
-	case 3:
+	case LEFT:
 		return x - 1, y
 	default:
 		return 0, 0

@@ -65,9 +65,9 @@ func (g *Grid) Node(x, y int) Node {
 func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	switch symbol {
 	case "i":
-		g.AddNode(NewInitEmitter(UP), x, y)
+		g.AddNode(NewInitEmitter(NONE), x, y)
 	case "s":
-		g.AddNode(NewSimpleEmitter(UP), x, y)
+		g.AddNode(NewSimpleEmitter(NONE), x, y)
 	}
 }
 
@@ -129,6 +129,9 @@ func (g *Grid) Reset() {
 
 func (g *Grid) Emit(x, y int, direction Direction) {
 	newX, newY := direction.NextPosition(x, y)
+	if newX == x && newY == y {
+		return
+	}
 	g.AddSignal(direction, newX, newY)
 }
 
