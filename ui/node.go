@@ -24,7 +24,7 @@ var (
 func (m mainModel) renderNode(node core.Node, i, j int) string {
 	// render cursor
 	if j == m.cursorX && i == m.cursorY {
-		if m.pulse/20%2 == 0 {
+		if m.grid.Pulse/20%2 == 0 {
 			return cursorStyle.Render("  ")
 		} else {
 			return cursorStyle.Render("..")

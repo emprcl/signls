@@ -26,7 +26,6 @@ type mainModel struct {
 	cursorY int
 	width   int
 	height  int
-	pulse   uint64
 }
 
 // New creates a new mainModel that hols the ui state. It takes a new grid.
@@ -58,15 +57,12 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case tickMsg:
-		if m.grid.Playing {
-			m.pulse++
-		}
 		return m, tick()
 
 	case tea.KeyMsg:
 		switch msg.String() {
 		case " ":
-			m.grid.Playing = !m.grid.Playing
+			m.grid.TogglePlay()
 			return m, nil
 		case "up":
 			m.cursorY = max(m.cursorY-1, 0)
@@ -80,7 +76,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "right":
 			m.cursorX = min(m.cursorX+1, m.grid.Width-1)
 			return m, nil
-		case "enter":
+		case "n":
 			m.grid.Update()
 			return m, nil
 		case "q":

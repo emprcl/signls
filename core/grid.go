@@ -77,6 +77,13 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 	return grid
 }
 
+func (g *Grid) TogglePlay() {
+	if !g.Playing {
+		g.Pulse = 0
+	}
+	g.Playing = !g.Playing
+}
+
 func (g *Grid) Nodes() [][]Node {
 	return g.nodes
 }

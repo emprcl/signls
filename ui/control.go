@@ -2,7 +2,6 @@ package ui
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/charmbracelet/lipgloss"
 )
@@ -22,7 +21,7 @@ func (m mainModel) renderControl() string {
 			lipgloss.JoinHorizontal(
 				lipgloss.Left,
 				cellStyle.Render("emit."),
-				cellStyle.Render(strconv.FormatUint(m.pulse, 10)),
+				"",
 			),
 			lipgloss.JoinHorizontal(
 				lipgloss.Left,
