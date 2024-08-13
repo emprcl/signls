@@ -27,45 +27,15 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 	}
 
 	// Basic test case
-	/*grid.AddSimultaneousEmitter(3, 3, RIGHT, true)
-	grid.AddSimultaneousEmitter(15, 3, DOWN, false)
-	grid.AddSimultaneousEmitter(15, 15, LEFT, false)
-	grid.AddSimultaneousEmitter(3, 15, UP, false)
+	grid.AddNode(7, 7, NewInitEmitter(RIGHT))
+	grid.AddNode(11, 7, NewSimpleEmitter(DOWN))
+	grid.AddNode(11, 11, NewSimpleEmitter(LEFT))
+	grid.AddNode(7, 11, NewSimpleEmitter(UP))
 
-	grid.AddSimultaneousEmitter(4, 4, RIGHT, true)
-	grid.AddSimultaneousEmitter(14, 4, DOWN, false)
-	grid.AddSimultaneousEmitter(14, 14, LEFT, false)
-	grid.AddSimultaneousEmitter(4, 14, UP, false)
-
-	grid.AddSimultaneousEmitter(5, 5, RIGHT, true)
-	grid.AddSimultaneousEmitter(13, 5, DOWN, false)
-	grid.AddSimultaneousEmitter(13, 13, LEFT, false)
-	grid.AddSimultaneousEmitter(5, 13, UP, false)
-
-	grid.AddSimultaneousEmitter(6, 6, RIGHT, true)
-	grid.AddSimultaneousEmitter(12, 6, DOWN, false)
-	grid.AddSimultaneousEmitter(12, 12, LEFT, false)
-	grid.AddSimultaneousEmitter(6, 12, UP, false)*/
-
-	grid.AddSimultaneousEmitter(7, 7, RIGHT, true)
-	grid.AddSimultaneousEmitter(11, 7, DOWN, false)
-	grid.AddSimultaneousEmitter(11, 11, LEFT, false)
-	grid.AddSimultaneousEmitter(7, 11, UP, false)
-
-	grid.AddSimultaneousEmitter(7, 2, RIGHT, true)
-	grid.AddSimultaneousEmitter(12, 2, LEFT, false)
-	grid.AddSimultaneousEmitter(7, 3, RIGHT, true)
-	grid.AddSimultaneousEmitter(9, 3, LEFT, false)
-
-	/*grid.AddSimultaneousEmitter(8, 8, RIGHT, true)
-	grid.AddSimultaneousEmitter(10, 8, DOWN, false)
-	grid.AddSimultaneousEmitter(10, 10, LEFT, false)
-	grid.AddSimultaneousEmitter(8, 10, UP, false)
-
-	grid.AddSimultaneousEmitter(3, 0, RIGHT, true)
-	grid.AddSimultaneousEmitter(4, 0, DOWN, false)
-	grid.AddSimultaneousEmitter(4, 1, LEFT, false)
-	grid.AddSimultaneousEmitter(3, 1, UP, false)*/
+	grid.AddNode(7, 2, NewInitEmitter(RIGHT))
+	grid.AddNode(12, 2, NewSimpleEmitter(LEFT))
+	grid.AddNode(7, 3, NewInitEmitter(RIGHT))
+	grid.AddNode(9, 3, NewSimpleEmitter(LEFT))
 
 	grid.clock = newClock(60., func() {
 		if !grid.Playing {
@@ -88,16 +58,8 @@ func (g *Grid) Nodes() [][]Node {
 	return g.nodes
 }
 
-func (g *Grid) AddSimultaneousEmitter(x, y int, direction Direction, emitOnPlay bool) {
-	g.nodes[y][x] = &SimultaneousEmitter{
-		direction: direction,
-		armed:     emitOnPlay,
-		note: Note{
-			Channel:  uint8(y),
-			Key:      30 + 7*uint8(x),
-			Velocity: 100,
-		},
-	}
+func (g *Grid) AddNode(x, y int, node Node) {
+	g.nodes[y][x] = node
 }
 
 func (g *Grid) AddSignal(x, y int, direction Direction) {
