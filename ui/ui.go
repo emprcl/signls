@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"strings"
 	"time"
 
 	"cykl/core"
@@ -26,13 +27,15 @@ type tickMsg time.Time
 type blinkMsg time.Time
 
 type mainModel struct {
-	grid    *core.Grid
-	cursorX int
-	cursorY int
-	width   int
-	height  int
-	insert  bool
-	blink   bool
+	grid       *core.Grid
+	cursorX    int
+	cursorY    int
+	selectionX int
+	selectionY int
+	width      int
+	height     int
+	insert     bool
+	blink      bool
 }
 
 // New creates a new mainModel that hols the ui state. It takes a new grid.
@@ -96,11 +99,22 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					SetDirection(core.DirectionFromString(msg.String()))
 			} else {
 				m.blink = true
-				newX, newY := core.DirectionFromString(msg.String()).
-					NextPosition(m.cursorX, m.cursorY)
-				m.cursorX = clamp(newX, 0, m.grid.Width-1)
-				m.cursorY = clamp(newY, 0, m.grid.Height-1)
+				m.cursorX, m.cursorY = moveCursor(
+					msg.String(), m.cursorX, m.cursorY,
+					0, m.grid.Width-1, 0, m.grid.Height-1,
+				)
+				m.selectionX, m.selectionY = moveCursor(
+					msg.String(), m.selectionX, m.selectionY,
+					m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
+				)
 			}
+			return m, nil
+		case "shift+up", "shift+right", "shift+down", "shift+left":
+			dir := strings.Replace(msg.String(), "shift+", "", 1)
+			m.selectionX, m.selectionY = moveCursor(
+				dir, m.selectionX, m.selectionY,
+				m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
+			)
 			return m, nil
 		case "i", "s":
 			m.grid.AddNodeFromSymbol(msg.String(), m.cursorX, m.cursorY)
@@ -108,7 +122,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case "backspace":
 			m.insert = false
-			m.grid.RemoveNode(m.cursorX, m.cursorY)
+			m.grid.RemoveNodes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			return m, nil
 		case "enter":
 			m.insert = !m.insert
@@ -145,13 +159,19 @@ func (m mainModel) View() string {
 
 func (m mainModel) renderGrid() string {
 	var lines []string
-	for i, line := range m.grid.Nodes() {
+	for y, line := range m.grid.Nodes() {
 		var nodes []string
-		for j, node := range line {
-			nodes = append(nodes, m.renderNode(node, i, j))
+		for x, node := range line {
+			nodes = append(nodes, m.renderNode(node, x, y))
 		}
 		lines = append(lines, lipgloss.JoinHorizontal(lipgloss.Left, nodes...))
 	}
 	lines = append(lines, m.renderControl())
 	return lipgloss.JoinVertical(lipgloss.Left, lines...)
+}
+
+func moveCursor(dir string, x, y, minX, maxX, minY, maxY int) (int, int) {
+	newX, newY := core.DirectionFromString(dir).
+		NextPosition(x, y)
+	return clamp(newX, minX, maxX), clamp(newY, minY, maxY)
 }

@@ -13,6 +13,9 @@ var (
 	cursorStyle = lipgloss.NewStyle().
 			Background(lipgloss.Color("190")).
 			Foreground(lipgloss.Color("0"))
+	selectionStyle = lipgloss.NewStyle().
+			Background(lipgloss.Color("238")).
+			Foreground(lipgloss.Color("244"))
 	emitterStyle = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color("15"))
@@ -22,18 +25,27 @@ var (
 				Foreground(lipgloss.Color("0"))
 )
 
-func (m mainModel) renderNode(node core.Node, i, j int) string {
+func (m mainModel) inSelectionRange(x, y int) bool {
+	return x >= m.cursorX &&
+		x <= m.selectionX &&
+		y >= m.cursorY &&
+		y <= m.selectionY
+}
+
+func (m mainModel) renderNode(node core.Node, x, y int) string {
 	// render cursor
 	isCursor := false
-	if j == m.cursorX && i == m.cursorY {
+	if x == m.cursorX && y == m.cursorY {
 		isCursor = true
 	}
 
 	// render grid
 	if node == nil && isCursor {
 		return cursorStyle.Render("  ")
+	} else if node == nil && m.inSelectionRange(x, y) {
+		return selectionStyle.Render("..")
 	} else if node == nil {
-		if (i+j)%2 == 0 {
+		if (x+y)%2 == 0 {
 			return "  "
 		}
 		return gridStyle.Render("░░")

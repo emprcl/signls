@@ -75,8 +75,12 @@ func (g *Grid) AddNode(node Node, x, y int) {
 	g.nodes[y][x] = node
 }
 
-func (g *Grid) RemoveNode(x, y int) {
-	g.nodes[y][x] = nil
+func (g *Grid) RemoveNodes(startX, startY, endX, endY int) {
+	for y := startY; y <= endY; y++ {
+		for x := startX; x <= endX; x++ {
+			g.nodes[y][x] = nil
+		}
+	}
 }
 
 func (g *Grid) AddSignal(direction Direction, x, y int) {
