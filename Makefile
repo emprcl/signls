@@ -24,6 +24,9 @@ build: $(BIN)
 checks: $(GOLANG_LINT)
 	$(GOLANG_LINT) run ./...
 
+bench:
+	$(GOLANG_BIN) test -bench=. -benchmem ./...
+
 monitor-midi:
 	$(ASEQDUMP_BIN) $(ASEQDUMP_NO_CLOCK_OPTS)
 
