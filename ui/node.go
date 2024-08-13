@@ -11,7 +11,7 @@ var (
 	gridStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("234"))
 	cursorStyle = lipgloss.NewStyle().
-			Background(lipgloss.Color("34"))
+			Background(lipgloss.Color("190"))
 	emitterStyle = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color("15"))
