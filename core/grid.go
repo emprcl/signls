@@ -12,7 +12,7 @@ type Grid struct {
 	Width  int
 
 	Playing bool
-	Pulses  uint64
+	Pulse   uint64
 }
 
 func NewGrid(width, height int, midi midi.Midi) *Grid {
@@ -89,70 +89,37 @@ func (g *Grid) AddSimultaneousEmitter(x, y int, direction Direction, emitOnPlay 
 }
 
 func (g *Grid) AddSignal(x, y int, direction Direction) {
-	if g.nodes[y][x] != nil {
-		g.Arm(x, y)
+	if t, ok := g.nodes[y][x].(Emitter); ok {
+		t.Arm()
+		t.Trig(g, x, y)
 		return
 	}
 	g.nodes[y][x] = &Signal{
 		direction: direction,
-		updated:   true,
+		pulse:     g.Pulse,
 	}
 }
 
 func (g *Grid) Update() {
-	g.Pulses++
-	g.RunSignals()
-	g.RunEmitters()
-	g.RunTriggers()
-	g.RunResets()
+	g.Pulse++
+	g.RunNodes()
 }
 
-func (g *Grid) RunSignals() {
-	for y := 0; y < g.Height; y++ {
-		for x := 0; x < g.Width; x++ {
-			if g.nodes[y][x] == nil {
-				continue
-			} else if _, ok := g.nodes[y][x].(Movable); !ok {
-				continue
-			}
-			g.nodes[y][x].(Movable).Move(g, x, y)
-		}
-	}
-}
-
-func (g *Grid) RunEmitters() {
-	for y := 0; y < g.Height; y++ {
-		for x := 0; x < g.Width; x++ {
-			if g.nodes[y][x] == nil {
-				continue
-			} else if _, ok := g.nodes[y][x].(Emitter); !ok {
-				continue
-			}
-			g.nodes[y][x].(Emitter).Emit(g, x, y)
-		}
-	}
-}
-
-func (g *Grid) RunTriggers() {
-	for y := 0; y < g.Height; y++ {
-		for x := 0; x < g.Width; x++ {
-			if g.nodes[y][x] == nil {
-				continue
-			} else if _, ok := g.nodes[y][x].(Emitter); !ok {
-				continue
-			}
-			g.nodes[y][x].(Emitter).Trig(g, x, y)
-		}
-	}
-}
-
-func (g *Grid) RunResets() {
+func (g *Grid) RunNodes() {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
 			if g.nodes[y][x] == nil {
 				continue
 			}
-			g.nodes[y][x].Reset()
+
+			if t, ok := g.nodes[y][x].(Movable); ok {
+				t.Move(g, x, y)
+			}
+
+			if t, ok := g.nodes[y][x].(Emitter); ok {
+				t.Trig(g, x, y)
+				t.Emit(g, x, y)
+			}
 		}
 	}
 }
@@ -167,12 +134,6 @@ func (g *Grid) Emit(x, y int, direction Direction) {
 		g.AddSignal(x, y+1, direction)
 	case 3:
 		g.AddSignal(x-1, y, direction)
-	}
-}
-
-func (g *Grid) Arm(x, y int) {
-	if t, ok := g.nodes[y][x].(Emitter); ok {
-		t.Arm()
 	}
 }
 
@@ -202,8 +163,9 @@ func (g *Grid) Move(x, y int, direction Direction) {
 
 	if g.nodes[newY][newX] == nil {
 		g.nodes[newY][newX] = g.nodes[y][x]
-	} else {
-		g.Arm(newX, newY)
+	} else if t, ok := g.nodes[newY][newX].(Emitter); ok {
+		t.Arm()
+		t.Trig(g, newY, newX)
 	}
 
 	g.nodes[y][x] = nil

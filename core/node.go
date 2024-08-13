@@ -15,11 +15,10 @@ package core
 // - Fixed note
 // - Random notes arpegiated (param range, algo)
 type Node interface {
-	Armed() bool
+	Activated() bool
 	Direction() Direction
 	Symbol() string
 	Color() string
-	Reset()
 }
 
 type Movable interface {
@@ -29,6 +28,6 @@ type Movable interface {
 type Emitter interface {
 	Arm()
 	Note() Note
-	Emit(g *Grid, x, y int)
 	Trig(g *Grid, x, y int)
+	Emit(g *Grid, x, y int)
 }

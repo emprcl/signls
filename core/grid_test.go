@@ -12,6 +12,8 @@ var benchmarks = []struct {
 	{size: 20},
 	{size: 100},
 	{size: 200},
+	{size: 300},
+	{size: 400},
 	{size: 500},
 }
 
