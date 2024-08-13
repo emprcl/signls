@@ -3,6 +3,7 @@ package ui
 import (
 	"cykl/core"
 	"fmt"
+	"log"
 
 	"github.com/charmbracelet/lipgloss"
 )
@@ -55,7 +56,7 @@ func (m mainModel) renderNode(node core.Node, x, y int) string {
 	}
 
 	// render node
-	switch node.(type) {
+	switch t := node.(type) {
 	case core.Movable:
 		if isCursor {
 			return cursorStyle.Render("  ")
@@ -70,7 +71,7 @@ func (m mainModel) renderNode(node core.Node, x, y int) string {
 			return cursorStyle.Render(symbol)
 		} else if node.Activated() && node.(core.Emitter).Muted() {
 			return activeEmitterStyle.Render(symbol)
-		} else if node.(core.Emitter).Muted() {
+		} else if t.Muted() {
 			return mutedEmitterStyle.Render(symbol)
 		} else if node.Activated() {
 			return activeEmitterStyle.
@@ -82,6 +83,7 @@ func (m mainModel) renderNode(node core.Node, x, y int) string {
 				Render(symbol)
 		}
 	default:
-		return "  "
+		log.Fatalf("cannot render node: %+v", t)
+		return ""
 	}
 }
