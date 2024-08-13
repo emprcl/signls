@@ -50,6 +50,12 @@ func (e *SimultaneousEmitter) Color() string {
 	return "165"
 }
 
+func (e *SimultaneousEmitter) Reset() {
+	e.pulse = 0
+	e.armed = false
+	e.triggered = false
+}
+
 func (e *SimultaneousEmitter) updated(pulse uint64) bool {
 	return e.pulse == pulse
 }

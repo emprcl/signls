@@ -114,10 +114,6 @@ func (g *Grid) AddSignal(x, y int, direction Direction) {
 
 func (g *Grid) Update() {
 	g.Pulse++
-	g.RunNodes()
-}
-
-func (g *Grid) RunNodes() {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
 			if g.nodes[y][x] == nil {
@@ -131,6 +127,22 @@ func (g *Grid) RunNodes() {
 			if n, ok := g.nodes[y][x].(Emitter); ok {
 				n.Trig(g, x, y)
 				n.Emit(g, x, y)
+			}
+		}
+	}
+}
+
+func (g *Grid) Reset() {
+	g.Playing = false
+	g.Pulse = 0
+	for y := 0; y < g.Height; y++ {
+		for x := 0; x < g.Width; x++ {
+			if _, ok := g.nodes[y][x].(Movable); ok {
+				g.nodes[y][x] = nil
+			}
+
+			if n, ok := g.nodes[y][x].(Emitter); ok {
+				n.Reset()
 			}
 		}
 	}

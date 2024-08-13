@@ -64,6 +64,9 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case " ":
 			m.grid.TogglePlay()
 			return m, nil
+		case "backspace":
+			m.grid.Reset()
+			return m, nil
 		case "up":
 			m.cursorY = max(m.cursorY-1, 0)
 			return m, nil

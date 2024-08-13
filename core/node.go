@@ -30,4 +30,5 @@ type Emitter interface {
 	Note() Note
 	Trig(g *Grid, x, y int)
 	Emit(g *Grid, x, y int)
+	Reset()
 }
