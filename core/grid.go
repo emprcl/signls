@@ -27,7 +27,7 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 	}
 
 	// Basic test case
-	grid.AddSimultaneousEmitter(3, 3, RIGHT, true)
+	/*grid.AddSimultaneousEmitter(3, 3, RIGHT, true)
 	grid.AddSimultaneousEmitter(15, 3, DOWN, false)
 	grid.AddSimultaneousEmitter(15, 15, LEFT, false)
 	grid.AddSimultaneousEmitter(3, 15, UP, false)
@@ -45,14 +45,14 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 	grid.AddSimultaneousEmitter(6, 6, RIGHT, true)
 	grid.AddSimultaneousEmitter(12, 6, DOWN, false)
 	grid.AddSimultaneousEmitter(12, 12, LEFT, false)
-	grid.AddSimultaneousEmitter(6, 12, UP, false)
+	grid.AddSimultaneousEmitter(6, 12, UP, false)*/
 
 	grid.AddSimultaneousEmitter(7, 7, RIGHT, true)
 	grid.AddSimultaneousEmitter(11, 7, DOWN, false)
 	grid.AddSimultaneousEmitter(11, 11, LEFT, false)
 	grid.AddSimultaneousEmitter(7, 11, UP, false)
 
-	grid.AddSimultaneousEmitter(8, 8, RIGHT, true)
+	/*grid.AddSimultaneousEmitter(8, 8, RIGHT, true)
 	grid.AddSimultaneousEmitter(10, 8, DOWN, false)
 	grid.AddSimultaneousEmitter(10, 10, LEFT, false)
 	grid.AddSimultaneousEmitter(8, 10, UP, false)
@@ -60,7 +60,7 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 	grid.AddSimultaneousEmitter(3, 0, RIGHT, true)
 	grid.AddSimultaneousEmitter(4, 0, DOWN, false)
 	grid.AddSimultaneousEmitter(4, 1, LEFT, false)
-	grid.AddSimultaneousEmitter(3, 1, UP, false)
+	grid.AddSimultaneousEmitter(3, 1, UP, false)*/
 
 	grid.clock = newClock(60., func() {
 		if !grid.Playing {
