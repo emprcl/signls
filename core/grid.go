@@ -52,6 +52,9 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 	grid.AddSimultaneousEmitter(11, 11, LEFT, false)
 	grid.AddSimultaneousEmitter(7, 11, UP, false)
 
+	grid.AddSimultaneousEmitter(7, 2, RIGHT, true)
+	grid.AddSimultaneousEmitter(12, 2, LEFT, false)
+
 	/*grid.AddSimultaneousEmitter(8, 8, RIGHT, true)
 	grid.AddSimultaneousEmitter(10, 8, DOWN, false)
 	grid.AddSimultaneousEmitter(10, 10, LEFT, false)
@@ -89,9 +92,9 @@ func (g *Grid) AddSimultaneousEmitter(x, y int, direction Direction, emitOnPlay 
 }
 
 func (g *Grid) AddSignal(x, y int, direction Direction) {
-	if t, ok := g.nodes[y][x].(Emitter); ok {
-		t.Arm()
-		t.Trig(g, x, y)
+	if n, ok := g.nodes[y][x].(Emitter); ok {
+		n.Arm()
+		n.Trig(g, x, y)
 		return
 	}
 	g.nodes[y][x] = &Signal{
@@ -112,13 +115,13 @@ func (g *Grid) RunNodes() {
 				continue
 			}
 
-			if t, ok := g.nodes[y][x].(Movable); ok {
-				t.Move(g, x, y)
+			if n, ok := g.nodes[y][x].(Movable); ok {
+				n.Move(g, x, y)
 			}
 
-			if t, ok := g.nodes[y][x].(Emitter); ok {
-				t.Trig(g, x, y)
-				t.Emit(g, x, y)
+			if n, ok := g.nodes[y][x].(Emitter); ok {
+				n.Trig(g, x, y)
+				n.Emit(g, x, y)
 			}
 		}
 	}
@@ -163,9 +166,9 @@ func (g *Grid) Move(x, y int, direction Direction) {
 
 	if g.nodes[newY][newX] == nil {
 		g.nodes[newY][newX] = g.nodes[y][x]
-	} else if t, ok := g.nodes[newY][newX].(Emitter); ok {
-		t.Arm()
-		t.Trig(g, newY, newX)
+	} else if n, ok := g.nodes[newY][newX].(Emitter); ok {
+		n.Arm()
+		n.Trig(g, newX, newY)
 	}
 
 	g.nodes[y][x] = nil
