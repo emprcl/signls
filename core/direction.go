@@ -23,3 +23,18 @@ func (d Direction) Symbol() string {
 		return "↑"
 	}
 }
+
+func (d Direction) NextPosition(x, y int) (int, int) {
+	switch d {
+	case 0:
+		return x, y - 1
+	case 1:
+		return x + 1, y
+	case 2:
+		return x, y + 1
+	case 3:
+		return x - 1, y
+	default:
+		return 0, 0
+	}
+}

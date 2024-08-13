@@ -64,7 +64,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case " ":
 			m.grid.TogglePlay()
 			return m, nil
-		case "backspace":
+		case "ctrl+d":
 			m.grid.Reset()
 			return m, nil
 		case "up":

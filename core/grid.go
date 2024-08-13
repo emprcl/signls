@@ -111,16 +111,8 @@ func (g *Grid) Reset() {
 }
 
 func (g *Grid) Emit(x, y int, direction Direction) {
-	switch direction {
-	case 0:
-		g.AddSignal(x, y-1, direction)
-	case 1:
-		g.AddSignal(x+1, y, direction)
-	case 2:
-		g.AddSignal(x, y+1, direction)
-	case 3:
-		g.AddSignal(x-1, y, direction)
-	}
+	newX, newY := direction.NextPosition(x, y)
+	g.AddSignal(newX, newY, direction)
 }
 
 func (g *Grid) Trig(x, y int) {
