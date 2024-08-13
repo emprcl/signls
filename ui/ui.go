@@ -128,6 +128,9 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.grid.RemoveNodes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			return m, nil
 		case "enter":
+			if m.grid.Node(m.cursorX, m.cursorY) == nil {
+				return m, nil
+			}
 			m.insert = !m.insert
 			return m, nil
 		case "ctrl+up":
@@ -136,6 +139,10 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+down":
 			m.grid.SetTempo(m.grid.Tempo() - 1)
 			return m, nil
+		case "esc":
+			m.insert = false
+			m.selectionX = m.cursorX
+			m.selectionY = m.cursorY
 		case "n":
 			m.grid.Update()
 			return m, nil

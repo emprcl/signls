@@ -24,7 +24,7 @@ func (m mainModel) renderControl() string {
 			lipgloss.JoinVertical(
 				lipgloss.Left,
 				cellStyle.Width(10).Render(m.selectedNodeName()),
-				".",
+				cellStyle.Render(m.modeName()),
 			),
 			lipgloss.JoinVertical(
 				lipgloss.Left,
@@ -50,6 +50,13 @@ func (m mainModel) transportSymbol() string {
 		return "●"
 	}
 	return " "
+}
+
+func (m mainModel) modeName() string {
+	if m.insert {
+		return "insert"
+	}
+	return "move"
 }
 
 func (m mainModel) selectedNode() core.Node {
