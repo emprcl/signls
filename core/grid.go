@@ -121,17 +121,7 @@ func (g *Grid) Trig(x, y int) {
 }
 
 func (g *Grid) Move(x, y int, direction Direction) {
-	newX, newY := x, y
-	switch direction {
-	case UP:
-		newY -= 1
-	case RIGHT:
-		newX += 1
-	case DOWN:
-		newY += 1
-	case LEFT:
-		newX -= 1
-	}
+	newX, newY := direction.NextPosition(x, y)
 
 	if newX >= g.Width || newY >= g.Height ||
 		newX < 0 || newY < 0 {
