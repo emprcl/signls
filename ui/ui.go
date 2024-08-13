@@ -54,6 +54,12 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width
 		m.height = msg.Height
 		m.grid.Resize(m.width/2, m.height-controlsHeight)
+		if m.cursorX > m.grid.Width-1 {
+			m.cursorX = m.grid.Width - 1
+		}
+		if m.cursorY > m.grid.Height-1 {
+			m.cursorY = m.grid.Height - 1
+		}
 		return m, nil
 
 	case tickMsg:
@@ -78,6 +84,12 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case "right":
 			m.cursorX = min(m.cursorX+1, m.grid.Width-1)
+			return m, nil
+		case "i", "s":
+			m.grid.AddNodeFromSymbol(msg.String(), m.cursorX, m.cursorY)
+			return m, nil
+		case "backspace":
+			m.grid.RemoveNode(m.cursorX, m.cursorY)
 			return m, nil
 		case "n":
 			m.grid.Update()

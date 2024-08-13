@@ -27,15 +27,15 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 	}
 
 	// Basic test case
-	grid.AddNode(7, 7, NewInitEmitter(RIGHT))
-	grid.AddNode(11, 7, NewSimpleEmitter(DOWN))
-	grid.AddNode(11, 11, NewSimpleEmitter(LEFT))
-	grid.AddNode(7, 11, NewSimpleEmitter(UP))
+	grid.AddNode(NewInitEmitter(RIGHT), 7, 7)
+	grid.AddNode(NewSimpleEmitter(DOWN), 11, 7)
+	grid.AddNode(NewSimpleEmitter(LEFT), 11, 11)
+	grid.AddNode(NewSimpleEmitter(UP), 7, 11)
 
-	grid.AddNode(7, 2, NewInitEmitter(RIGHT))
-	grid.AddNode(12, 2, NewSimpleEmitter(LEFT))
-	grid.AddNode(7, 3, NewInitEmitter(RIGHT))
-	grid.AddNode(9, 3, NewSimpleEmitter(LEFT))
+	grid.AddNode(NewInitEmitter(RIGHT), 7, 2)
+	grid.AddNode(NewSimpleEmitter(LEFT), 12, 2)
+	grid.AddNode(NewInitEmitter(RIGHT), 7, 3)
+	grid.AddNode(NewSimpleEmitter(LEFT), 9, 3)
 
 	grid.clock = newClock(60., func() {
 		if !grid.Playing {
@@ -58,11 +58,24 @@ func (g *Grid) Nodes() [][]Node {
 	return g.nodes
 }
 
-func (g *Grid) AddNode(x, y int, node Node) {
+func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
+	switch symbol {
+	case "i":
+		g.AddNode(NewInitEmitter(UP), x, y)
+	case "s":
+		g.AddNode(NewSimpleEmitter(UP), x, y)
+	}
+}
+
+func (g *Grid) AddNode(node Node, x, y int) {
 	g.nodes[y][x] = node
 }
 
-func (g *Grid) AddSignal(x, y int, direction Direction) {
+func (g *Grid) RemoveNode(x, y int) {
+	g.nodes[y][x] = nil
+}
+
+func (g *Grid) AddSignal(direction Direction, x, y int) {
 	if n, ok := g.nodes[y][x].(Emitter); ok {
 		n.Arm()
 		n.Trig(g, x, y)
@@ -112,7 +125,7 @@ func (g *Grid) Reset() {
 
 func (g *Grid) Emit(x, y int, direction Direction) {
 	newX, newY := direction.NextPosition(x, y)
-	g.AddSignal(newX, newY, direction)
+	g.AddSignal(direction, newX, newY)
 }
 
 func (g *Grid) Trig(x, y int) {
