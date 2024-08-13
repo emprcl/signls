@@ -5,7 +5,7 @@ type Signal struct {
 	updated   bool
 }
 
-func (s *Signal) Update(g *Grid, x, y int) {
+func (s *Signal) Move(g *Grid, x, y int) {
 	if s.updated {
 		s.updated = false
 	} else {
@@ -18,7 +18,7 @@ func (s *Signal) Direction() Direction {
 	return s.direction
 }
 
-func (s *Signal) Activated() bool {
+func (s *Signal) Armed() bool {
 	return true
 }
 

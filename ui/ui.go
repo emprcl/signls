@@ -80,6 +80,9 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "right":
 			m.cursorX = min(m.cursorX+1, m.grid.Width-1)
 			return m, nil
+		case "enter":
+			m.grid.Update()
+			return m, nil
 		case "q":
 			return m, tea.Quit
 		}

@@ -12,6 +12,7 @@ type Grid struct {
 	Width  int
 
 	Playing bool
+	Pulses  uint64
 }
 
 func NewGrid(width, height int, midi midi.Midi) *Grid {
@@ -56,12 +57,15 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 	grid.AddSimultaneousEmitter(10, 10, LEFT, false)
 	grid.AddSimultaneousEmitter(8, 10, UP, false)
 
-	grid.AddSimultaneousEmitter(20, 3, RIGHT, true)
-	grid.AddSimultaneousEmitter(21, 3, DOWN, false)
-	grid.AddSimultaneousEmitter(21, 4, LEFT, false)
-	grid.AddSimultaneousEmitter(20, 4, UP, false)
+	grid.AddSimultaneousEmitter(3, 0, RIGHT, true)
+	grid.AddSimultaneousEmitter(4, 0, DOWN, false)
+	grid.AddSimultaneousEmitter(4, 1, LEFT, false)
+	grid.AddSimultaneousEmitter(3, 1, UP, false)
 
 	grid.clock = newClock(60., func() {
+		if !grid.Playing {
+			return
+		}
 		grid.Update()
 	})
 
@@ -75,16 +79,18 @@ func (g *Grid) Nodes() [][]Node {
 func (g *Grid) AddSimultaneousEmitter(x, y int, direction Direction, emitOnPlay bool) {
 	g.nodes[y][x] = &SimultaneousEmitter{
 		direction: direction,
-		activated: emitOnPlay,
+		armed:     emitOnPlay,
+		note: Note{
+			Channel:  uint8(y),
+			Key:      30 + 7*uint8(x),
+			Velocity: 100,
+		},
 	}
 }
 
 func (g *Grid) AddSignal(x, y int, direction Direction) {
 	if g.nodes[y][x] != nil {
-		if t, ok := g.nodes[y][x].(Emitter); ok {
-			t.Emit()
-		}
-		// TODO: mutualise code with move
+		g.Arm(x, y)
 		return
 	}
 	g.nodes[y][x] = &Signal{
@@ -94,23 +100,35 @@ func (g *Grid) AddSignal(x, y int, direction Direction) {
 }
 
 func (g *Grid) Update() {
-	if !g.Playing {
-		return
-	}
-	g.RunSignalsAndEmitters()
+	g.Pulses++
+	g.RunSignals()
+	g.RunEmitters()
 	g.RunTriggers()
 	g.RunResets()
 }
 
-func (g *Grid) RunSignalsAndEmitters() {
+func (g *Grid) RunSignals() {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
 			if g.nodes[y][x] == nil {
 				continue
-			} else if _, ok := g.nodes[y][x].(Trigger); ok {
+			} else if _, ok := g.nodes[y][x].(Movable); !ok {
 				continue
 			}
-			g.nodes[y][x].Update(g, x, y)
+			g.nodes[y][x].(Movable).Move(g, x, y)
+		}
+	}
+}
+
+func (g *Grid) RunEmitters() {
+	for y := 0; y < g.Height; y++ {
+		for x := 0; x < g.Width; x++ {
+			if g.nodes[y][x] == nil {
+				continue
+			} else if _, ok := g.nodes[y][x].(Emitter); !ok {
+				continue
+			}
+			g.nodes[y][x].(Emitter).Emit(g, x, y)
 		}
 	}
 }
@@ -120,10 +138,10 @@ func (g *Grid) RunTriggers() {
 		for x := 0; x < g.Width; x++ {
 			if g.nodes[y][x] == nil {
 				continue
-			} else if _, ok := g.nodes[y][x].(Trigger); !ok {
+			} else if _, ok := g.nodes[y][x].(Emitter); !ok {
 				continue
 			}
-			g.nodes[y][x].Update(g, x, y)
+			g.nodes[y][x].(Emitter).Trig(g, x, y)
 		}
 	}
 }
@@ -152,6 +170,17 @@ func (g *Grid) Emit(x, y int, direction Direction) {
 	}
 }
 
+func (g *Grid) Arm(x, y int) {
+	if t, ok := g.nodes[y][x].(Emitter); ok {
+		t.Arm()
+	}
+}
+
+func (g *Grid) Trig(x, y int) {
+	note := g.nodes[y][x].(Emitter).Note()
+	g.midi.NoteOn(0, note.Channel, note.Key, note.Velocity)
+}
+
 func (g *Grid) Move(x, y int, direction Direction) {
 	newX, newY := x, y
 	switch direction {
@@ -173,10 +202,8 @@ func (g *Grid) Move(x, y int, direction Direction) {
 
 	if g.nodes[newY][newX] == nil {
 		g.nodes[newY][newX] = g.nodes[y][x]
-	} else if t, ok := g.nodes[newY][newX].(Trigger); ok {
-		t.Trig()
-	} else if t, ok := g.nodes[newY][newX].(Emitter); ok {
-		t.Emit()
+	} else {
+		g.Arm(newX, newY)
 	}
 
 	g.nodes[y][x] = nil
