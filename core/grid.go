@@ -54,6 +54,8 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 
 	grid.AddSimultaneousEmitter(7, 2, RIGHT, true)
 	grid.AddSimultaneousEmitter(12, 2, LEFT, false)
+	grid.AddSimultaneousEmitter(7, 3, RIGHT, true)
+	grid.AddSimultaneousEmitter(9, 3, LEFT, false)
 
 	/*grid.AddSimultaneousEmitter(8, 8, RIGHT, true)
 	grid.AddSimultaneousEmitter(10, 8, DOWN, false)
