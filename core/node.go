@@ -17,6 +17,7 @@ package core
 type Node interface {
 	Activated() bool
 	Direction() Direction
+	SetDirection(dir Direction)
 	Symbol() string
 	Color() string
 }

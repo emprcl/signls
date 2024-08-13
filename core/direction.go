@@ -9,6 +9,21 @@ const (
 	LEFT
 )
 
+func DirectionFromString(dir string) Direction {
+	switch dir {
+	case "up":
+		return UP
+	case "right":
+		return RIGHT
+	case "down":
+		return DOWN
+	case "left":
+		return LEFT
+	default:
+		return UP
+	}
+}
+
 func (d Direction) Symbol() string {
 	switch d {
 	case 0:

@@ -14,11 +14,16 @@ const (
 	// It saves some cpu. Right now we run it at 30 fps.
 	refreshFrequency = 33 * time.Millisecond
 
+	blinkFrequency = 500 * time.Millisecond
+
 	controlsHeight = 4
 )
 
 // tickMsg is a message that triggers ui rrefresh
 type tickMsg time.Time
+
+// blinkMsg is a message that triggers blinking ui elements
+type blinkMsg time.Time
 
 type mainModel struct {
 	grid    *core.Grid
@@ -26,6 +31,8 @@ type mainModel struct {
 	cursorY int
 	width   int
 	height  int
+	insert  bool
+	blink   bool
 }
 
 // New creates a new mainModel that hols the ui state. It takes a new grid.
@@ -43,8 +50,14 @@ func tick() tea.Cmd {
 	})
 }
 
+func blink() tea.Cmd {
+	return tea.Tick(blinkFrequency, func(t time.Time) tea.Msg {
+		return blinkMsg(t)
+	})
+}
+
 func (m mainModel) Init() tea.Cmd {
-	return tea.Batch(tea.EnterAltScreen, tick())
+	return tea.Batch(tea.EnterAltScreen, tick(), blink())
 }
 
 func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -65,6 +78,10 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tickMsg:
 		return m, tick()
 
+	case blinkMsg:
+		m.blink = !m.blink
+		return m, blink()
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case " ":
@@ -73,23 +90,28 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+d":
 			m.grid.Reset()
 			return m, nil
-		case "up":
-			m.cursorY = max(m.cursorY-1, 0)
-			return m, nil
-		case "down":
-			m.cursorY = min(m.cursorY+1, m.grid.Height-1)
-			return m, nil
-		case "left":
-			m.cursorX = max(m.cursorX-1, 0)
-			return m, nil
-		case "right":
-			m.cursorX = min(m.cursorX+1, m.grid.Width-1)
+		case "up", "right", "down", "left":
+			if m.insert {
+				m.grid.Node(m.cursorX, m.cursorY).
+					SetDirection(core.DirectionFromString(msg.String()))
+			} else {
+				m.blink = true
+				newX, newY := core.DirectionFromString(msg.String()).
+					NextPosition(m.cursorX, m.cursorY)
+				m.cursorX = clamp(newX, 0, m.grid.Width-1)
+				m.cursorY = clamp(newY, 0, m.grid.Height-1)
+			}
 			return m, nil
 		case "i", "s":
 			m.grid.AddNodeFromSymbol(msg.String(), m.cursorX, m.cursorY)
+			m.insert = true
 			return m, nil
 		case "backspace":
+			m.insert = false
 			m.grid.RemoveNode(m.cursorX, m.cursorY)
+			return m, nil
+		case "enter":
+			m.insert = !m.insert
 			return m, nil
 		case "n":
 			m.grid.Update()

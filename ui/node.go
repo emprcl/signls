@@ -11,7 +11,8 @@ var (
 	gridStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("234"))
 	cursorStyle = lipgloss.NewStyle().
-			Background(lipgloss.Color("190"))
+			Background(lipgloss.Color("190")).
+			Foreground(lipgloss.Color("0"))
 	emitterStyle = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color("15"))
@@ -23,16 +24,15 @@ var (
 
 func (m mainModel) renderNode(node core.Node, i, j int) string {
 	// render cursor
+	isCursor := false
 	if j == m.cursorX && i == m.cursorY {
-		if m.grid.Pulse/20%2 == 0 {
-			return cursorStyle.Render("  ")
-		} else {
-			return cursorStyle.Render("..")
-		}
+		isCursor = true
 	}
 
 	// render grid
-	if node == nil {
+	if node == nil && isCursor {
+		return cursorStyle.Render("  ")
+	} else if node == nil {
 		if (i+j)%2 == 0 {
 			return "  "
 		}
@@ -42,11 +42,18 @@ func (m mainModel) renderNode(node core.Node, i, j int) string {
 	// render node
 	switch node.(type) {
 	case *core.Signal:
+		if isCursor {
+			return cursorStyle.Render("  ")
+		}
 		return activeEmitterStyle.Render("  ")
 	default:
 		symbol := fmt.Sprintf("%s%s", node.Symbol(), node.Direction().Symbol())
 
-		if node.Activated() {
+		if isCursor && !m.insert {
+			return cursorStyle.Render(symbol)
+		} else if isCursor && m.insert && m.blink {
+			return cursorStyle.Render(symbol)
+		} else if node.Activated() {
 			return activeEmitterStyle.
 				Foreground(lipgloss.Color(node.Color())).
 				Render(symbol)

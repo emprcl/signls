@@ -58,6 +58,10 @@ func (g *Grid) Nodes() [][]Node {
 	return g.nodes
 }
 
+func (g *Grid) Node(x, y int) Node {
+	return g.nodes[y][x]
+}
+
 func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	switch symbol {
 	case "i":

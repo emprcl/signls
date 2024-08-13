@@ -16,6 +16,10 @@ func (s *Signal) Direction() Direction {
 	return s.direction
 }
 
+func (s *Signal) SetDirection(dir Direction) {
+	s.direction = dir
+}
+
 func (s *Signal) Activated() bool {
 	return true
 }

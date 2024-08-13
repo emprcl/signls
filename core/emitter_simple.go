@@ -53,6 +53,10 @@ func (e *SimpleEmitter) Direction() Direction {
 	return e.direction
 }
 
+func (e *SimpleEmitter) SetDirection(dir Direction) {
+	e.direction = dir
+}
+
 func (e *SimpleEmitter) Symbol() string {
 	return "S"
 }
