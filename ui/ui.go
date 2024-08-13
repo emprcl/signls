@@ -120,6 +120,9 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.grid.AddNodeFromSymbol(msg.String(), m.cursorX, m.cursorY)
 			m.insert = true
 			return m, nil
+		case "m":
+			m.grid.ToggleNodeMutes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
+			return m, nil
 		case "backspace":
 			m.insert = false
 			m.grid.RemoveNodes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)

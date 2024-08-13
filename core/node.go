@@ -28,7 +28,9 @@ type Movable interface {
 
 type Emitter interface {
 	Arm()
+	ToggleMute()
 	Note() Note
+	Muted() bool
 	Trig(g *Grid, x, y int)
 	Emit(g *Grid, x, y int)
 	Reset()

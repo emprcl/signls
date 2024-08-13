@@ -83,6 +83,17 @@ func (g *Grid) RemoveNodes(startX, startY, endX, endY int) {
 	}
 }
 
+func (g *Grid) ToggleNodeMutes(startX, startY, endX, endY int) {
+	for y := startY; y <= endY; y++ {
+		for x := startX; x <= endX; x++ {
+			if _, ok := g.nodes[y][x].(Emitter); !ok {
+				continue
+			}
+			g.nodes[y][x].(Emitter).ToggleMute()
+		}
+	}
+}
+
 func (g *Grid) AddSignal(direction Direction, x, y int) {
 	if n, ok := g.nodes[y][x].(Emitter); ok {
 		n.Arm()

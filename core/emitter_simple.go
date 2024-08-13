@@ -6,6 +6,7 @@ type SimpleEmitter struct {
 	pulse     uint64
 	armed     bool
 	triggered bool
+	muted     bool
 }
 
 func NewSimpleEmitter(direction Direction) *SimpleEmitter {
@@ -31,22 +32,34 @@ func (e *SimpleEmitter) Arm() {
 	e.armed = true
 }
 
+func (e *SimpleEmitter) ToggleMute() {
+	e.muted = !e.muted
+}
+
+func (e *SimpleEmitter) Muted() bool {
+	return e.muted
+}
+
 func (e *SimpleEmitter) Trig(g *Grid, x, y int) {
-	if e.armed {
-		g.Trig(x, y)
-		e.triggered = true
-		e.armed = false
-		e.pulse = g.Pulse
+	if !e.armed {
+		return
 	}
+	if !e.muted {
+		g.Trig(x, y)
+	}
+	e.triggered = true
+	e.armed = false
+	e.pulse = g.Pulse
 	// TODO: handle length and note off
 }
 
 func (e *SimpleEmitter) Emit(g *Grid, x, y int) {
-	if !e.updated(g.Pulse) && e.triggered {
-		g.Emit(x, y, e.direction)
-		e.triggered = false
-		e.pulse = g.Pulse
+	if e.updated(g.Pulse) || !e.triggered {
+		return
 	}
+	g.Emit(x, y, e.direction)
+	e.triggered = false
+	e.pulse = g.Pulse
 }
 
 func (e *SimpleEmitter) Direction() Direction {
