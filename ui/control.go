@@ -18,6 +18,12 @@ var (
 )
 
 func (m mainModel) renderControl() string {
+	var pane string
+	if m.edit {
+		pane = m.nodeEdit()
+	} else {
+		pane = m.gridInfo()
+	}
 	return controlStyle.Render(
 		lipgloss.JoinHorizontal(
 			lipgloss.Left,
@@ -26,7 +32,7 @@ func (m mainModel) renderControl() string {
 				cellStyle.Width(12).Render(m.selectedNodeName()),
 				cellStyle.Render(m.modeName()),
 			),
-			m.gridInfo(),
+			pane,
 		),
 	)
 }
@@ -46,8 +52,8 @@ func (m mainModel) gridInfo() string {
 		),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			"",
 			cellStyle.Render(fmt.Sprintf("%d", m.grid.Pulse)),
+			m.grid.MidiDevice(),
 		),
 	)
 }
@@ -57,18 +63,23 @@ func (m mainModel) nodeEdit() string {
 		lipgloss.Left,
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			cellStyle.Render(fmt.Sprintf("%d,%d", m.cursorX, m.cursorY)),
-			cellStyle.Render(fmt.Sprintf("%d,%d", m.grid.Width, m.grid.Height)),
+			cellStyle.Render("c4"),
+			cellStyle.Render("note"),
 		),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			cellStyle.Render(fmt.Sprintf("%.f %s", m.grid.Tempo(), m.transportSymbol())),
-			"8:8",
+			cellStyle.Render("100"),
+			cellStyle.Render("vel"),
 		),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			"",
-			cellStyle.Render(fmt.Sprintf("%d", m.grid.Pulse)),
+			cellStyle.Render("100"),
+			cellStyle.Render("len"),
+		),
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			cellStyle.Render("1"),
+			cellStyle.Render("chan"),
 		),
 	)
 }

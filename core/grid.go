@@ -18,6 +18,7 @@ type Grid struct {
 	Playing bool
 	Pulse   uint64
 
+	device    int
 	clipboard [][]Node
 }
 
@@ -66,6 +67,21 @@ func (g *Grid) SetTempo(tempo float64) {
 
 func (g *Grid) Tempo() float64 {
 	return g.clock.tempo
+}
+
+func (g *Grid) MidiDevice() string {
+	if len(g.midi.Devices()) < g.device+1 {
+		return "no midi device"
+	}
+	return g.midi.Devices()[g.device].String()
+}
+
+func (g *Grid) CycleMidiDevice() {
+	if len(g.midi.Devices()) < g.device+2 {
+		g.device = 0
+		return
+	}
+	g.device++
 }
 
 func (g *Grid) QuarterNote() bool {

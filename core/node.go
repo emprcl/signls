@@ -9,11 +9,12 @@ package core
 //   - Emit on a random port
 //   - Emit on one of the port round robin
 //
-// Triggers
-// - Never (blocks signals)
-// - Always
-// - Fixed note
-// - Random notes arpegiated (param range, algo)
+// Note behavior
+// - Silence
+// - Behavior from signal (how to?)
+// - Fixed (tied to scale)
+// - Random (tied to scale)
+// - Random notes arpegiated (param range, algo) (tied to signal?)
 type Node interface {
 	Activated() bool
 	Direction() Direction
