@@ -36,6 +36,7 @@ type mainModel struct {
 	height     int
 	insert     bool
 	blink      bool
+	mute       bool
 }
 
 // New creates a new mainModel that hols the ui state. It takes a new grid.
@@ -122,6 +123,10 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case "m":
 			m.grid.ToggleNodeMutes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
+			return m, nil
+		case "M":
+			m.grid.SetAllNodeMutes(!m.mute)
+			m.mute = !m.mute
 			return m, nil
 		case "backspace":
 			m.insert = false

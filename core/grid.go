@@ -141,7 +141,18 @@ func (g *Grid) ToggleNodeMutes(startX, startY, endX, endY int) {
 			if _, ok := g.nodes[y][x].(Emitter); !ok {
 				continue
 			}
-			g.nodes[y][x].(Emitter).ToggleMute()
+			g.nodes[y][x].(Emitter).SetMute(!g.nodes[y][x].(Emitter).Muted())
+		}
+	}
+}
+
+func (g *Grid) SetAllNodeMutes(mute bool) {
+	for y := 0; y < g.Height; y++ {
+		for x := 0; x < g.Width; x++ {
+			if _, ok := g.nodes[y][x].(Emitter); !ok {
+				continue
+			}
+			g.nodes[y][x].(Emitter).SetMute(mute)
 		}
 	}
 }

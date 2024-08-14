@@ -41,8 +41,8 @@ func (e *InitEmitter) Arm() {
 	e.armed = true
 }
 
-func (e *InitEmitter) ToggleMute() {
-	e.muted = !e.muted
+func (e *InitEmitter) SetMute(mute bool) {
+	e.muted = mute
 }
 
 func (e *InitEmitter) Muted() bool {
