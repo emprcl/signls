@@ -17,9 +17,10 @@ const (
 //
 // Read more: http://midi.teragonaudio.com/tech/midispec/clock.htm
 type clock struct {
-	ticker *time.Ticker
-	update chan float64
-	tempo  float64
+	ticker       *time.Ticker
+	update       chan float64
+	tempo        float64
+	shouldUpdate bool
 }
 
 func (c *clock) setTempo(tempo float64) {
@@ -40,13 +41,12 @@ func newClock(tempo float64, tick func()) *clock {
 			select {
 			case <-c.ticker.C:
 				tick()
+				if c.shouldUpdate {
+					c.ticker.Reset(newClockInterval(c.tempo))
+					c.shouldUpdate = false
+				}
 			case newTempo := <-c.update:
-				// Re-creating a ticker at each update is not ideal because it
-				// creates jitter when updating the tempo while playing, but we
-				// can't update an existing ticker.
-				// Maybe there's a better way...
-				c.ticker.Stop()
-				c.ticker = time.NewTicker(newClockInterval(newTempo))
+				c.shouldUpdate = true
 				c.tempo = newTempo
 			}
 		}

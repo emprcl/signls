@@ -8,8 +8,6 @@
  	- A moving behavior ?
 
 TODO:
- - add signal ui
- - improve ticker
  - add root/scale global conf
  - add midi note menu
  - add midi cc menu
