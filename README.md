@@ -11,4 +11,4 @@ TODO:
  - add root/scale global conf
  - add midi note menu
  - add midi cc menu
- - find a way to display "on top of" in lipgloss/bubbletea
+ - find a way to display "on top of" in lipgloss/bubbletea (maybe https://github.com/charmbracelet/lipgloss/pull/102)

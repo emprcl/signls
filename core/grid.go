@@ -33,7 +33,7 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 	}
 
 	// Basic test case
-	grid.AddNode(NewInitEmitter(RIGHT), 7, 7)
+	grid.AddNode(NewInitEmitter(DOWN|RIGHT), 7, 7)
 	grid.AddNode(NewSimpleEmitter(DOWN), 11, 7)
 	grid.AddNode(NewSimpleEmitter(LEFT), 11, 11)
 	grid.AddNode(NewSimpleEmitter(UP), 7, 11)

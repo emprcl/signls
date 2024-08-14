@@ -66,7 +66,9 @@ func (e *InitEmitter) Emit(g *Grid, x, y int) {
 	if e.updated(g.Pulse) || !e.triggered {
 		return
 	}
-	g.Emit(x, y, e.direction)
+	for _, dir := range e.direction.Decompose() {
+		g.Emit(x, y, dir)
+	}
 	e.triggered = false
 	e.pulse = g.Pulse
 }
@@ -76,7 +78,11 @@ func (e *InitEmitter) Direction() Direction {
 }
 
 func (e *InitEmitter) SetDirection(dir Direction) {
-	e.direction = dir
+	if e.direction.Contains(dir) {
+		e.direction = e.direction.Remove(dir)
+		return
+	}
+	e.direction = e.direction.Add(dir)
 }
 
 func (e *InitEmitter) Symbol() string {
