@@ -34,7 +34,7 @@ type mainModel struct {
 	selectionY int
 	width      int
 	height     int
-	insert     bool
+	edit       bool
 	blink      bool
 	mute       bool
 }
@@ -95,7 +95,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.grid.Reset()
 			return m, nil
 		case "up", "right", "down", "left":
-			if m.insert {
+			if m.edit {
 				m.grid.Node(m.cursorX, m.cursorY).
 					SetDirection(core.DirectionFromString(msg.String()))
 			} else {
@@ -119,7 +119,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case "i", "s":
 			m.grid.AddNodeFromSymbol(msg.String(), m.cursorX, m.cursorY)
-			m.insert = true
+			m.edit = true
 			return m, nil
 		case "m":
 			m.grid.ToggleNodeMutes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
@@ -129,14 +129,14 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.mute = !m.mute
 			return m, nil
 		case "backspace":
-			m.insert = false
+			m.edit = false
 			m.grid.RemoveNodes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			return m, nil
 		case "enter":
 			if m.grid.Node(m.cursorX, m.cursorY) == nil {
 				return m, nil
 			}
-			m.insert = !m.insert
+			m.edit = !m.edit
 			return m, nil
 		case "ctrl+up":
 			m.grid.SetTempo(m.grid.Tempo() + 1)
@@ -154,7 +154,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.grid.Paste(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			return m, nil
 		case "esc":
-			m.insert = false
+			m.edit = false
 			m.selectionX = m.cursorX
 			m.selectionY = m.cursorY
 		case "n":

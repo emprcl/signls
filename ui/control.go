@@ -23,7 +23,7 @@ func (m mainModel) renderControl() string {
 			lipgloss.Left,
 			lipgloss.JoinVertical(
 				lipgloss.Left,
-				cellStyle.Width(10).Render(m.selectedNodeName()),
+				cellStyle.Width(12).Render(m.selectedNodeName()),
 				cellStyle.Render(m.modeName()),
 			),
 			m.gridInfo(),
@@ -81,8 +81,8 @@ func (m mainModel) transportSymbol() string {
 }
 
 func (m mainModel) modeName() string {
-	if m.insert {
-		return "insert"
+	if m.edit {
+		return "edit"
 	}
 	return "move"
 }
