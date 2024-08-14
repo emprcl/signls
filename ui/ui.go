@@ -139,6 +139,15 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+down":
 			m.grid.SetTempo(m.grid.Tempo() - 1)
 			return m, nil
+		case "ctrl+c":
+			m.grid.CopyOrCut(m.cursorX, m.cursorY, m.selectionX, m.selectionY, false)
+			return m, nil
+		case "ctrl+x":
+			m.grid.CopyOrCut(m.cursorX, m.cursorY, m.selectionX, m.selectionY, true)
+			return m, nil
+		case "ctrl+v":
+			m.grid.Paste(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
+			return m, nil
 		case "esc":
 			m.insert = false
 			m.selectionX = m.cursorX

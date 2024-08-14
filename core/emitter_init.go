@@ -21,6 +21,14 @@ func NewInitEmitter(direction Direction) *InitEmitter {
 	}
 }
 
+func (e *InitEmitter) Copy() Node {
+	return &InitEmitter{
+		direction: e.direction,
+		armed:     true,
+		note:      e.note,
+	}
+}
+
 func (e *InitEmitter) Activated() bool {
 	return e.armed || e.triggered
 }

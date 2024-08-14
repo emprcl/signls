@@ -20,6 +20,13 @@ func NewSimpleEmitter(direction Direction) *SimpleEmitter {
 	}
 }
 
+func (e *SimpleEmitter) Copy() Node {
+	return &SimpleEmitter{
+		direction: e.direction,
+		note:      e.note,
+	}
+}
+
 func (e *SimpleEmitter) Activated() bool {
 	return e.armed || e.triggered
 }

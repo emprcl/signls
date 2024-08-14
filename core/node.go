@@ -29,6 +29,7 @@ type Movable interface {
 
 type Emitter interface {
 	Arm()
+	Copy() Node
 	ToggleMute()
 	Note() Note
 	Muted() bool

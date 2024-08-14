@@ -17,6 +17,8 @@ type Grid struct {
 
 	Playing bool
 	Pulse   uint64
+
+	clipboard [][]Node
 }
 
 func NewGrid(width, height int, midi midi.Midi) *Grid {
@@ -71,6 +73,37 @@ func (g *Grid) QuarterNote() bool {
 		return false
 	}
 	return g.Pulse/uint64(pulsesPerStep)%uint64(stepsPerQuarterNote) == 0
+}
+
+func (g *Grid) CopyOrCut(startX, startY, endX, endY int, cut bool) {
+	nodes := make([][]Node, endY-startY+1)
+	for i := range nodes {
+		nodes[i] = make([]Node, endX-startX+1)
+	}
+	for y := startY; y <= endY; y++ {
+		for x := startX; x <= endX; x++ {
+			_, ok := g.nodes[y][x].(Emitter)
+			if ok {
+				nodes[y-startY][x-startX] = g.nodes[y][x]
+			}
+			if ok && cut {
+				g.nodes[y][x] = nil
+			}
+		}
+	}
+	g.clipboard = nodes
+}
+
+func (g *Grid) Paste(startX, startY, endX, endY int) {
+	h, w := len(g.clipboard), len(g.clipboard[0])
+	for y := 0; y < h && startY+y <= endY; y++ {
+		for x := 0; x < w && startX+x <= endX; x++ {
+			if _, ok := g.clipboard[y][x].(Emitter); !ok {
+				continue
+			}
+			g.nodes[startY+y][startX+x] = g.clipboard[y][x].(Emitter).Copy()
+		}
+	}
 }
 
 func (g *Grid) Nodes() [][]Node {
