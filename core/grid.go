@@ -157,18 +157,6 @@ func (g *Grid) SetAllNodeMutes(mute bool) {
 	}
 }
 
-func (g *Grid) AddSignal(direction Direction, x, y int) {
-	if n, ok := g.nodes[y][x].(Emitter); ok {
-		n.Arm()
-		n.Trig(g, x, y)
-		return
-	}
-	g.nodes[y][x] = &Signal{
-		direction: direction,
-		pulse:     g.Pulse,
-	}
-}
-
 func (g *Grid) Update() {
 	g.Pulse++
 	for y := 0; y < g.Height; y++ {
@@ -210,7 +198,15 @@ func (g *Grid) Emit(x, y int, direction Direction) {
 	if newX == x && newY == y {
 		return
 	}
-	g.AddSignal(direction, newX, newY)
+	if n, ok := g.nodes[newY][newX].(Emitter); ok {
+		n.Arm()
+		n.Trig(g, newX, newY)
+		return
+	}
+	g.nodes[newY][newX] = &Signal{
+		direction: direction,
+		pulse:     g.Pulse,
+	}
 }
 
 func (g *Grid) Trig(x, y int) {
