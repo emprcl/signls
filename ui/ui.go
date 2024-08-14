@@ -117,7 +117,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
 			)
 			return m, nil
-		case "i", "s":
+		case "b", "s":
 			m.grid.AddNodeFromSymbol(msg.String(), m.cursorX, m.cursorY)
 			m.edit = true
 			return m, nil

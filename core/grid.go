@@ -132,7 +132,7 @@ func (g *Grid) Node(x, y int) Node {
 
 func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	switch symbol {
-	case "i":
+	case "b":
 		g.AddNode(NewInitEmitter(NONE), x, y)
 	case "s":
 		g.AddNode(NewSimpleEmitter(NONE), x, y)
