@@ -25,7 +25,7 @@ func (s *Signal) Activated() bool {
 }
 
 func (s *Signal) Symbol() string {
-	return " "
+	return "  "
 }
 
 func (s *Signal) Name() string {

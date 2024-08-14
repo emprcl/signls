@@ -2,7 +2,6 @@ package ui
 
 import (
 	"cykl/core"
-	"fmt"
 	"log"
 
 	"github.com/charmbracelet/lipgloss"
@@ -63,7 +62,7 @@ func (m mainModel) renderNode(node core.Node, x, y int) string {
 		}
 		return activeEmitterStyle.Render("  ")
 	case core.Emitter:
-		symbol := fmt.Sprintf("%s%s", node.Symbol(), node.Direction().Symbol())
+		symbol := node.Symbol()
 
 		if isCursor && !m.insert {
 			return cursorStyle.Render(symbol)

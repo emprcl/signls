@@ -1,6 +1,8 @@
 package core
 
-type SimpleEmitter struct {
+import "fmt"
+
+type SpreadEmitter struct {
 	note      Note
 	direction Direction
 	pulse     uint64
@@ -9,8 +11,8 @@ type SimpleEmitter struct {
 	muted     bool
 }
 
-func NewSimpleEmitter(direction Direction) *SimpleEmitter {
-	return &SimpleEmitter{
+func NewSimpleEmitter(direction Direction) *SpreadEmitter {
+	return &SpreadEmitter{
 		direction: direction,
 		note: Note{
 			Channel:  uint8(0),
@@ -20,34 +22,34 @@ func NewSimpleEmitter(direction Direction) *SimpleEmitter {
 	}
 }
 
-func (e *SimpleEmitter) Copy() Node {
-	return &SimpleEmitter{
+func (e *SpreadEmitter) Copy() Node {
+	return &SpreadEmitter{
 		direction: e.direction,
 		note:      e.note,
 	}
 }
 
-func (e *SimpleEmitter) Activated() bool {
+func (e *SpreadEmitter) Activated() bool {
 	return e.armed || e.triggered
 }
 
-func (e *SimpleEmitter) Note() Note {
+func (e *SpreadEmitter) Note() Note {
 	return e.note
 }
 
-func (e *SimpleEmitter) Arm() {
+func (e *SpreadEmitter) Arm() {
 	e.armed = true
 }
 
-func (e *SimpleEmitter) SetMute(mute bool) {
+func (e *SpreadEmitter) SetMute(mute bool) {
 	e.muted = mute
 }
 
-func (e *SimpleEmitter) Muted() bool {
+func (e *SpreadEmitter) Muted() bool {
 	return e.muted
 }
 
-func (e *SimpleEmitter) Trig(g *Grid, x, y int) {
+func (e *SpreadEmitter) Trig(g *Grid, x, y int) {
 	if !e.armed {
 		return
 	}
@@ -60,7 +62,7 @@ func (e *SimpleEmitter) Trig(g *Grid, x, y int) {
 	// TODO: handle length and note off
 }
 
-func (e *SimpleEmitter) Emit(g *Grid, x, y int) {
+func (e *SpreadEmitter) Emit(g *Grid, x, y int) {
 	if e.updated(g.Pulse) || !e.triggered {
 		return
 	}
@@ -71,11 +73,11 @@ func (e *SimpleEmitter) Emit(g *Grid, x, y int) {
 	e.pulse = g.Pulse
 }
 
-func (e *SimpleEmitter) Direction() Direction {
+func (e *SpreadEmitter) Direction() Direction {
 	return e.direction
 }
 
-func (e *SimpleEmitter) SetDirection(dir Direction) {
+func (e *SpreadEmitter) SetDirection(dir Direction) {
 	if e.direction.Contains(dir) {
 		e.direction = e.direction.Remove(dir)
 		return
@@ -83,24 +85,24 @@ func (e *SimpleEmitter) SetDirection(dir Direction) {
 	e.direction = e.direction.Add(dir)
 }
 
-func (e *SimpleEmitter) Symbol() string {
-	return "S"
+func (e *SpreadEmitter) Symbol() string {
+	return fmt.Sprintf("%s%s", "S", e.Direction().Symbol())
 }
 
-func (e *SimpleEmitter) Name() string {
-	return "E Simple"
+func (e *SpreadEmitter) Name() string {
+	return "spread"
 }
 
-func (e *SimpleEmitter) Color() string {
+func (e *SpreadEmitter) Color() string {
 	return "177"
 }
 
-func (e *SimpleEmitter) Reset() {
+func (e *SpreadEmitter) Reset() {
 	e.pulse = 0
 	e.armed = false
 	e.triggered = false
 }
 
-func (e *SimpleEmitter) updated(pulse uint64) bool {
+func (e *SpreadEmitter) updated(pulse uint64) bool {
 	return e.pulse == pulse
 }

@@ -1,6 +1,8 @@
 package core
 
-type InitEmitter struct {
+import "fmt"
+
+type BangEmitter struct {
 	note      Note
 	direction Direction
 	pulse     uint64
@@ -9,8 +11,8 @@ type InitEmitter struct {
 	muted     bool
 }
 
-func NewInitEmitter(direction Direction) *InitEmitter {
-	return &InitEmitter{
+func NewInitEmitter(direction Direction) *BangEmitter {
+	return &BangEmitter{
 		direction: direction,
 		armed:     true,
 		note: Note{
@@ -21,35 +23,35 @@ func NewInitEmitter(direction Direction) *InitEmitter {
 	}
 }
 
-func (e *InitEmitter) Copy() Node {
-	return &InitEmitter{
+func (e *BangEmitter) Copy() Node {
+	return &BangEmitter{
 		direction: e.direction,
 		armed:     true,
 		note:      e.note,
 	}
 }
 
-func (e *InitEmitter) Activated() bool {
+func (e *BangEmitter) Activated() bool {
 	return e.armed || e.triggered
 }
 
-func (e *InitEmitter) Note() Note {
+func (e *BangEmitter) Note() Note {
 	return e.note
 }
 
-func (e *InitEmitter) Arm() {
+func (e *BangEmitter) Arm() {
 	e.armed = true
 }
 
-func (e *InitEmitter) SetMute(mute bool) {
+func (e *BangEmitter) SetMute(mute bool) {
 	e.muted = mute
 }
 
-func (e *InitEmitter) Muted() bool {
+func (e *BangEmitter) Muted() bool {
 	return e.muted
 }
 
-func (e *InitEmitter) Trig(g *Grid, x, y int) {
+func (e *BangEmitter) Trig(g *Grid, x, y int) {
 	if !e.armed {
 		return
 	}
@@ -62,7 +64,7 @@ func (e *InitEmitter) Trig(g *Grid, x, y int) {
 	// TODO: handle length and note off
 }
 
-func (e *InitEmitter) Emit(g *Grid, x, y int) {
+func (e *BangEmitter) Emit(g *Grid, x, y int) {
 	if e.updated(g.Pulse) || !e.triggered {
 		return
 	}
@@ -73,11 +75,11 @@ func (e *InitEmitter) Emit(g *Grid, x, y int) {
 	e.pulse = g.Pulse
 }
 
-func (e *InitEmitter) Direction() Direction {
+func (e *BangEmitter) Direction() Direction {
 	return e.direction
 }
 
-func (e *InitEmitter) SetDirection(dir Direction) {
+func (e *BangEmitter) SetDirection(dir Direction) {
 	if e.direction.Contains(dir) {
 		e.direction = e.direction.Remove(dir)
 		return
@@ -85,24 +87,24 @@ func (e *InitEmitter) SetDirection(dir Direction) {
 	e.direction = e.direction.Add(dir)
 }
 
-func (e *InitEmitter) Symbol() string {
-	return "I"
+func (e *BangEmitter) Symbol() string {
+	return fmt.Sprintf("%s%s", "B", e.Direction().Symbol())
 }
 
-func (e *InitEmitter) Name() string {
-	return "E Initial"
+func (e *BangEmitter) Name() string {
+	return "bang"
 }
 
-func (e *InitEmitter) Color() string {
+func (e *BangEmitter) Color() string {
 	return "165"
 }
 
-func (e *InitEmitter) Reset() {
+func (e *BangEmitter) Reset() {
 	e.pulse = 0
 	e.armed = true
 	e.triggered = false
 }
 
-func (e *InitEmitter) updated(pulse uint64) bool {
+func (e *BangEmitter) updated(pulse uint64) bool {
 	return e.pulse == pulse
 }

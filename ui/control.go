@@ -26,21 +26,49 @@ func (m mainModel) renderControl() string {
 				cellStyle.Width(10).Render(m.selectedNodeName()),
 				cellStyle.Render(m.modeName()),
 			),
-			lipgloss.JoinVertical(
-				lipgloss.Left,
-				cellStyle.Render(fmt.Sprintf("%d,%d", m.cursorX, m.cursorY)),
-				cellStyle.Render(fmt.Sprintf("%d,%d", m.grid.Width, m.grid.Height)),
-			),
-			lipgloss.JoinVertical(
-				lipgloss.Left,
-				cellStyle.Render(fmt.Sprintf("%.f %s", m.grid.Tempo(), m.transportSymbol())),
-				"8:8",
-			),
-			lipgloss.JoinVertical(
-				lipgloss.Left,
-				"",
-				cellStyle.Render(fmt.Sprintf("%d", m.grid.Pulse)),
-			),
+			m.gridInfo(),
+		),
+	)
+}
+
+func (m mainModel) gridInfo() string {
+	return lipgloss.JoinHorizontal(
+		lipgloss.Left,
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			cellStyle.Render(fmt.Sprintf("%d,%d", m.cursorX, m.cursorY)),
+			cellStyle.Render(fmt.Sprintf("%d,%d", m.grid.Width, m.grid.Height)),
+		),
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			cellStyle.Render(fmt.Sprintf("%.f %s", m.grid.Tempo(), m.transportSymbol())),
+			"8:8",
+		),
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			"",
+			cellStyle.Render(fmt.Sprintf("%d", m.grid.Pulse)),
+		),
+	)
+}
+
+func (m mainModel) nodeEdit() string {
+	return lipgloss.JoinHorizontal(
+		lipgloss.Left,
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			cellStyle.Render(fmt.Sprintf("%d,%d", m.cursorX, m.cursorY)),
+			cellStyle.Render(fmt.Sprintf("%d,%d", m.grid.Width, m.grid.Height)),
+		),
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			cellStyle.Render(fmt.Sprintf("%.f %s", m.grid.Tempo(), m.transportSymbol())),
+			"8:8",
+		),
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			"",
+			cellStyle.Render(fmt.Sprintf("%d", m.grid.Pulse)),
 		),
 	)
 }
@@ -67,5 +95,12 @@ func (m mainModel) selectedNodeName() string {
 	if m.selectedNode() == nil {
 		return "empty"
 	}
-	return m.selectedNode().Name()
+	return lipgloss.JoinHorizontal(
+		lipgloss.Left,
+		emitterStyle.
+			MarginRight(1).
+			Background(lipgloss.Color(m.selectedNode().Color())).
+			Render(m.selectedNode().Symbol()),
+		m.selectedNode().Name(),
+	)
 }
