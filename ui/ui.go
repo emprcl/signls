@@ -119,14 +119,17 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case "shift+up", "shift+right", "shift+down", "shift+left":
 			dir := strings.Replace(msg.String(), "shift+", "", 1)
-			if m.edit {
-				m.handleParamEdit(dir)
-				return m, nil
-			}
 			m.selectionX, m.selectionY = moveCursor(
 				dir, m.selectionX, m.selectionY,
 				m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
 			)
+			return m, nil
+		case "ctrl+up", "ctrl+right", "ctrl+down", "ctrl+left":
+			dir := strings.Replace(msg.String(), "ctrl+", "", 1)
+			if !m.edit {
+				return m, nil
+			}
+			m.handleParamEdit(dir)
 			return m, nil
 		case "b", "s":
 			m.grid.AddNodeFromSymbol(msg.String(), m.cursorX, m.cursorY)
@@ -154,13 +157,13 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.param = 0
 			}
 			return m, nil
-		case "ctrl+up":
+		case "=":
 			m.grid.SetTempo(m.grid.Tempo() + 1)
 			return m, nil
-		case "ctrl+down":
+		case ")":
 			m.grid.SetTempo(m.grid.Tempo() - 1)
 			return m, nil
-		case "=":
+		case "f2":
 			m.grid.CycleMidiDevice()
 			return m, nil
 		case "ctrl+c":
