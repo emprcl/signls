@@ -94,16 +94,21 @@ func (g *Grid) CopyOrCut(startX, startY, endX, endY int, cut bool) {
 	for i := range nodes {
 		nodes[i] = make([]Node, endX-startX+1)
 	}
+	count := 0
 	for y := startY; y <= endY; y++ {
 		for x := startX; x <= endX; x++ {
 			_, ok := g.nodes[y][x].(Emitter)
 			if ok {
 				nodes[y-startY][x-startX] = g.nodes[y][x]
+				count++
 			}
 			if ok && cut {
 				g.nodes[y][x] = nil
 			}
 		}
+	}
+	if count == 0 {
+		return
 	}
 	g.clipboard = nodes
 }

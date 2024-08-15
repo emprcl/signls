@@ -17,7 +17,7 @@ type Param interface {
 
 func NewParamsForNode(node core.Node) []Param {
 	switch node.(type) {
-	case *core.BangEmitter:
+	case *core.BangEmitter, *core.SpreadEmitter:
 		return []Param{
 			Direction{node: node},
 			Key{node: node},
