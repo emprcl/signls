@@ -23,6 +23,7 @@ func NewParamsForNode(node core.Node) []Param {
 			Key{node: node},
 			Velocity{node: node},
 			Length{node: node},
+			Channel{node: node},
 		}
 	default:
 		return []Param{}

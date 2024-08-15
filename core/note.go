@@ -15,6 +15,7 @@ const (
 	maxKey      uint8 = 127
 	maxVelocity uint8 = 127
 	maxLength   uint8 = 127
+	maxChannel  uint8 = 15
 
 	silence noteBehavior = iota
 	fixed
@@ -71,4 +72,11 @@ func (n *Note) SetLength(length uint8) {
 		return
 	}
 	n.Length = length
+}
+
+func (n *Note) SetChannel(channel uint8) {
+	if channel > maxChannel {
+		return
+	}
+	n.Channel = channel
 }
