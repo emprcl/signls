@@ -49,7 +49,9 @@ func (e *SpreadEmitter) Muted() bool {
 }
 
 func (e *SpreadEmitter) Trig(pulse uint64) {
-	e.note.tick()
+	if !e.updated(pulse) {
+		e.note.tick()
+	}
 	if !e.armed {
 		return
 	}

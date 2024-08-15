@@ -51,7 +51,9 @@ func (e *BangEmitter) Muted() bool {
 }
 
 func (e *BangEmitter) Trig(pulse uint64) {
-	e.note.tick()
+	if !e.updated(pulse) {
+		e.note.tick()
+	}
 	if !e.armed {
 		return
 	}

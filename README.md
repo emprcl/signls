@@ -8,7 +8,6 @@
  	- A moving behavior ?
 
 TODO:
- - fix bug on spread emitters midi triggers
  - add root/scale global conf
  - add tempo division control
  - add new emitters

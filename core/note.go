@@ -64,6 +64,7 @@ func (n *Note) tick() {
 func (n *Note) Play() {
 	n.midi.NoteOn(n.Channel, n.Key, n.Velocity)
 	n.triggered = true
+	n.pulse = 0
 }
 
 func (n *Note) Stop() {
@@ -76,6 +77,9 @@ func (n *Note) SetKey(key uint8) {
 	if key > maxKey {
 		n.Key = 0
 		return
+	}
+	if key < 0 {
+		n.Key = 127
 	}
 	n.Key = key
 }

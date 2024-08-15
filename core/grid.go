@@ -38,17 +38,6 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 		grid.nodes[i] = make([]Node, width)
 	}
 
-	// Basic test case
-	grid.AddNode(NewInitEmitter(midi, DOWN|RIGHT), 7, 7)
-	grid.AddNode(NewSimpleEmitter(midi, DOWN), 11, 7)
-	grid.AddNode(NewSimpleEmitter(midi, LEFT), 11, 11)
-	grid.AddNode(NewSimpleEmitter(midi, UP), 7, 11)
-
-	grid.AddNode(NewInitEmitter(midi, RIGHT), 7, 2)
-	grid.AddNode(NewSimpleEmitter(midi, LEFT), 12, 2)
-	grid.AddNode(NewInitEmitter(midi, RIGHT), 7, 3)
-	grid.AddNode(NewSimpleEmitter(midi, LEFT), 9, 3)
-
 	grid.clock = newClock(defaultTempo, func() {
 		if !grid.Playing {
 			return

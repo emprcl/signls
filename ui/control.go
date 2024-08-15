@@ -48,7 +48,7 @@ func (m mainModel) gridInfo() string {
 		),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			cellStyle.Render(fmt.Sprintf("%.f %s", m.grid.Tempo(), m.transportSymbol())),
+			cellStyle.Render(fmt.Sprintf("%.f %s", m.grid.Tempo(), m.tempoSymbol())),
 			cellStyle.Render("1:16"), // TODO: implement
 		),
 		lipgloss.JoinVertical(
@@ -58,7 +58,7 @@ func (m mainModel) gridInfo() string {
 		),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			cellStyle.Render(fmt.Sprintf("%d", m.grid.Pulse)),
+			cellStyle.Render(fmt.Sprintf("%s %d", m.transportSymbol(), m.grid.Pulse)),
 			m.grid.MidiDevice(),
 		),
 	)
@@ -86,36 +86,20 @@ func (m mainModel) nodeEdit() string {
 		lipgloss.Left,
 		params...,
 	)
-	// return lipgloss.JoinHorizontal(
-	// 	lipgloss.Left,
-	// 	lipgloss.JoinVertical(
-	// 		lipgloss.Left,
-	// 		cellStyle.Render("c4"),
-	// 		cellStyle.Render("note"),
-	// 	),
-	// 	lipgloss.JoinVertical(
-	// 		lipgloss.Left,
-	// 		cellStyle.Render("100"),
-	// 		cellStyle.Render("vel"),
-	// 	),
-	// 	lipgloss.JoinVertical(
-	// 		lipgloss.Left,
-	// 		cellStyle.Render("100"),
-	// 		cellStyle.Render("len"),
-	// 	),
-	// 	lipgloss.JoinVertical(
-	// 		lipgloss.Left,
-	// 		cellStyle.Render("1"),
-	// 		cellStyle.Render("chan"),
-	// 	),
-	// )
 }
 
-func (m mainModel) transportSymbol() string {
+func (m mainModel) tempoSymbol() string {
 	if m.grid.QuarterNote() {
 		return "●"
 	}
 	return " "
+}
+
+func (m mainModel) transportSymbol() string {
+	if m.grid.Playing {
+		return "▶"
+	}
+	return "■"
 }
 
 func (m mainModel) modeName() string {
