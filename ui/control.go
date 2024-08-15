@@ -14,9 +14,8 @@ var (
 
 	cellStyle = lipgloss.NewStyle().
 			MarginRight(2)
-	activeCellStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("190")).
-			MarginRight(2)
+	activeCellStyle = cellStyle.
+			Foreground(lipgloss.Color("190"))
 )
 
 func (m mainModel) renderControl() string {

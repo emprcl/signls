@@ -10,10 +10,11 @@ const (
 	defaultKey      uint8 = 60
 	defaultChannel  uint8 = 0
 	defaultVelocity uint8 = 100
-	defaultLength   uint8 = 1
+	defaultLength   uint8 = uint8(pulsesPerStep)
 
 	maxKey      uint8 = 127
 	maxVelocity uint8 = 127
+	maxLength   uint8 = 127
 
 	silence noteBehavior = iota
 	fixed
@@ -63,4 +64,11 @@ func (n *Note) SetVelocity(velocity uint8) {
 		return
 	}
 	n.Velocity = velocity
+}
+
+func (n *Note) SetLength(length uint8) {
+	if length > maxLength {
+		return
+	}
+	n.Length = length
 }

@@ -99,12 +99,12 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case "tab":
 			if m.edit {
-				m.moveParam("right")
+				m.moveParam(msg)
 			}
 			return m, nil
 		case "up", "right", "down", "left":
 			if m.edit {
-				m.moveParam(msg.String())
+				m.moveParam(msg)
 				return m, nil
 			}
 			m.blink = true
@@ -238,19 +238,23 @@ func (m mainModel) renderGrid() string {
 	return lipgloss.JoinVertical(lipgloss.Left, lines...)
 }
 
-func (m *mainModel) moveParam(dir string) {
+func (m *mainModel) moveParam(msg tea.KeyMsg) {
 	if len(m.params) == 0 {
 		return
 	}
-	switch dir {
+	switch msg.String() {
 	case "right":
-		m.param = (m.param + 1) % len(m.params)
+		if m.param+1 >= len(m.params) {
+			return
+		}
+		m.param++
 	case "left":
 		if m.param-1 < 0 {
-			m.param = len(m.params) - 1
-		} else {
-			m.param = (m.param - 1) % len(m.params)
+			return
 		}
+		m.param--
+	case "tab":
+		m.param = (m.param + 1) % len(m.params)
 	}
 }
 
