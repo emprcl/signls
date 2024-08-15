@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"cykl/core"
+	"cykl/ui/param"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -28,12 +29,14 @@ type blinkMsg time.Time
 
 type mainModel struct {
 	grid       *core.Grid
+	params     []param.Param
 	cursorX    int
 	cursorY    int
 	selectionX int
 	selectionY int
 	width      int
 	height     int
+	param      int
 	edit       bool
 	blink      bool
 	mute       bool
@@ -94,10 +97,14 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+d":
 			m.grid.Reset()
 			return m, nil
+		case "tab":
+			if m.edit {
+				m.param = (m.param + 1) % len(m.params)
+			}
+			return m, nil
 		case "up", "right", "down", "left":
 			if m.edit {
-				m.grid.Node(m.cursorX, m.cursorY).
-					SetDirection(core.DirectionFromString(msg.String()))
+				m.handleParamEdit(msg)
 			} else {
 				m.blink = true
 				m.cursorX, m.cursorY = moveCursor(
@@ -119,6 +126,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case "b", "s":
 			m.grid.AddNodeFromSymbol(msg.String(), m.cursorX, m.cursorY)
+			m.params = param.NewParamsForNode(m.selectedNode())
 			m.edit = true
 			return m, nil
 		case "m":
@@ -133,10 +141,14 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.grid.RemoveNodes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			return m, nil
 		case "enter":
-			if m.grid.Node(m.cursorX, m.cursorY) == nil {
+			if m.selectedNode() == nil {
 				return m, nil
 			}
 			m.edit = !m.edit
+			if m.edit {
+				m.params = param.NewParamsForNode(m.selectedNode())
+				m.param = 0
+			}
 			return m, nil
 		case "ctrl+up":
 			m.grid.SetTempo(m.grid.Tempo() + 1)
@@ -158,8 +170,10 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case "esc":
 			m.edit = false
+			m.param = 0
 			m.selectionX = m.cursorX
 			m.selectionY = m.cursorY
+			return m, nil
 		case "n":
 			m.grid.Update()
 			return m, nil
@@ -189,6 +203,26 @@ func (m mainModel) View() string {
 		cleanup,
 	)
 }
+func (m mainModel) handleParamEdit(msg tea.KeyMsg) {
+	if len(m.params) < m.param+1 {
+		return
+	}
+
+	switch p := m.params[m.param].(type) {
+	case param.Direction:
+		p.SetFromKeyString(msg.String())
+	}
+
+	switch msg.String() {
+	case "up", "right":
+		m.params[m.param].Increment()
+	case "down", "left":
+		m.params[m.param].Decrement()
+	}
+
+	//m.grid.Node(m.cursorX, m.cursorY).
+	//	SetDirection(core.DirectionFromString(msg.String()))
+}
 
 func (m mainModel) renderGrid() string {
 	var lines []string
@@ -204,7 +238,18 @@ func (m mainModel) renderGrid() string {
 }
 
 func moveCursor(dir string, x, y, minX, maxX, minY, maxY int) (int, int) {
-	newX, newY := core.DirectionFromString(dir).
-		NextPosition(x, y)
+	var newX, newY int
+	switch dir {
+	case "up":
+		newX, newY = x, y-1
+	case "right":
+		newX, newY = x+1, y
+	case "down":
+		newX, newY = x, y+1
+	case "left":
+		newX, newY = x-1, y
+	default:
+		newX, newY = 0, 0
+	}
 	return clamp(newX, minX, maxX), clamp(newY, minY, maxY)
 }

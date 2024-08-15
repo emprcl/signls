@@ -32,21 +32,6 @@ var (
 	}
 )
 
-func DirectionFromString(dir string) Direction {
-	switch dir {
-	case "up":
-		return UP
-	case "right":
-		return RIGHT
-	case "down":
-		return DOWN
-	case "left":
-		return LEFT
-	default:
-		return UP
-	}
-}
-
 func (d Direction) Decompose() []Direction {
 	directions := []Direction{}
 	for _, dir := range allDirections {

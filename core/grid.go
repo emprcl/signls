@@ -15,6 +15,9 @@ type Grid struct {
 	Height int
 	Width  int
 
+	Key   uint8
+	Scale uint8
+
 	Playing bool
 	Pulse   uint64
 

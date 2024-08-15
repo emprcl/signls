@@ -29,7 +29,7 @@ func (s *Signal) Symbol() string {
 }
 
 func (s *Signal) Name() string {
-	return "Signal"
+	return "signal"
 }
 
 func (s *Signal) Color() string {

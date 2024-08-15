@@ -13,8 +13,7 @@ var (
 			MarginLeft(2)
 
 	cellStyle = lipgloss.NewStyle().
-			Width(8).
-			MarginRight(0)
+			MarginRight(2)
 )
 
 func (m mainModel) renderControl() string {
@@ -29,7 +28,7 @@ func (m mainModel) renderControl() string {
 			lipgloss.Left,
 			lipgloss.JoinVertical(
 				lipgloss.Left,
-				cellStyle.Width(12).Render(m.selectedNodeName()),
+				cellStyle.Width(9).Render(m.selectedNodeName()),
 				cellStyle.Render(m.modeName()),
 			),
 			pane,
@@ -48,7 +47,12 @@ func (m mainModel) gridInfo() string {
 		lipgloss.JoinVertical(
 			lipgloss.Left,
 			cellStyle.Render(fmt.Sprintf("%.f %s", m.grid.Tempo(), m.transportSymbol())),
-			"8:8",
+			cellStyle.Render("1:16"), // TODO: implement
+		),
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			cellStyle.Render("C4"),
+			cellStyle.Render("Dorien"),
 		),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
@@ -59,29 +63,44 @@ func (m mainModel) gridInfo() string {
 }
 
 func (m mainModel) nodeEdit() string {
+	params := []string{}
+	for _, p := range m.params {
+		params = append(
+			params,
+			lipgloss.JoinVertical(
+				lipgloss.Left,
+				cellStyle.Render(p.Display()),
+				cellStyle.Render(p.Name()),
+			),
+		)
+	}
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
-		lipgloss.JoinVertical(
-			lipgloss.Left,
-			cellStyle.Render("c4"),
-			cellStyle.Render("note"),
-		),
-		lipgloss.JoinVertical(
-			lipgloss.Left,
-			cellStyle.Render("100"),
-			cellStyle.Render("vel"),
-		),
-		lipgloss.JoinVertical(
-			lipgloss.Left,
-			cellStyle.Render("100"),
-			cellStyle.Render("len"),
-		),
-		lipgloss.JoinVertical(
-			lipgloss.Left,
-			cellStyle.Render("1"),
-			cellStyle.Render("chan"),
-		),
+		params...,
 	)
+	// return lipgloss.JoinHorizontal(
+	// 	lipgloss.Left,
+	// 	lipgloss.JoinVertical(
+	// 		lipgloss.Left,
+	// 		cellStyle.Render("c4"),
+	// 		cellStyle.Render("note"),
+	// 	),
+	// 	lipgloss.JoinVertical(
+	// 		lipgloss.Left,
+	// 		cellStyle.Render("100"),
+	// 		cellStyle.Render("vel"),
+	// 	),
+	// 	lipgloss.JoinVertical(
+	// 		lipgloss.Left,
+	// 		cellStyle.Render("100"),
+	// 		cellStyle.Render("len"),
+	// 	),
+	// 	lipgloss.JoinVertical(
+	// 		lipgloss.Left,
+	// 		cellStyle.Render("1"),
+	// 		cellStyle.Render("chan"),
+	// 	),
+	// )
 }
 
 func (m mainModel) transportSymbol() string {
