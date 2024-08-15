@@ -31,3 +31,7 @@ func (k Key) Decrement() {
 func (k Key) Set(value int) {
 	k.node.(core.Emitter).Note().SetKey(uint8(value))
 }
+
+func (k Key) Preview() {
+	k.node.(core.Emitter).Note().Play()
+}

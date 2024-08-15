@@ -218,6 +218,7 @@ func (m mainModel) handleParamEdit(key string) {
 	switch p := m.params[m.param].(type) {
 	case param.Direction:
 		p.SetFromKeyString(key)
+		return
 	}
 
 	switch key {
@@ -225,6 +226,14 @@ func (m mainModel) handleParamEdit(key string) {
 		m.params[m.param].Increment()
 	case "down", "left":
 		m.params[m.param].Decrement()
+	}
+
+	switch p := m.params[m.param].(type) {
+	case param.Key:
+		if m.grid.Playing {
+			return
+		}
+		p.Preview()
 	}
 }
 
