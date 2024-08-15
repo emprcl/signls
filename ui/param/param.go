@@ -21,6 +21,7 @@ func NewParamsForNode(node core.Node) []Param {
 		return []Param{
 			Direction{node: node},
 			Key{node: node},
+			Velocity{node: node},
 		}
 	default:
 		return []Param{}

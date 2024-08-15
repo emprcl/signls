@@ -12,7 +12,8 @@ const (
 	defaultVelocity uint8 = 100
 	defaultLength   uint8 = 1
 
-	maxKey uint8 = 127
+	maxKey      uint8 = 127
+	maxVelocity uint8 = 127
 
 	silence noteBehavior = iota
 	fixed
@@ -41,7 +42,7 @@ func (n Note) IsValid() bool {
 	return n.Key == 0
 }
 
-func (n Note) Name() string {
+func (n Note) KeyName() string {
 	return midi.Note(n.Key)
 }
 
@@ -50,9 +51,16 @@ func (n Note) Play() {
 }
 
 func (n *Note) SetKey(key uint8) {
-	if n.Key > maxKey {
+	if key > maxKey {
 		n.Key = 0
 		return
 	}
 	n.Key = key
+}
+
+func (n *Note) SetVelocity(velocity uint8) {
+	if velocity > maxVelocity {
+		return
+	}
+	n.Velocity = velocity
 }

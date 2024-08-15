@@ -13,7 +13,7 @@ func (k Key) Name() string {
 }
 
 func (k Key) Display() string {
-	return k.node.(core.Emitter).Note().Name()
+	return k.node.(core.Emitter).Note().KeyName()
 }
 
 func (k Key) Value() int {
