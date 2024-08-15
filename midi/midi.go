@@ -22,14 +22,17 @@ const (
 // Midi provides a way to interct with midi devices.
 type Midi interface {
 	Devices() gomidi.OutPorts
-	NoteOn(device int, channel uint8, note uint8, velocity uint8)
-	NoteOff(device int, channel uint8, note uint8)
-	Silence(device int, channel uint8)
-	ControlChange(device int, channel, controller, value uint8)
-	ProgramChange(device int, channel uint8, value uint8)
-	Pitchbend(device int, channel uint8, value int16)
-	AfterTouch(device int, channel uint8, value uint8)
-	SendClock(devices []int)
+	ActiveDevice() drivers.Out
+	SetActiveDevice(device int)
+	CycleMidiDevices()
+	NoteOn(channel uint8, note uint8, velocity uint8)
+	NoteOff(channel uint8, note uint8)
+	Silence(channel uint8)
+	ControlChange(channel, controller, value uint8)
+	ProgramChange(channel uint8, value uint8)
+	Pitchbend(channel uint8, value int16)
+	AfterTouch(channel uint8, value uint8)
+	SendClock()
 	Close()
 }
 
@@ -38,6 +41,9 @@ type Midi interface {
 type midi struct {
 	// devices holds all the midi devices outputs that are returned by gomidi.
 	devices gomidi.OutPorts
+
+	// active holes the active device
+	active int
 
 	// Because we want to allow the usage of multiple midi devices at the same
 	// time, we start a goroutine for each device that can receive note trigs.
@@ -111,48 +117,73 @@ func (m *midi) Devices() gomidi.OutPorts {
 	return m.devices
 }
 
-// NoteOn sends a Note On midi meessage to the given device.
-func (m *midi) NoteOn(device int, channel uint8, note uint8, velocity uint8) {
-	m.outputs[device] <- gomidi.NoteOn(channel, note, velocity)
+// CycleMidiDevices cycle through all devices and
+// and sets the next one as active
+func (m *midi) CycleMidiDevices() {
+	if len(m.Devices()) < m.active+2 {
+		m.active = 0
+		return
+	}
+	m.active++
 }
 
-// NoteOff sends a Note Off midi meessage to the given device.
-func (m *midi) NoteOff(device int, channel uint8, note uint8) {
-	m.outputs[device] <- gomidi.NoteOff(channel, note)
+// SetActiveDevice sets the active device
+func (m *midi) SetActiveDevice(device int) {
+	if len(m.devices) < device+1 {
+		m.active = 0
+		return
+	}
+	m.active = device
+}
+
+// ActiveDevice returns the active device
+func (m *midi) ActiveDevice() drivers.Out {
+	if len(m.devices) < m.active+1 {
+		return nil
+	}
+	return m.devices[m.active]
+}
+
+// NoteOn sends a Note On midi meessage to the active device.
+func (m *midi) NoteOn(channel uint8, note uint8, velocity uint8) {
+	m.outputs[m.active] <- gomidi.NoteOn(channel, note, velocity)
+}
+
+// NoteOff sends a Note Off midi meessage to the active device.
+func (m *midi) NoteOff(channel uint8, note uint8) {
+	m.outputs[m.active] <- gomidi.NoteOff(channel, note)
 }
 
 // Silence sends a note off message for every running note on every channel.
-func (m *midi) Silence(device int, channel uint8) {
+func (m *midi) Silence(channel uint8) {
 	for _, msg := range gomidi.SilenceChannel(int8(channel)) {
-		m.outputs[device] <- msg
+		m.outputs[m.active] <- msg
 	}
 }
 
-// ControlChange sends a Control Change messages to the given device.
-func (m *midi) ControlChange(device int, channel, controller, value uint8) {
-	m.outputs[device] <- gomidi.ControlChange(channel, controller, value)
+// ControlChange sends a Control Change messages to the active device.
+func (m *midi) ControlChange(channel, controller, value uint8) {
+	m.outputs[m.active] <- gomidi.ControlChange(channel, controller, value)
 }
 
-// ProgramChange sends a Program Change messages to the given device.
-func (m *midi) ProgramChange(device int, channel uint8, value uint8) {
-	m.outputs[device] <- gomidi.ProgramChange(channel, value)
+// ProgramChange sends a Program Change messages to the active device.
+func (m *midi) ProgramChange(channel uint8, value uint8) {
+	m.outputs[m.active] <- gomidi.ProgramChange(channel, value)
 }
 
-// Pitchbend sends a Pitch Bend messages to the given device.
-func (m *midi) Pitchbend(device int, channel uint8, value int16) {
-	m.outputs[device] <- gomidi.Pitchbend(channel, value)
+// Pitchbend sends a Pitch Bend messages to the active device.
+func (m *midi) Pitchbend(channel uint8, value int16) {
+	m.outputs[m.active] <- gomidi.Pitchbend(channel, value)
 }
 
-// AfterTouch sends a After Touch messages to the given device.
-func (m *midi) AfterTouch(device int, channel uint8, value uint8) {
-	m.outputs[device] <- gomidi.AfterTouch(channel, value)
+// AfterTouch sends a After Touch messages to the active device.
+func (m *midi) AfterTouch(channel uint8, value uint8) {
+	m.outputs[m.active] <- gomidi.AfterTouch(channel, value)
 }
 
-// SendClock sends a Clock midi meessage to given devices.
-func (m *midi) SendClock(devices []int) {
-	for _, device := range devices {
-		m.outputs[device] <- gomidi.TimingClock()
-	}
+// SendClock sends a Clock midi meessage to the active device.
+func (m *midi) SendClock() {
+	m.outputs[m.active] <- gomidi.TimingClock()
 }
 
 // Close terminates all the device goroutines gracefully.

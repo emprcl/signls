@@ -99,26 +99,30 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case "tab":
 			if m.edit {
-				m.param = (m.param + 1) % len(m.params)
+				m.moveParam("right")
 			}
 			return m, nil
 		case "up", "right", "down", "left":
 			if m.edit {
-				m.handleParamEdit(msg)
-			} else {
-				m.blink = true
-				m.cursorX, m.cursorY = moveCursor(
-					msg.String(), m.cursorX, m.cursorY,
-					0, m.grid.Width-1, 0, m.grid.Height-1,
-				)
-				m.selectionX, m.selectionY = moveCursor(
-					msg.String(), m.selectionX, m.selectionY,
-					m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
-				)
+				m.moveParam(msg.String())
+				return m, nil
 			}
+			m.blink = true
+			m.cursorX, m.cursorY = moveCursor(
+				msg.String(), m.cursorX, m.cursorY,
+				0, m.grid.Width-1, 0, m.grid.Height-1,
+			)
+			m.selectionX, m.selectionY = moveCursor(
+				msg.String(), m.selectionX, m.selectionY,
+				m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
+			)
 			return m, nil
 		case "shift+up", "shift+right", "shift+down", "shift+left":
 			dir := strings.Replace(msg.String(), "shift+", "", 1)
+			if m.edit {
+				m.handleParamEdit(dir)
+				return m, nil
+			}
 			m.selectionX, m.selectionY = moveCursor(
 				dir, m.selectionX, m.selectionY,
 				m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
@@ -203,25 +207,22 @@ func (m mainModel) View() string {
 		cleanup,
 	)
 }
-func (m mainModel) handleParamEdit(msg tea.KeyMsg) {
+func (m mainModel) handleParamEdit(key string) {
 	if len(m.params) < m.param+1 {
 		return
 	}
 
 	switch p := m.params[m.param].(type) {
 	case param.Direction:
-		p.SetFromKeyString(msg.String())
+		p.SetFromKeyString(key)
 	}
 
-	switch msg.String() {
+	switch key {
 	case "up", "right":
 		m.params[m.param].Increment()
 	case "down", "left":
 		m.params[m.param].Decrement()
 	}
-
-	//m.grid.Node(m.cursorX, m.cursorY).
-	//	SetDirection(core.DirectionFromString(msg.String()))
 }
 
 func (m mainModel) renderGrid() string {
@@ -235,6 +236,22 @@ func (m mainModel) renderGrid() string {
 	}
 	lines = append(lines, m.renderControl())
 	return lipgloss.JoinVertical(lipgloss.Left, lines...)
+}
+
+func (m *mainModel) moveParam(dir string) {
+	if len(m.params) == 0 {
+		return
+	}
+	switch dir {
+	case "right":
+		m.param = (m.param + 1) % len(m.params)
+	case "left":
+		if m.param-1 < 0 {
+			m.param = len(m.params) - 1
+		} else {
+			m.param = (m.param - 1) % len(m.params)
+		}
+	}
 }
 
 func moveCursor(dir string, x, y, minX, maxX, minY, maxY int) (int, int) {

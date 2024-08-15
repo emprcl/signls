@@ -14,6 +14,9 @@ var (
 
 	cellStyle = lipgloss.NewStyle().
 			MarginRight(2)
+	activeCellStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("190")).
+			MarginRight(2)
 )
 
 func (m mainModel) renderControl() string {
@@ -64,13 +67,19 @@ func (m mainModel) gridInfo() string {
 
 func (m mainModel) nodeEdit() string {
 	params := []string{}
-	for _, p := range m.params {
+	style := cellStyle
+	for k, p := range m.params {
+		if k == m.param {
+			style = activeCellStyle
+		} else {
+			style = cellStyle
+		}
 		params = append(
 			params,
 			lipgloss.JoinVertical(
 				lipgloss.Left,
-				cellStyle.Render(p.Display()),
-				cellStyle.Render(p.Name()),
+				style.Render(p.Display()),
+				style.Render(p.Name()),
 			),
 		)
 	}

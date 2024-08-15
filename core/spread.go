@@ -1,9 +1,12 @@
 package core
 
-import "fmt"
+import (
+	"cykl/midi"
+	"fmt"
+)
 
 type SpreadEmitter struct {
-	note      Note
+	note      *Note
 	direction Direction
 	pulse     uint64
 	armed     bool
@@ -11,14 +14,10 @@ type SpreadEmitter struct {
 	muted     bool
 }
 
-func NewSimpleEmitter(direction Direction) *SpreadEmitter {
+func NewSimpleEmitter(midi midi.Midi, direction Direction) *SpreadEmitter {
 	return &SpreadEmitter{
 		direction: direction,
-		note: Note{
-			Channel:  uint8(0),
-			Key:      60,
-			Velocity: 100,
-		},
+		note:      NewNote(midi),
 	}
 }
 
@@ -33,7 +32,7 @@ func (e *SpreadEmitter) Activated() bool {
 	return e.armed || e.triggered
 }
 
-func (e *SpreadEmitter) Note() Note {
+func (e *SpreadEmitter) Note() *Note {
 	return e.note
 }
 

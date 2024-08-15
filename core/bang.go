@@ -1,9 +1,12 @@
 package core
 
-import "fmt"
+import (
+	"cykl/midi"
+	"fmt"
+)
 
 type BangEmitter struct {
-	note      Note
+	note      *Note
 	direction Direction
 	pulse     uint64
 	armed     bool
@@ -11,15 +14,11 @@ type BangEmitter struct {
 	muted     bool
 }
 
-func NewInitEmitter(direction Direction) *BangEmitter {
+func NewInitEmitter(midi midi.Midi, direction Direction) *BangEmitter {
 	return &BangEmitter{
 		direction: direction,
 		armed:     true,
-		note: Note{
-			Channel:  uint8(1),
-			Key:      60,
-			Velocity: 100,
-		},
+		note:      NewNote(midi),
 	}
 }
 
@@ -35,7 +34,7 @@ func (e *BangEmitter) Activated() bool {
 	return e.armed || e.triggered
 }
 
-func (e *BangEmitter) Note() Note {
+func (e *BangEmitter) Note() *Note {
 	return e.note
 }
 

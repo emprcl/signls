@@ -21,7 +21,6 @@ type Grid struct {
 	Playing bool
 	Pulse   uint64
 
-	device    int
 	clipboard [][]Node
 }
 
@@ -37,15 +36,15 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 	}
 
 	// Basic test case
-	grid.AddNode(NewInitEmitter(DOWN|RIGHT), 7, 7)
-	grid.AddNode(NewSimpleEmitter(DOWN), 11, 7)
-	grid.AddNode(NewSimpleEmitter(LEFT), 11, 11)
-	grid.AddNode(NewSimpleEmitter(UP), 7, 11)
+	grid.AddNode(NewInitEmitter(midi, DOWN|RIGHT), 7, 7)
+	grid.AddNode(NewSimpleEmitter(midi, DOWN), 11, 7)
+	grid.AddNode(NewSimpleEmitter(midi, LEFT), 11, 11)
+	grid.AddNode(NewSimpleEmitter(midi, UP), 7, 11)
 
-	grid.AddNode(NewInitEmitter(RIGHT), 7, 2)
-	grid.AddNode(NewSimpleEmitter(LEFT), 12, 2)
-	grid.AddNode(NewInitEmitter(RIGHT), 7, 3)
-	grid.AddNode(NewSimpleEmitter(LEFT), 9, 3)
+	grid.AddNode(NewInitEmitter(midi, RIGHT), 7, 2)
+	grid.AddNode(NewSimpleEmitter(midi, LEFT), 12, 2)
+	grid.AddNode(NewInitEmitter(midi, RIGHT), 7, 3)
+	grid.AddNode(NewSimpleEmitter(midi, LEFT), 9, 3)
 
 	grid.clock = newClock(defaultTempo, func() {
 		if !grid.Playing {
@@ -73,18 +72,14 @@ func (g *Grid) Tempo() float64 {
 }
 
 func (g *Grid) MidiDevice() string {
-	if len(g.midi.Devices()) < g.device+1 {
+	if g.midi.ActiveDevice() == nil {
 		return "no midi device"
 	}
-	return g.midi.Devices()[g.device].String()
+	return g.midi.ActiveDevice().String()
 }
 
 func (g *Grid) CycleMidiDevice() {
-	if len(g.midi.Devices()) < g.device+2 {
-		g.device = 0
-		return
-	}
-	g.device++
+	g.midi.CycleMidiDevices()
 }
 
 func (g *Grid) QuarterNote() bool {
@@ -136,9 +131,9 @@ func (g *Grid) Node(x, y int) Node {
 func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	switch symbol {
 	case "b":
-		g.AddNode(NewInitEmitter(NONE), x, y)
+		g.AddNode(NewInitEmitter(g.midi, NONE), x, y)
 	case "s":
-		g.AddNode(NewSimpleEmitter(NONE), x, y)
+		g.AddNode(NewSimpleEmitter(g.midi, NONE), x, y)
 	}
 }
 
@@ -229,8 +224,7 @@ func (g *Grid) Emit(x, y int, direction Direction) {
 }
 
 func (g *Grid) Trig(x, y int) {
-	note := g.nodes[y][x].(Emitter).Note()
-	g.midi.NoteOn(0, note.Channel, note.Key, note.Velocity)
+	g.nodes[y][x].(Emitter).Note().Play()
 }
 
 func (g *Grid) Move(x, y int, direction Direction) {

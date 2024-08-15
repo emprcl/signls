@@ -31,7 +31,7 @@ type Movable interface {
 type Emitter interface {
 	Arm()
 	Copy() Node
-	Note() Note
+	Note() *Note
 	Muted() bool
 	SetMute(mute bool)
 	Trig(g *Grid, x, y int)

@@ -20,6 +20,7 @@ func NewParamsForNode(node core.Node) []Param {
 	case *core.BangEmitter:
 		return []Param{
 			Direction{node: node},
+			Key{node: node},
 		}
 	default:
 		return []Param{}
