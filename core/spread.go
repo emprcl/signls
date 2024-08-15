@@ -48,16 +48,16 @@ func (e *SpreadEmitter) Muted() bool {
 	return e.muted
 }
 
-func (e *SpreadEmitter) Trig(g *Grid, x, y int) {
+func (e *SpreadEmitter) Trig(pulse uint64) {
 	if !e.armed {
 		return
 	}
 	if !e.muted {
-		g.Trig(x, y)
+		e.note.Play()
 	}
 	e.triggered = true
 	e.armed = false
-	e.pulse = g.Pulse
+	e.pulse = pulse
 	// TODO: handle length and note off
 }
 

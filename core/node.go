@@ -34,7 +34,7 @@ type Emitter interface {
 	Note() *Note
 	Muted() bool
 	SetMute(mute bool)
-	Trig(g *Grid, x, y int)
+	Trig(pulse uint64)
 	Emit(g *Grid, x, y int)
 	Reset()
 }

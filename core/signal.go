@@ -5,6 +5,13 @@ type Signal struct {
 	pulse     uint64
 }
 
+func NewSignal(direction Direction, pulse uint64) *Signal {
+	return &Signal{
+		direction: direction,
+		pulse:     pulse,
+	}
+}
+
 func (s *Signal) Move(g *Grid, x, y int) {
 	if !s.updated(g.Pulse) {
 		g.Move(x, y, s.direction)

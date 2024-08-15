@@ -189,7 +189,7 @@ func (g *Grid) Update() {
 			}
 
 			if n, ok := g.nodes[y][x].(Emitter); ok {
-				n.Trig(g, x, y)
+				n.Trig(g.Pulse)
 				n.Emit(g, x, y)
 			}
 		}
@@ -219,17 +219,10 @@ func (g *Grid) Emit(x, y int, direction Direction) {
 	}
 	if n, ok := g.nodes[newY][newX].(Emitter); ok {
 		n.Arm()
-		n.Trig(g, newX, newY)
+		n.Trig(g.Pulse)
 		return
 	}
-	g.nodes[newY][newX] = &Signal{
-		direction: direction,
-		pulse:     g.Pulse,
-	}
-}
-
-func (g *Grid) Trig(x, y int) {
-	g.nodes[y][x].(Emitter).Note().Play()
+	g.nodes[newY][newX] = NewSignal(direction, g.Pulse)
 }
 
 func (g *Grid) Move(x, y int, direction Direction) {
@@ -245,7 +238,7 @@ func (g *Grid) Move(x, y int, direction Direction) {
 		g.nodes[newY][newX] = g.nodes[y][x]
 	} else if n, ok := g.nodes[newY][newX].(Emitter); ok {
 		n.Arm()
-		n.Trig(g, newX, newY)
+		n.Trig(g.Pulse)
 	}
 
 	g.nodes[y][x] = nil
