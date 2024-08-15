@@ -28,6 +28,7 @@ type Midi interface {
 	NoteOn(channel uint8, note uint8, velocity uint8)
 	NoteOff(channel uint8, note uint8)
 	Silence(channel uint8)
+	SilenceAll()
 	ControlChange(channel, controller, value uint8)
 	ProgramChange(channel uint8, value uint8)
 	Pitchbend(channel uint8, value int16)
@@ -154,10 +155,17 @@ func (m *midi) NoteOff(channel uint8, note uint8) {
 	m.outputs[m.active] <- gomidi.NoteOff(channel, note)
 }
 
-// Silence sends a note off message for every running note on every channel.
+// Silence sends a note off message for every running note on given channel.
 func (m *midi) Silence(channel uint8) {
 	for _, msg := range gomidi.SilenceChannel(int8(channel)) {
 		m.outputs[m.active] <- msg
+	}
+}
+
+// SilenceAll sends a note off message for every running note on every channel.
+func (m *midi) SilenceAll() {
+	for c := 0; c < 16; c++ {
+		m.Silence(uint8(c))
 	}
 }
 

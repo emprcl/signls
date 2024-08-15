@@ -51,6 +51,7 @@ func (e *BangEmitter) Muted() bool {
 }
 
 func (e *BangEmitter) Trig(pulse uint64) {
+	e.note.tick()
 	if !e.armed {
 		return
 	}
@@ -60,7 +61,6 @@ func (e *BangEmitter) Trig(pulse uint64) {
 	e.triggered = true
 	e.armed = false
 	e.pulse = pulse
-	// TODO: handle length and note off
 }
 
 func (e *BangEmitter) Emit(g *Grid, x, y int) {
@@ -102,6 +102,7 @@ func (e *BangEmitter) Reset() {
 	e.pulse = 0
 	e.armed = true
 	e.triggered = false
+	e.Note().Stop()
 }
 
 func (e *BangEmitter) updated(pulse uint64) bool {

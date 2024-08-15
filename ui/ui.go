@@ -94,9 +94,6 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case " ":
 			m.grid.TogglePlay()
 			return m, nil
-		case "ctrl+d":
-			m.grid.Reset()
-			return m, nil
 		case "tab":
 			if m.edit {
 				m.moveParam(msg)
@@ -185,6 +182,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.grid.Update()
 			return m, nil
 		case "q":
+			m.grid.Reset()
 			return m, tea.Quit
 		}
 	}

@@ -14,6 +14,7 @@ func (m *Mock) CycleMidiDevices()                                {}
 func (m *Mock) NoteOn(channel uint8, note uint8, velocity uint8) {}
 func (m *Mock) NoteOff(channel uint8, note uint8)                {}
 func (m *Mock) Silence(channel uint8)                            {}
+func (m *Mock) SilenceAll()                                      {}
 func (m *Mock) ControlChange(channel, controller, value uint8)   {}
 func (m *Mock) ProgramChange(channel uint8, value uint8)         {}
 func (m *Mock) Pitchbend(channel uint8, value int16)             {}

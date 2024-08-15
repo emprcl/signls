@@ -28,6 +28,9 @@ type Note struct {
 	Key      uint8
 	Velocity uint8
 	Length   uint8
+
+	pulse     uint64
+	triggered bool
 }
 
 func NewNote(midi midi.Midi) *Note {
@@ -48,8 +51,25 @@ func (n Note) KeyName() string {
 	return midi.Note(n.Key)
 }
 
-func (n Note) Play() {
+func (n *Note) tick() {
+	if !n.triggered {
+		return
+	}
+	n.pulse++
+	if n.pulse >= uint64(n.Length)*uint64(pulsesPerStep) {
+		n.Stop()
+	}
+}
+
+func (n *Note) Play() {
 	n.midi.NoteOn(n.Channel, n.Key, n.Velocity)
+	n.triggered = true
+}
+
+func (n *Note) Stop() {
+	n.midi.NoteOff(n.Channel, n.Key)
+	n.triggered = false
+	n.pulse = 0
 }
 
 func (n *Note) SetKey(key uint8) {

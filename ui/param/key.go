@@ -2,6 +2,7 @@ package param
 
 import (
 	"cykl/core"
+	"time"
 )
 
 type Key struct {
@@ -33,5 +34,10 @@ func (k Key) Set(value int) {
 }
 
 func (k Key) Preview() {
-	k.node.(core.Emitter).Note().Play()
+	go func() {
+		n := *k.node.(core.Emitter).Note()
+		n.Play()
+		time.Sleep(time.Second)
+		n.Stop()
+	}()
 }

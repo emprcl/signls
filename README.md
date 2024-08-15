@@ -8,9 +8,10 @@
  	- A moving behavior ?
 
 TODO:
+ - fix bug on spread emitters midi triggers
  - add root/scale global conf
  - add tempo division control
+ - add new emitters
+ - add new note behaviors
  - add pipes
- - add midi note menu
  - add midi cc menu
- - find a way to display "on top of" in lipgloss/bubbletea (maybe https://github.com/charmbracelet/lipgloss/pull/102)

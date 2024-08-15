@@ -2,6 +2,7 @@ package core
 
 import (
 	"cykl/midi"
+	"sync"
 )
 
 const (
@@ -9,6 +10,8 @@ const (
 )
 
 type Grid struct {
+	mu sync.Mutex
+
 	midi   midi.Midi
 	clock  *clock
 	nodes  [][]Node
@@ -57,10 +60,11 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 }
 
 func (g *Grid) TogglePlay() {
-	if !g.Playing {
-		g.Pulse = 0
-	}
 	g.Playing = !g.Playing
+	if !g.Playing {
+		g.Reset()
+		g.midi.SilenceAll()
+	}
 }
 
 func (g *Grid) SetTempo(tempo float64) {
@@ -86,7 +90,7 @@ func (g *Grid) QuarterNote() bool {
 	if !g.Playing {
 		return false
 	}
-	return g.Pulse/uint64(pulsesPerStep)%uint64(stepsPerQuarterNote) == 0
+	return g.Pulse/uint64(pulsesPerStep)%uint64(stepsPerQuarterNote) == 1
 }
 
 func (g *Grid) CopyOrCut(startX, startY, endX, endY int, cut bool) {
@@ -177,7 +181,8 @@ func (g *Grid) SetAllNodeMutes(mute bool) {
 }
 
 func (g *Grid) Update() {
-	g.Pulse++
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
 			if g.nodes[y][x] == nil {
@@ -194,9 +199,12 @@ func (g *Grid) Update() {
 			}
 		}
 	}
+	g.Pulse++
 }
 
 func (g *Grid) Reset() {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	g.Playing = false
 	g.Pulse = 0
 	for y := 0; y < g.Height; y++ {
