@@ -22,7 +22,7 @@ type Grid struct {
 	Scale uint8
 
 	Playing bool
-	Pulse   uint64
+	pulse   uint64
 
 	clipboard [][]Node
 }
@@ -75,11 +75,15 @@ func (g *Grid) CycleMidiDevice() {
 	g.midi.CycleMidiDevices()
 }
 
+func (g *Grid) Pulse() uint64 {
+	return g.pulse / uint64(pulsesPerStep*stepsPerQuarterNote)
+}
+
 func (g *Grid) QuarterNote() bool {
 	if !g.Playing {
 		return false
 	}
-	return g.Pulse/uint64(pulsesPerStep)%uint64(stepsPerQuarterNote) == 1
+	return g.pulse/uint64(pulsesPerStep)%uint64(stepsPerQuarterNote) == 0
 }
 
 func (g *Grid) CopyOrCut(startX, startY, endX, endY int, cut bool) {
@@ -172,7 +176,7 @@ func (g *Grid) SetAllNodeMutes(mute bool) {
 func (g *Grid) Update() {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if g.Pulse%uint64(pulsesPerStep) != 0 {
+	if g.pulse%uint64(pulsesPerStep) != 0 {
 		g.Tick()
 		return
 	}
@@ -187,12 +191,12 @@ func (g *Grid) Update() {
 			}
 
 			if n, ok := g.nodes[y][x].(Emitter); ok {
-				n.Trig(g.Pulse)
+				n.Trig(g.pulse)
 				n.Emit(g, x, y)
 			}
 		}
 	}
-	g.Pulse++
+	g.pulse++
 }
 
 func (g *Grid) Tick() {
@@ -203,14 +207,14 @@ func (g *Grid) Tick() {
 			}
 		}
 	}
-	g.Pulse++
+	g.pulse++
 }
 
 func (g *Grid) Reset() {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	g.Playing = false
-	g.Pulse = 0
+	g.pulse = 0
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
 			if _, ok := g.nodes[y][x].(Movable); ok {
@@ -231,10 +235,10 @@ func (g *Grid) Emit(x, y int, direction Direction) {
 	}
 	if n, ok := g.nodes[newY][newX].(Emitter); ok {
 		n.Arm()
-		n.Trig(g.Pulse)
+		n.Trig(g.pulse)
 		return
 	}
-	g.nodes[newY][newX] = NewSignal(direction, g.Pulse)
+	g.nodes[newY][newX] = NewSignal(direction, g.pulse)
 }
 
 func (g *Grid) Move(x, y int, direction Direction) {
@@ -250,7 +254,7 @@ func (g *Grid) Move(x, y int, direction Direction) {
 		g.nodes[newY][newX] = g.nodes[y][x]
 	} else if n, ok := g.nodes[newY][newX].(Emitter); ok {
 		n.Arm()
-		n.Trig(g.Pulse)
+		n.Trig(g.pulse)
 	}
 
 	g.nodes[y][x] = nil

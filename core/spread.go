@@ -66,14 +66,14 @@ func (e *SpreadEmitter) Trig(pulse uint64) {
 }
 
 func (e *SpreadEmitter) Emit(g *Grid, x, y int) {
-	if e.updated(g.Pulse) || !e.triggered {
+	if e.updated(g.pulse) || !e.triggered {
 		return
 	}
 	for _, dir := range e.direction.Decompose() {
 		g.Emit(x, y, dir)
 	}
 	e.triggered = false
-	e.pulse = g.Pulse
+	e.pulse = g.pulse
 }
 
 func (e *SpreadEmitter) Direction() Direction {

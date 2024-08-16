@@ -49,7 +49,7 @@ func (m mainModel) gridInfo() string {
 		lipgloss.JoinVertical(
 			lipgloss.Left,
 			cellStyle.Render(fmt.Sprintf("%.f %s", m.grid.Tempo(), m.tempoSymbol())),
-			cellStyle.Render("1:16"), // TODO: implement
+			cellStyle.Render(fmt.Sprintf("%s %d", m.transportSymbol(), m.grid.Pulse())),
 		),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
@@ -58,7 +58,7 @@ func (m mainModel) gridInfo() string {
 		),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			cellStyle.Render(fmt.Sprintf("%s %d", m.transportSymbol(), m.grid.Pulse)),
+			"",
 			m.grid.MidiDevice(),
 		),
 	)

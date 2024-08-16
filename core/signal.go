@@ -13,9 +13,9 @@ func NewSignal(direction Direction, pulse uint64) *Signal {
 }
 
 func (s *Signal) Move(g *Grid, x, y int) {
-	if !s.updated(g.Pulse) {
+	if !s.updated(g.pulse) {
 		g.Move(x, y, s.direction)
-		s.pulse = g.Pulse
+		s.pulse = g.pulse
 	}
 }
 
