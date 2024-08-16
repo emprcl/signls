@@ -22,9 +22,10 @@ func NewSimpleEmitter(midi midi.Midi, direction Direction) *SpreadEmitter {
 }
 
 func (e *SpreadEmitter) Copy() Node {
+	newNote := *e.note
 	return &SpreadEmitter{
 		direction: e.direction,
-		note:      e.note,
+		note:      &newNote,
 	}
 }
 
@@ -41,6 +42,7 @@ func (e *SpreadEmitter) Arm() {
 }
 
 func (e *SpreadEmitter) SetMute(mute bool) {
+	e.note.Stop()
 	e.muted = mute
 }
 
@@ -50,7 +52,7 @@ func (e *SpreadEmitter) Muted() bool {
 
 func (e *SpreadEmitter) Trig(pulse uint64) {
 	if !e.updated(pulse) {
-		e.note.tick()
+		e.note.Tick()
 	}
 	if !e.armed {
 		return

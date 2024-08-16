@@ -9,7 +9,6 @@
 
 TODO:
  - add root/scale global conf
- - add tempo division control
  - add new emitters
  - add new note behaviors
  - add pipes

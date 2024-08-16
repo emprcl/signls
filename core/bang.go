@@ -23,10 +23,11 @@ func NewInitEmitter(midi midi.Midi, direction Direction) *BangEmitter {
 }
 
 func (e *BangEmitter) Copy() Node {
+	newNote := *e.note
 	return &BangEmitter{
 		direction: e.direction,
 		armed:     true,
-		note:      e.note,
+		note:      &newNote,
 	}
 }
 
@@ -43,6 +44,7 @@ func (e *BangEmitter) Arm() {
 }
 
 func (e *BangEmitter) SetMute(mute bool) {
+	e.note.Stop()
 	e.muted = mute
 }
 
@@ -52,7 +54,7 @@ func (e *BangEmitter) Muted() bool {
 
 func (e *BangEmitter) Trig(pulse uint64) {
 	if !e.updated(pulse) {
-		e.note.tick()
+		e.note.Tick()
 	}
 	if !e.armed {
 		return

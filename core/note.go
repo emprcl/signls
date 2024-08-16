@@ -14,7 +14,8 @@ const (
 
 	maxKey      uint8 = 127
 	maxVelocity uint8 = 127
-	maxLength   uint8 = 127
+	maxLength   uint8 = 127 // 127 is infinity
+	minLength   uint8 = 1
 	maxChannel  uint8 = 15
 
 	silence noteBehavior = iota
@@ -29,6 +30,7 @@ type Note struct {
 	Velocity uint8
 	Length   uint8
 
+	nextKey   uint8
 	pulse     uint64
 	triggered bool
 }
@@ -48,23 +50,38 @@ func (n Note) IsValid() bool {
 }
 
 func (n Note) KeyName() string {
+	if n.nextKey > 0 {
+		return midi.Note(n.nextKey)
+	}
 	return midi.Note(n.Key)
 }
 
-func (n *Note) tick() {
+func (n Note) KeyValue() uint8 {
+	if n.nextKey > 0 {
+		return n.nextKey
+	}
+	return n.Key
+}
+
+func (n *Note) Tick() {
 	if !n.triggered {
 		return
 	}
 	n.pulse++
-	if n.pulse >= uint64(n.Length)*uint64(pulsesPerStep) {
+	if n.Length < maxLength && n.pulse >= uint64(n.Length) {
 		n.Stop()
 	}
 }
 
 func (n *Note) Play() {
+	if n.nextKey > 0 {
+		n.Stop()
+		n.Key = n.nextKey
+	}
 	n.midi.NoteOn(n.Channel, n.Key, n.Velocity)
 	n.triggered = true
 	n.pulse = 0
+	n.nextKey = 0
 }
 
 func (n *Note) Stop() {
@@ -75,13 +92,17 @@ func (n *Note) Stop() {
 
 func (n *Note) SetKey(key uint8) {
 	if key > maxKey {
-		n.Key = 0
+		n.nextKey = 0
 		return
 	}
 	if key < 0 {
-		n.Key = 127
+		n.nextKey = 127
 	}
-	n.Key = key
+	n.nextKey = key
+	if !n.triggered {
+		n.Key = n.nextKey
+		n.nextKey = 0
+	}
 }
 
 func (n *Note) SetVelocity(velocity uint8) {
@@ -92,7 +113,7 @@ func (n *Note) SetVelocity(velocity uint8) {
 }
 
 func (n *Note) SetLength(length uint8) {
-	if length > maxLength {
+	if length > maxLength || length < minLength {
 		return
 	}
 	n.Length = length
@@ -103,4 +124,8 @@ func (n *Note) SetChannel(channel uint8) {
 		return
 	}
 	n.Channel = channel
+}
+
+func (n *Note) ClockDivision() (int, int) {
+	return pulsesPerStep, stepsPerQuarterNote
 }

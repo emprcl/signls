@@ -18,7 +18,7 @@ func (k Key) Display() string {
 }
 
 func (k Key) Value() int {
-	return int(k.node.(core.Emitter).Note().Key)
+	return int(k.node.(core.Emitter).Note().KeyValue())
 }
 
 func (k Key) Increment() {
@@ -37,7 +37,7 @@ func (k Key) Preview() {
 	go func() {
 		n := *k.node.(core.Emitter).Note()
 		n.Play()
-		time.Sleep(time.Second)
+		time.Sleep(300 * time.Millisecond)
 		n.Stop()
 	}()
 }

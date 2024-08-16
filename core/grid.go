@@ -172,6 +172,10 @@ func (g *Grid) SetAllNodeMutes(mute bool) {
 func (g *Grid) Update() {
 	g.mu.Lock()
 	defer g.mu.Unlock()
+	if g.Pulse%uint64(pulsesPerStep) != 0 {
+		g.Tick()
+		return
+	}
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
 			if g.nodes[y][x] == nil {
@@ -185,6 +189,17 @@ func (g *Grid) Update() {
 			if n, ok := g.nodes[y][x].(Emitter); ok {
 				n.Trig(g.Pulse)
 				n.Emit(g, x, y)
+			}
+		}
+	}
+	g.Pulse++
+}
+
+func (g *Grid) Tick() {
+	for y := 0; y < g.Height; y++ {
+		for x := 0; x < g.Width; x++ {
+			if n, ok := g.nodes[y][x].(Emitter); ok {
+				n.Note().Tick()
 			}
 		}
 	}
