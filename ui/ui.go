@@ -47,6 +47,7 @@ type mainModel struct {
 func New(grid *core.Grid) tea.Model {
 	model := mainModel{
 		grid:    grid,
+		params:  param.NewParamsForGrid(grid),
 		cursorX: 1,
 		cursorY: 1,
 	}
@@ -161,8 +162,10 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.edit = !m.edit
 			if m.edit {
 				m.params = param.NewParamsForNode(m.selectedNode())
-				m.param = 0
+			} else {
+				m.params = param.NewParamsForGrid(m.grid)
 			}
+			m.param = 0
 			return m, nil
 		case "!":
 			if !m.grid.Playing {
@@ -173,6 +176,18 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.selectedNode().(core.Emitter).Arm()
 			m.selectedNode().(core.Emitter).Trig(m.grid.Pulse())
+			return m, nil
+		case "*":
+			if m.edit {
+				return m, nil
+			}
+			param.Get("root", m.params).Increment()
+			return m, nil
+		case "ù":
+			if m.edit {
+				return m, nil
+			}
+			param.Get("root", m.params).Decrement()
 			return m, nil
 		case "=":
 			m.grid.SetTempo(m.grid.Tempo() + 1)

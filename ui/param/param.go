@@ -29,3 +29,18 @@ func NewParamsForNode(node core.Node) []Param {
 		return []Param{}
 	}
 }
+
+func NewParamsForGrid(grid *core.Grid) []Param {
+	return []Param{
+		Root{grid: grid},
+	}
+}
+
+func Get(name string, params []Param) Param {
+	for _, p := range params {
+		if p.Name() == name {
+			return p
+		}
+	}
+	return params[0]
+}

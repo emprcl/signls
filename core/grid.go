@@ -6,7 +6,8 @@ import (
 )
 
 const (
-	defaultTempo = 120.
+	defaultTempo         = 120.
+	defaultRootKey uint8 = 60
 )
 
 type Grid struct {
@@ -33,6 +34,7 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 		nodes:  make([][]Node, height),
 		Height: height,
 		Width:  width,
+		Key:    defaultRootKey,
 	}
 	for i := range grid.nodes {
 		grid.nodes[i] = make([]Node, width)

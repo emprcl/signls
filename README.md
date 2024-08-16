@@ -13,3 +13,9 @@ TODO:
  - add new note behaviors
  - add pipes
  - add midi cc menu
+
+Names:
+  - Nyll
+  - KYVL
+  - HYDR
+  - VYRN

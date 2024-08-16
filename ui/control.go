@@ -2,6 +2,7 @@ package ui
 
 import (
 	"cykl/core"
+	"cykl/ui/param"
 	"fmt"
 
 	"github.com/charmbracelet/lipgloss"
@@ -39,6 +40,7 @@ func (m mainModel) renderControl() string {
 }
 
 func (m mainModel) gridInfo() string {
+	root := param.Get("root", m.params)
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		lipgloss.JoinVertical(
@@ -53,7 +55,7 @@ func (m mainModel) gridInfo() string {
 		),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			cellStyle.Render("C4"),
+			cellStyle.Render(root.Display()),
 			cellStyle.Render("Dorien"),
 		),
 		lipgloss.JoinVertical(
