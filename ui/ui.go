@@ -46,7 +46,9 @@ type mainModel struct {
 // Check the core package.
 func New(grid *core.Grid) tea.Model {
 	model := mainModel{
-		grid: grid,
+		grid:    grid,
+		cursorX: 1,
+		cursorY: 1,
 	}
 	return model
 }
@@ -161,6 +163,16 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.params = param.NewParamsForNode(m.selectedNode())
 				m.param = 0
 			}
+			return m, nil
+		case "!":
+			if !m.grid.Playing {
+				return m, nil
+			}
+			if _, ok := m.selectedNode().(core.Emitter); !ok {
+				return m, nil
+			}
+			m.selectedNode().(core.Emitter).Arm()
+			m.selectedNode().(core.Emitter).Trig(m.grid.Pulse())
 			return m, nil
 		case "=":
 			m.grid.SetTempo(m.grid.Tempo() + 1)

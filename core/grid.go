@@ -76,7 +76,7 @@ func (g *Grid) CycleMidiDevice() {
 }
 
 func (g *Grid) Pulse() uint64 {
-	return g.pulse / uint64(pulsesPerStep*stepsPerQuarterNote)
+	return g.pulse / uint64(pulsesPerStep)
 }
 
 func (g *Grid) QuarterNote() bool {
