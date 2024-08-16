@@ -14,7 +14,7 @@ type Length struct {
 }
 
 func (l Length) Name() string {
-	return "length"
+	return "len"
 }
 
 func (l Length) Display() string {
@@ -34,7 +34,7 @@ func (l Length) Display() string {
 	case pulsesPerStep * stepsPerQuarterNote * 2:
 		return "1|2"
 	case maxLength:
-		return "INF"
+		return "inf"
 	default:
 		return fmt.Sprintf("%.1f", float64(length)/float64(pulsesPerStep))
 	}

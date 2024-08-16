@@ -10,7 +10,7 @@ type Channel struct {
 }
 
 func (c Channel) Name() string {
-	return "channel"
+	return "cha"
 }
 
 func (c Channel) Display() string {

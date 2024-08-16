@@ -10,7 +10,7 @@ type Velocity struct {
 }
 
 func (v Velocity) Name() string {
-	return "velocity"
+	return "vel"
 }
 
 func (v Velocity) Display() string {

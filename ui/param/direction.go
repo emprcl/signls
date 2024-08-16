@@ -2,7 +2,6 @@ package param
 
 import (
 	"cykl/core"
-	"fmt"
 )
 
 type Direction struct {
@@ -10,11 +9,12 @@ type Direction struct {
 }
 
 func (d Direction) Name() string {
-	return "direction"
+	return "dir"
 }
 
 func (d Direction) Display() string {
-	return fmt.Sprintf("%s (%04b)", d.node.Direction().Symbol(), int(d.node.Direction()>>1))
+	return d.node.Direction().Symbol()
+	//return fmt.Sprintf("%s (%04b)", d.node.Direction().Symbol(), int(d.node.Direction()>>1))
 }
 
 func (d Direction) Value() int {
