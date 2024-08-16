@@ -14,10 +14,10 @@ type BangEmitter struct {
 	muted     bool
 }
 
-func NewInitEmitter(midi midi.Midi, direction Direction) *BangEmitter {
+func NewBangEmitter(midi midi.Midi, direction Direction, armed bool) *BangEmitter {
 	return &BangEmitter{
 		direction: direction,
-		armed:     true,
+		armed:     armed,
 		note:      NewNote(midi),
 	}
 }
@@ -26,7 +26,7 @@ func (e *BangEmitter) Copy() Node {
 	newNote := *e.note
 	return &BangEmitter{
 		direction: e.direction,
-		armed:     true,
+		armed:     e.armed,
 		note:      &newNote,
 	}
 }

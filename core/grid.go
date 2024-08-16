@@ -133,9 +133,9 @@ func (g *Grid) Node(x, y int) Node {
 func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	switch symbol {
 	case "b":
-		g.AddNode(NewInitEmitter(g.midi, NONE), x, y)
+		g.AddNode(NewBangEmitter(g.midi, NONE, !g.Playing), x, y)
 	case "s":
-		g.AddNode(NewSimpleEmitter(g.midi, NONE), x, y)
+		g.AddNode(NewSpreadEmitter(g.midi, NONE), x, y)
 	}
 }
 

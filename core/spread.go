@@ -14,7 +14,7 @@ type SpreadEmitter struct {
 	muted     bool
 }
 
-func NewSimpleEmitter(midi midi.Midi, direction Direction) *SpreadEmitter {
+func NewSpreadEmitter(midi midi.Midi, direction Direction) *SpreadEmitter {
 	return &SpreadEmitter{
 		direction: direction,
 		note:      NewNote(midi),

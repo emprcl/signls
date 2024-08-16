@@ -127,11 +127,11 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			dir := strings.Replace(msg.String(), "ctrl+", "", 1)
 			if !m.edit {
 				m.cursorX, m.cursorY = moveCursor(
-					dir, 10, m.cursorX, m.cursorY,
+					dir, 4, m.cursorX, m.cursorY,
 					0, m.grid.Width-1, 0, m.grid.Height-1,
 				)
 				m.selectionX, m.selectionY = moveCursor(
-					dir, 10, m.selectionX, m.selectionY,
+					dir, 4, m.selectionX, m.selectionY,
 					m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
 				)
 				return m, nil
