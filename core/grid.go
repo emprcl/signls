@@ -20,7 +20,7 @@ type Grid struct {
 	Width  int
 
 	Key   uint8
-	Scale uint8
+	Scale Scale
 
 	Playing bool
 	pulse   uint64
@@ -35,6 +35,7 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 		Height: height,
 		Width:  width,
 		Key:    defaultRootKey,
+		Scale:  CHROMATIC,
 	}
 	for i := range grid.nodes {
 		grid.nodes[i] = make([]Node, width)

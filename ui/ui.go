@@ -189,6 +189,18 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			param.Get("root", m.params).Decrement()
 			return m, nil
+		case "µ":
+			if m.edit {
+				return m, nil
+			}
+			param.Get("scale", m.params).Increment()
+			return m, nil
+		case "%":
+			if m.edit {
+				return m, nil
+			}
+			param.Get("scale", m.params).Decrement()
+			return m, nil
 		case "=":
 			m.grid.SetTempo(m.grid.Tempo() + 1)
 			return m, nil

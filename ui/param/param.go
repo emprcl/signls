@@ -33,6 +33,7 @@ func NewParamsForNode(node core.Node) []Param {
 func NewParamsForGrid(grid *core.Grid) []Param {
 	return []Param{
 		Root{grid: grid},
+		Scale{grid: grid, scales: core.AllScales()},
 	}
 }
 

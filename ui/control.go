@@ -41,6 +41,7 @@ func (m mainModel) renderControl() string {
 
 func (m mainModel) gridInfo() string {
 	root := param.Get("root", m.params)
+	scale := param.Get("scale", m.params)
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		lipgloss.JoinVertical(
@@ -56,7 +57,7 @@ func (m mainModel) gridInfo() string {
 		lipgloss.JoinVertical(
 			lipgloss.Left,
 			cellStyle.Render(root.Display()),
-			cellStyle.Render("Dorien"),
+			cellStyle.Render(scale.Display()),
 		),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
