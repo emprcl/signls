@@ -35,7 +35,7 @@ func (s Scale) Set(value int) {
 	} else if value >= len(s.scales) {
 		value = 0
 	}
-	s.grid.Scale = s.scales[value]
+	s.grid.SetScale(s.scales[value])
 }
 
 func (s Scale) scaleIndex() int {

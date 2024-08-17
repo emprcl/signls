@@ -1,8 +1,9 @@
 package core
 
 import (
+	"cykl/midi"
 	"maps"
-	"math/bits"
+	"math"
 	"slices"
 )
 
@@ -79,16 +80,62 @@ var (
 	}
 )
 
-type Interval uint16
+type Key uint8
 
-func (i Interval) Semitones() int {
-	return bits.TrailingZeros16(uint16(i))
+func (k Key) Name() string {
+	return midi.Note(uint8(k))
 }
 
+func (k Key) AllSemitonesFrom(key Key) uint8 {
+	return uint8(key - k)
+}
+
+func (k Key) SemitonesFrom(key Key) uint8 {
+	return uint8(key-k) % 12
+}
+
+func (k Key) InScale(key Key, scale Scale) bool {
+	interval := k.SemitonesFrom(key)
+	return scale&(1<<interval) != 0
+}
+
+func (k Key) Transpose(key Key, scale Scale, oldInterval uint8) Key {
+	newKey := k + Key(k.AllSemitonesFrom(key)-oldInterval)
+	if newKey.InScale(key, scale) {
+		return newKey
+	}
+	var closestKey Key
+	minDistance := math.MaxUint8
+	interval := newKey.SemitonesFrom(key)
+	for i := 0; i < 12; i++ {
+		if scale&(1<<i) != 0 {
+			// TODO: Improve transposition
+			distance := int(math.Abs(float64(int(interval) - i)))
+			if distance <= minDistance {
+				closestKey = key + Key(i)
+				minDistance = distance
+			}
+		}
+	}
+	return closestKey
+}
+
+type Interval uint16
 type Scale uint16
 
 func AllScales() []Scale {
 	return slices.Collect(maps.Keys(allScales))
+}
+
+func AllKeysInScale(root Key, scale Scale) []Key {
+	var keys []Key
+	for i := 0; i <= 127; i++ {
+		if scale&(1<<(i%12)) != 0 {
+			key := root%12 + Key(i)
+			keys = append(keys, key)
+		}
+	}
+	return keys
 }
 
 func (s Scale) Name() string {

@@ -7,6 +7,8 @@ import (
 
 type Key struct {
 	node core.Node
+	keys []core.Key
+	root core.Key
 }
 
 func (k Key) Name() string {
@@ -22,22 +24,31 @@ func (k Key) Value() int {
 }
 
 func (k Key) Increment() {
-	k.Set(k.Value() + 1)
+	k.Set(k.keyIndex() + 1)
 }
 
 func (k Key) Decrement() {
-	k.Set(k.Value() - 1)
+	k.Set(k.keyIndex() - 1)
 }
 
 func (k Key) Set(value int) {
-	k.node.(core.Emitter).Note().SetKey(uint8(value))
+	k.node.(core.Emitter).Note().SetKey(k.keys[value], k.root)
 }
 
 func (k Key) Preview() {
 	go func() {
 		n := *k.node.(core.Emitter).Note()
-		n.Play()
+		n.Play(core.Key(60), core.CHROMATIC)
 		time.Sleep(300 * time.Millisecond)
 		n.Stop()
 	}()
+}
+
+func (k Key) keyIndex() int {
+	for i := 0; i < len(k.keys); i++ {
+		if k.node.(core.Emitter).Note().KeyValue() == k.keys[i] {
+			return i
+		}
+	}
+	return 0
 }

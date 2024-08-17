@@ -30,6 +30,7 @@ type blinkMsg time.Time
 type mainModel struct {
 	grid       *core.Grid
 	params     []param.Param
+	gridParams []param.Param
 	cursorX    int
 	cursorY    int
 	selectionX int
@@ -46,10 +47,10 @@ type mainModel struct {
 // Check the core package.
 func New(grid *core.Grid) tea.Model {
 	model := mainModel{
-		grid:    grid,
-		params:  param.NewParamsForGrid(grid),
-		cursorX: 1,
-		cursorY: 1,
+		grid:       grid,
+		gridParams: param.NewParamsForGrid(grid),
+		cursorX:    1,
+		cursorY:    1,
 	}
 	return model
 }
@@ -141,7 +142,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case "b", "s":
 			m.grid.AddNodeFromSymbol(msg.String(), m.cursorX, m.cursorY)
-			m.params = param.NewParamsForNode(m.selectedNode())
+			m.params = param.NewParamsForNode(m.grid, m.selectedNode())
 			m.edit = true
 			return m, nil
 		case "m":
@@ -161,9 +162,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.edit = !m.edit
 			if m.edit {
-				m.params = param.NewParamsForNode(m.selectedNode())
-			} else {
-				m.params = param.NewParamsForGrid(m.grid)
+				m.params = param.NewParamsForNode(m.grid, m.selectedNode())
 			}
 			m.param = 0
 			return m, nil
@@ -175,31 +174,31 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			m.selectedNode().(core.Emitter).Arm()
-			m.selectedNode().(core.Emitter).Trig(m.grid.Pulse())
+			m.selectedNode().(core.Emitter).Trig(m.grid.Key, m.grid.Scale, m.grid.Pulse())
 			return m, nil
 		case "*":
 			if m.edit {
 				return m, nil
 			}
-			param.Get("root", m.params).Increment()
+			param.Get("root", m.gridParams).Increment()
 			return m, nil
 		case "ù":
 			if m.edit {
 				return m, nil
 			}
-			param.Get("root", m.params).Decrement()
+			param.Get("root", m.gridParams).Decrement()
 			return m, nil
 		case "µ":
 			if m.edit {
 				return m, nil
 			}
-			param.Get("scale", m.params).Increment()
+			param.Get("scale", m.gridParams).Increment()
 			return m, nil
 		case "%":
 			if m.edit {
 				return m, nil
 			}
-			param.Get("scale", m.params).Decrement()
+			param.Get("scale", m.gridParams).Decrement()
 			return m, nil
 		case "=":
 			m.grid.SetTempo(m.grid.Tempo() + 1)

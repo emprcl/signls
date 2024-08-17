@@ -15,12 +15,16 @@ type Param interface {
 	Decrement()
 }
 
-func NewParamsForNode(node core.Node) []Param {
+func NewParamsForNode(grid *core.Grid, node core.Node) []Param {
 	switch node.(type) {
 	case *core.BangEmitter, *core.SpreadEmitter:
 		return []Param{
 			Direction{node: node},
-			Key{node: node},
+			Key{
+				node: node,
+				keys: core.AllKeysInScale(grid.Key, grid.Scale),
+				root: grid.Key,
+			},
 			Velocity{node: node},
 			Length{node: node},
 			Channel{node: node},

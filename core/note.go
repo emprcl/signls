@@ -7,12 +7,12 @@ import (
 type noteBehavior uint8
 
 const (
-	defaultKey      uint8 = 60
+	defaultKey      Key   = 60
 	defaultChannel  uint8 = 0
 	defaultVelocity uint8 = 100
 	defaultLength   uint8 = uint8(pulsesPerStep)
 
-	maxKey      uint8 = 127
+	maxKey      Key   = 127
 	maxVelocity uint8 = 127
 	maxLength   uint8 = 127 // 127 is infinity
 	minLength   uint8 = 1
@@ -25,12 +25,13 @@ const (
 type Note struct {
 	midi     midi.Midi
 	behavior noteBehavior // TODO: implement
+	Key      Key
+	Interval uint8
 	Channel  uint8
-	Key      uint8
 	Velocity uint8
 	Length   uint8
 
-	nextKey   uint8
+	nextKey   Key
 	pulse     uint64
 	triggered bool
 }
@@ -45,18 +46,14 @@ func NewNote(midi midi.Midi) *Note {
 	}
 }
 
-func (n Note) IsValid() bool {
-	return n.Key == 0
-}
-
 func (n Note) KeyName() string {
 	if n.nextKey > 0 {
-		return midi.Note(n.nextKey)
+		return midi.Note(uint8(n.nextKey))
 	}
-	return midi.Note(n.Key)
+	return midi.Note(uint8(n.Key))
 }
 
-func (n Note) KeyValue() uint8 {
+func (n Note) KeyValue() Key {
 	if n.nextKey > 0 {
 		return n.nextKey
 	}
@@ -73,32 +70,37 @@ func (n *Note) Tick() {
 	}
 }
 
-func (n *Note) Play() {
+func (n *Note) Transpose(root Key, scale Scale) {
+	n.SetKey(n.Key.Transpose(root, scale, n.Interval), root)
+}
+
+func (n *Note) Play(key Key, scale Scale) {
 	if n.nextKey > 0 {
 		n.Stop()
 		n.Key = n.nextKey
 	}
-	n.midi.NoteOn(n.Channel, n.Key, n.Velocity)
+	n.Transpose(key, scale)
+	n.midi.NoteOn(n.Channel, uint8(n.Key), n.Velocity)
 	n.triggered = true
 	n.pulse = 0
 	n.nextKey = 0
 }
 
 func (n *Note) Stop() {
-	n.midi.NoteOff(n.Channel, n.Key)
+	n.midi.NoteOff(n.Channel, uint8(n.Key))
 	n.triggered = false
 	n.pulse = 0
 }
 
-func (n *Note) SetKey(key uint8) {
+func (n *Note) SetKey(key Key, root Key) {
 	if key > maxKey {
-		n.nextKey = 0
-		return
+		n.nextKey = Key(0)
+	} else if key < 0 {
+		n.nextKey = Key(127)
+	} else {
+		n.nextKey = Key(key)
 	}
-	if key < 0 {
-		n.nextKey = 127
-	}
-	n.nextKey = key
+	n.Interval = uint8(n.nextKey.AllSemitonesFrom(root))
 	if !n.triggered {
 		n.Key = n.nextKey
 		n.nextKey = 0

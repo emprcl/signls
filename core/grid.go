@@ -7,7 +7,8 @@ import (
 
 const (
 	defaultTempo         = 120.
-	defaultRootKey uint8 = 60
+	defaultRootKey Key   = 60
+	defaultScale   Scale = CHROMATIC
 )
 
 type Grid struct {
@@ -19,7 +20,7 @@ type Grid struct {
 	Height int
 	Width  int
 
-	Key   uint8
+	Key   Key
 	Scale Scale
 
 	Playing bool
@@ -35,7 +36,7 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 		Height: height,
 		Width:  width,
 		Key:    defaultRootKey,
-		Scale:  CHROMATIC,
+		Scale:  defaultScale,
 	}
 	for i := range grid.nodes {
 		grid.nodes[i] = make([]Node, width)
@@ -65,6 +66,16 @@ func (g *Grid) SetTempo(tempo float64) {
 
 func (g *Grid) Tempo() float64 {
 	return g.clock.tempo
+}
+
+func (g *Grid) SetKey(key Key) {
+	g.Key = key
+	g.Transpose()
+}
+
+func (g *Grid) SetScale(scale Scale) {
+	g.Scale = scale
+	g.Transpose()
 }
 
 func (g *Grid) MidiDevice() string {
@@ -194,7 +205,7 @@ func (g *Grid) Update() {
 			}
 
 			if n, ok := g.nodes[y][x].(Emitter); ok {
-				n.Trig(g.pulse)
+				n.Trig(g.Key, g.Scale, g.pulse)
 				n.Emit(g, x, y)
 			}
 		}
@@ -211,6 +222,16 @@ func (g *Grid) Tick() {
 		}
 	}
 	g.pulse++
+}
+
+func (g *Grid) Transpose() {
+	for y := 0; y < g.Height; y++ {
+		for x := 0; x < g.Width; x++ {
+			if n, ok := g.nodes[y][x].(Emitter); ok {
+				n.Note().Transpose(g.Key, g.Scale)
+			}
+		}
+	}
 }
 
 func (g *Grid) Reset() {
@@ -238,7 +259,7 @@ func (g *Grid) Emit(x, y int, direction Direction) {
 	}
 	if n, ok := g.nodes[newY][newX].(Emitter); ok {
 		n.Arm()
-		n.Trig(g.pulse)
+		n.Trig(g.Key, g.Scale, g.pulse)
 		return
 	}
 	g.nodes[newY][newX] = NewSignal(direction, g.pulse)
@@ -257,7 +278,7 @@ func (g *Grid) Move(x, y int, direction Direction) {
 		g.nodes[newY][newX] = g.nodes[y][x]
 	} else if n, ok := g.nodes[newY][newX].(Emitter); ok {
 		n.Arm()
-		n.Trig(g.pulse)
+		n.Trig(g.Key, g.Scale, g.pulse)
 	}
 
 	g.nodes[y][x] = nil

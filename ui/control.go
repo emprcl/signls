@@ -40,8 +40,8 @@ func (m mainModel) renderControl() string {
 }
 
 func (m mainModel) gridInfo() string {
-	root := param.Get("root", m.params)
-	scale := param.Get("scale", m.params)
+	root := param.Get("root", m.gridParams)
+	scale := param.Get("scale", m.gridParams)
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		lipgloss.JoinVertical(

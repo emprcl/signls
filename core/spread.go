@@ -50,7 +50,7 @@ func (e *SpreadEmitter) Muted() bool {
 	return e.muted
 }
 
-func (e *SpreadEmitter) Trig(pulse uint64) {
+func (e *SpreadEmitter) Trig(key Key, scale Scale, pulse uint64) {
 	if !e.updated(pulse) {
 		e.note.Tick()
 	}
@@ -58,7 +58,7 @@ func (e *SpreadEmitter) Trig(pulse uint64) {
 		return
 	}
 	if !e.muted {
-		e.note.Play()
+		e.note.Play(key, scale)
 	}
 	e.triggered = true
 	e.armed = false

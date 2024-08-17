@@ -2,7 +2,10 @@ package param
 
 import (
 	"cykl/core"
-	"cykl/midi"
+)
+
+const (
+	maxKey int = 127
 )
 
 type Root struct {
@@ -14,7 +17,7 @@ func (r Root) Name() string {
 }
 
 func (r Root) Display() string {
-	return midi.Note(r.grid.Key)
+	return r.grid.Key.Name()
 }
 
 func (r Root) Value() int {
@@ -30,8 +33,8 @@ func (r Root) Decrement() {
 }
 
 func (r Root) Set(value int) {
-	if value > 127 {
+	if value < 0 || value > maxKey {
 		return
 	}
-	r.grid.Key = uint8(value)
+	r.grid.SetKey(core.Key(value))
 }
