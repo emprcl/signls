@@ -8,7 +8,6 @@
  	- A moving behavior ?
 
 TODO:
- - add root/scale global conf
  - add new emitters
  - add new note behaviors
  - add pipes
