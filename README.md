@@ -8,6 +8,7 @@
  	- A moving behavior ?
 
 TODO:
+ - fix bug with key param on fixed scale
  - add new emitters
  - add new note behaviors
  - add pipes
