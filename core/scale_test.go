@@ -17,6 +17,7 @@ func TestKeyTransposition(t *testing.T) {
 		{Key(87), Key(60), Key(60), IONIAN, Key(88)},
 		{Key(87), Key(60), Key(60), DORIAN, Key(87)},
 		{Key(63), Key(60), Key(61), MIXOLYDIAN, Key(65)},
+		{Key(68), Key(60), Key(61), MIXOLYDIAN, Key(70)},
 	}
 	for _, tt := range tests {
 		oldInterval := tt.key.AllSemitonesFrom(tt.previousRoot)
