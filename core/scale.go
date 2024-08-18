@@ -87,15 +87,12 @@ func (k Key) Name() string {
 }
 
 func (k Key) AllSemitonesFrom(key Key) int {
-	return int(key) - int(k)
+	return int(k) - int(key)
 }
 
 func (k Key) SemitonesFrom(key Key) int {
-	d := int(key) - int(k)
-	if d < 0 {
-		d = -d
-	}
-	return d % 12
+	d := int(k) - int(key)
+	return mod(d, 12)
 }
 
 func (k Key) InScale(root Key, scale Scale) bool {
@@ -105,7 +102,7 @@ func (k Key) InScale(root Key, scale Scale) bool {
 
 func (k Key) Transpose(root Key, scale Scale, oldInterval int) Key {
 	// 1) First, lets just transpose a simple key change.
-	newKey := Key(int(k) + k.AllSemitonesFrom(root) - oldInterval)
+	newKey := Key(int(k) + oldInterval - k.AllSemitonesFrom(root))
 	if newKey.InScale(root, scale) {
 		return newKey
 	}
@@ -114,10 +111,7 @@ func (k Key) Transpose(root Key, scale Scale, oldInterval int) Key {
 	// Lets try to change to push the key up or down
 	// according to its initial interval, and check
 	// if we're in the new scale.'
-	if oldInterval < 0 {
-		oldInterval = -oldInterval
-	}
-	switch Interval(1 << (oldInterval % 12)) {
+	switch Interval(1 << (mod(oldInterval, 12))) {
 	case MINOR_2ND, MINOR_3RD, MINOR_6TH, MINOR_7TH:
 		newKey += Key(1)
 	case MAJOR_2ND, MAJOR_3RD, MAJOR_6TH, MAJOR_7TH:
@@ -139,6 +133,7 @@ func (k Key) Transpose(root Key, scale Scale, oldInterval int) Key {
 	// ex: going from diatonic to pentatonic scale
 	// Let's do best effort according to the min
 	// distance to a note in the scale.'
+	// TODO: add test cases for this part.
 	minDistance := math.MaxUint8
 	interval := newKey.SemitonesFrom(root)
 	for i := 0; i < 12; i++ {
@@ -199,4 +194,9 @@ func (s Scale) Intervals() []int {
 		}
 	}
 	return intervals
+}
+
+// mod handles negative numbers modulos
+func mod(a, b int) int {
+	return (a%b + b) % b
 }
