@@ -103,28 +103,70 @@ func (k Key) InScale(root Key, scale Scale) bool {
 	return scale&(1<<interval) != 0
 }
 
-func (k Key) Transpose(key Key, scale Scale, oldInterval int) Key {
-	newKey := Key(int(k) + k.AllSemitonesFrom(key) - oldInterval)
-	if newKey.InScale(key, scale) {
+func (k Key) Transpose(root Key, scale Scale, oldInterval int) Key {
+	// 1) First, lets just transpose a simple key change.
+	newKey := Key(int(k) + k.AllSemitonesFrom(root) - oldInterval)
+	if newKey.InScale(root, scale) {
 		return newKey
 	}
-	var closestKey Key
+
+	// 2) If not in scale, it means that the scale changed.
+	// Lets try to change to push the key up or down
+	// according to its initial interval, and check
+	// if we're in the new scale.'
+	if oldInterval < 0 {
+		oldInterval = -oldInterval
+	}
+	switch Interval(1 << (oldInterval % 12)) {
+	case MINOR_2ND, MINOR_3RD, MINOR_6TH, MINOR_7TH:
+		newKey += Key(1)
+	case MAJOR_2ND, MAJOR_3RD, MAJOR_6TH, MAJOR_7TH:
+		newKey -= Key(1)
+	case FOURTH:
+		newKey += Key(1)
+	case TRITONE:
+		newKey -= Key(1)
+	case FIFTH:
+		newKey -= Key(1)
+	}
+
+	if newKey.InScale(root, scale) {
+		return newKey
+	}
+
+	// 3) If we're here, we're probably changing
+	// to a scale with a different length.
+	// ex: going from diatonic to pentatonic scale
+	// Let's do best effort according to the min
+	// distance to a note in the scale.'
 	minDistance := math.MaxUint8
-	interval := newKey.SemitonesFrom(key)
+	interval := newKey.SemitonesFrom(root)
 	for i := 0; i < 12; i++ {
 		if scale&(1<<i) != 0 {
-			// TODO: Improve transposition
-			distance := int(math.Abs(float64(int(interval) - i)))
-			if distance <= minDistance {
-				closestKey = key + Key(i)
+			distance := interval - i
+			if distance < 0 {
+				distance = -distance
+			}
+			if distance < minDistance {
+				newKey = root + Key(i)
 				minDistance = distance
 			}
 		}
 	}
-	return closestKey
+	return newKey
 }
 
 type Interval uint16
+
+func (in Interval) Int() int {
+	for i := 0; i < 12; i++ {
+		if in&(1<<i) != 0 {
+			return i
+		}
+	}
+	return 0
+}
+
 type Scale uint16
 
 func AllScales() []Scale {
