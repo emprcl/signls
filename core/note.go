@@ -4,8 +4,6 @@ import (
 	"cykl/midi"
 )
 
-type noteBehavior uint8
-
 const (
 	defaultKey      Key   = 60
 	defaultChannel  uint8 = 0
@@ -17,14 +15,10 @@ const (
 	maxLength   uint8 = 127 // 127 is infinity
 	minLength   uint8 = 1
 	maxChannel  uint8 = 15
-
-	silence noteBehavior = iota
-	fixed
 )
 
 type Note struct {
 	midi     midi.Midi
-	behavior noteBehavior // TODO: implement
 	Key      Key
 	Interval int
 	Channel  uint8
@@ -34,15 +28,18 @@ type Note struct {
 	nextKey   Key
 	pulse     uint64
 	triggered bool
+
+	NoteBehavior
 }
 
 func NewNote(midi midi.Midi) *Note {
 	return &Note{
-		midi:     midi,
-		Channel:  defaultChannel,
-		Key:      defaultKey,
-		Velocity: defaultVelocity,
-		Length:   defaultLength,
+		midi:         midi,
+		Channel:      defaultChannel,
+		Key:          defaultKey,
+		Velocity:     defaultVelocity,
+		Length:       defaultLength,
+		NoteBehavior: FixedNote{},
 	}
 }
 
@@ -75,12 +72,7 @@ func (n *Note) Transpose(root Key, scale Scale) {
 }
 
 func (n *Note) Play(key Key, scale Scale) {
-	if n.nextKey > 0 {
-		n.Stop()
-		n.Key = n.nextKey
-	}
-	n.Transpose(key, scale)
-	n.midi.NoteOn(n.Channel, uint8(n.Key), n.Velocity)
+	n.NoteBehavior.Play(n, key, scale)
 	n.triggered = true
 	n.pulse = 0
 	n.nextKey = 0
@@ -96,7 +88,7 @@ func (n *Note) SetKey(key Key, root Key) {
 	if key > maxKey {
 		n.nextKey = Key(0)
 	} else if key < 0 {
-		n.nextKey = Key(127)
+		n.nextKey = maxKey
 	} else {
 		n.nextKey = Key(key)
 	}

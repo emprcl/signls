@@ -29,6 +29,10 @@ func (d Direction) Decrement() {
 	// direction selection working differently
 }
 
+func (d Direction) Left() {}
+
+func (d Direction) Right() {}
+
 func (d Direction) Set(value int) {
 	d.node.SetDirection(core.Direction(value))
 }

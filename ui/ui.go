@@ -266,10 +266,14 @@ func (m mainModel) handleParamEdit(key string) {
 	}
 
 	switch key {
-	case "up", "right":
+	case "up":
 		m.params[m.param].Increment()
-	case "down", "left":
+	case "down":
 		m.params[m.param].Decrement()
+	case "left":
+		m.params[m.param].Left()
+	case "right":
+		m.params[m.param].Right()
 	}
 
 	switch p := m.params[m.param].(type) {

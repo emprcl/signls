@@ -13,6 +13,8 @@ type Param interface {
 	Set(value int)
 	Increment()
 	Decrement()
+	Left()
+	Right()
 }
 
 func NewParamsForNode(grid *core.Grid, node core.Node) []Param {
@@ -24,6 +26,7 @@ func NewParamsForNode(grid *core.Grid, node core.Node) []Param {
 				node: node,
 				keys: core.AllKeysInScale(grid.Key, grid.Scale),
 				root: grid.Key,
+				mode: KeyMode{node: node, modes: core.AllNoteBehaviors()},
 			},
 			Velocity{node: node},
 			Length{node: node},

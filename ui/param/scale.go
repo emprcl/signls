@@ -29,6 +29,10 @@ func (s Scale) Decrement() {
 	s.Set(s.scaleIndex() - 1)
 }
 
+func (s Scale) Left() {}
+
+func (s Scale) Right() {}
+
 func (s Scale) Set(value int) {
 	if value < 0 {
 		value = len(s.scales) - 1

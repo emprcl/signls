@@ -52,6 +52,10 @@ func (l Length) Decrement() {
 	l.Set(l.Value() - 1)
 }
 
+func (l Length) Left() {}
+
+func (l Length) Right() {}
+
 func (l Length) Set(value int) {
 	l.node.(core.Emitter).Note().SetLength(uint8(value))
 }

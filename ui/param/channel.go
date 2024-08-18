@@ -29,6 +29,10 @@ func (c Channel) Decrement() {
 	c.Set(c.Value() - 1)
 }
 
+func (c Channel) Left() {}
+
+func (c Channel) Right() {}
+
 func (c Channel) Set(value int) {
 	c.node.(core.Emitter).Note().SetChannel(uint8(value))
 }

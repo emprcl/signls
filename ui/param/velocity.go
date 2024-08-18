@@ -29,6 +29,10 @@ func (v Velocity) Decrement() {
 	v.Set(v.Value() - 1)
 }
 
+func (v Velocity) Left() {}
+
+func (v Velocity) Right() {}
+
 func (v Velocity) Set(value int) {
 	v.node.(core.Emitter).Note().SetVelocity(uint8(value))
 }

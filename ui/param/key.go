@@ -2,6 +2,7 @@ package param
 
 import (
 	"cykl/core"
+	"fmt"
 	"time"
 )
 
@@ -9,6 +10,7 @@ type Key struct {
 	node core.Node
 	keys []core.Key
 	root core.Key
+	mode KeyMode
 }
 
 func (k Key) Name() string {
@@ -16,7 +18,14 @@ func (k Key) Name() string {
 }
 
 func (k Key) Display() string {
-	return k.node.(core.Emitter).Note().KeyName()
+	switch k.mode.Display() {
+	case "silent":
+		return "•"
+	case "random":
+		return fmt.Sprintf("%s%s", "r", k.node.(core.Emitter).Note().KeyName())
+	default:
+		return k.node.(core.Emitter).Note().KeyName()
+	}
 }
 
 func (k Key) Value() int {
@@ -29,6 +38,14 @@ func (k Key) Increment() {
 
 func (k Key) Decrement() {
 	k.Set(k.keyIndex() - 1)
+}
+
+func (k Key) Left() {
+	k.mode.Decrement()
+}
+
+func (k Key) Right() {
+	k.mode.Increment()
 }
 
 func (k Key) Set(value int) {

@@ -32,6 +32,10 @@ func (r Root) Decrement() {
 	r.Set(r.Value() - 1)
 }
 
+func (r Root) Left() {}
+
+func (r Root) Right() {}
+
 func (r Root) Set(value int) {
 	if value < 0 || value > maxKey {
 		return
