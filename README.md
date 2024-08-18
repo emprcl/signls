@@ -8,6 +8,7 @@
  	- A moving behavior ?
 
 TODO:
+ - improve emmiters structure
  - add new emitters
  - add new note behaviors
  - add pipes
