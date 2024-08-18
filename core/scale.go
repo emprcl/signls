@@ -86,21 +86,25 @@ func (k Key) Name() string {
 	return midi.Note(uint8(k))
 }
 
-func (k Key) AllSemitonesFrom(key Key) uint8 {
-	return uint8(key - k)
+func (k Key) AllSemitonesFrom(key Key) int {
+	return int(key) - int(k)
 }
 
-func (k Key) SemitonesFrom(key Key) uint8 {
-	return uint8(key-k) % 12
+func (k Key) SemitonesFrom(key Key) int {
+	d := int(key) - int(k)
+	if d < 0 {
+		d = -d
+	}
+	return d % 12
 }
 
-func (k Key) InScale(key Key, scale Scale) bool {
-	interval := k.SemitonesFrom(key)
+func (k Key) InScale(root Key, scale Scale) bool {
+	interval := k.SemitonesFrom(root)
 	return scale&(1<<interval) != 0
 }
 
-func (k Key) Transpose(key Key, scale Scale, oldInterval uint8) Key {
-	newKey := k + Key(k.AllSemitonesFrom(key)-oldInterval)
+func (k Key) Transpose(key Key, scale Scale, oldInterval int) Key {
+	newKey := Key(int(k) + k.AllSemitonesFrom(key) - oldInterval)
 	if newKey.InScale(key, scale) {
 		return newKey
 	}

@@ -26,7 +26,7 @@ type Note struct {
 	midi     midi.Midi
 	behavior noteBehavior // TODO: implement
 	Key      Key
-	Interval uint8
+	Interval int
 	Channel  uint8
 	Velocity uint8
 	Length   uint8
@@ -100,7 +100,7 @@ func (n *Note) SetKey(key Key, root Key) {
 	} else {
 		n.nextKey = Key(key)
 	}
-	n.Interval = uint8(n.nextKey.AllSemitonesFrom(root))
+	n.Interval = n.nextKey.AllSemitonesFrom(root)
 	if !n.triggered {
 		n.Key = n.nextKey
 		n.nextKey = 0

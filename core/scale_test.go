@@ -16,4 +16,8 @@ func TestScale(t *testing.T) {
 	if newKey != want {
 		t.Fatalf("%d should transpose to %d in c ionian scale, got %d", key, want, newKey)
 	}
+
+	if !key.InScale(root, DORIAN) {
+		t.Fatalf("%d should be in c dorian scale", key)
+	}
 }
