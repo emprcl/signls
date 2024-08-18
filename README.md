@@ -9,10 +9,13 @@
 
 TODO:
  - improve emmiters structure
+ - add random note octave spread
+ - add randomness on every note param
+ - add note probability
+ - replace emitter by another, keeping parameters
  - add new emitters
- - add new note behaviors
  - add pipes
- - add midi cc menu
+ - add midi cc (note behavior?)
 
 Names:
   - Nyll

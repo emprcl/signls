@@ -10,8 +10,8 @@ type NoteBehavior interface {
 func AllNoteBehaviors() []NoteBehavior {
 	return []NoteBehavior{
 		FixedNote{},
-		RandomNote{},
 		SilentNote{},
+		RandomNote{},
 	}
 }
 
