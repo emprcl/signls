@@ -24,6 +24,9 @@ build: $(BIN)
 checks: $(GOLANG_LINT)
 	$(GOLANG_LINT) run ./...
 
+test:
+	$(GOLANG_BIN) test ./...
+
 bench:
 	$(GOLANG_BIN) test -bench=. -benchmem ./...
 
