@@ -8,10 +8,11 @@
  	- A moving behavior ?
 
 TODO:
+ - add a way for a bang to output signal at every tick
+ - replace emitter by another, keeping parameters
  - add random note octave spread
  - add randomness on every note param
  - add note probability
- - replace emitter by another, keeping parameters
  - add new emitters
  - add pipes
  - add midi cc (note behavior?)
