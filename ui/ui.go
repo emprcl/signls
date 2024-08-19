@@ -117,6 +117,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				msg.String(), 1, m.selectionX, m.selectionY,
 				m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
 			)
+			m.params = param.NewParamsForNode(m.grid, m.selectedNode())
 			return m, nil
 		case "shift+up", "shift+right", "shift+down", "shift+left":
 			dir := strings.Replace(msg.String(), "shift+", "", 1)
@@ -127,15 +128,8 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case "ctrl+up", "ctrl+right", "ctrl+down", "ctrl+left":
 			dir := strings.Replace(msg.String(), "ctrl+", "", 1)
-			if !m.edit {
-				m.cursorX, m.cursorY = moveCursor(
-					dir, 4, m.cursorX, m.cursorY,
-					0, m.grid.Width-1, 0, m.grid.Height-1,
-				)
-				m.selectionX, m.selectionY = moveCursor(
-					dir, 4, m.selectionX, m.selectionY,
-					m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
-				)
+			if !m.edit && m.selectedNode() != nil {
+				param.NewDirection(m.selectedNode()).SetFromKeyString(dir)
 				return m, nil
 			}
 			m.handleParamEdit(dir)
@@ -143,7 +137,6 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "b", "s":
 			m.grid.AddNodeFromSymbol(msg.String(), m.cursorX, m.cursorY)
 			m.params = param.NewParamsForNode(m.grid, m.selectedNode())
-			m.edit = true
 			return m, nil
 		case "m":
 			m.grid.ToggleNodeMutes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
@@ -161,10 +154,6 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			m.edit = !m.edit
-			if m.edit {
-				m.params = param.NewParamsForNode(m.grid, m.selectedNode())
-			}
-			m.param = 0
 			return m, nil
 		case "!":
 			if !m.grid.Playing {
@@ -254,6 +243,7 @@ func (m mainModel) View() string {
 		cleanup,
 	)
 }
+
 func (m mainModel) handleParamEdit(key string) {
 	if len(m.params) < m.param+1 {
 		return

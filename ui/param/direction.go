@@ -8,13 +8,18 @@ type Direction struct {
 	node core.Node
 }
 
+func NewDirection(node core.Node) Direction {
+	return Direction{
+		node: node,
+	}
+}
+
 func (d Direction) Name() string {
-	return "dir"
+	return "direction"
 }
 
 func (d Direction) Display() string {
 	return d.node.Direction().Symbol()
-	//return fmt.Sprintf("%s (%04b)", d.node.Direction().Symbol(), int(d.node.Direction()>>1))
 }
 
 func (d Direction) Value() int {
