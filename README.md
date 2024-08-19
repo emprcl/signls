@@ -8,7 +8,6 @@
  	- A moving behavior ?
 
 TODO:
- - improve emmiters structure
  - add random note octave spread
  - add randomness on every note param
  - add note probability

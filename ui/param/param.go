@@ -19,7 +19,7 @@ type Param interface {
 
 func NewParamsForNode(grid *core.Grid, node core.Node) []Param {
 	switch node.(type) {
-	case *core.BangEmitter, *core.SpreadEmitter:
+	case core.Emitter:
 		return []Param{
 			Key{
 				node: node,
