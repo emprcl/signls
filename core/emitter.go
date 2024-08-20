@@ -1,23 +1,30 @@
 package core
 
+type EmitterBehavior interface {
+	ArmedOnStart() bool
+	EmitDirections(dir Direction) Direction
+	Symbol(dir Direction) string
+	Name() string
+	Color() string
+}
+
 type BaseEmitter struct {
-	note      *Note
+	behavior  EmitterBehavior
 	direction Direction
+	note      *Note
 	pulse     uint64
 	armed     bool
 	triggered bool
 	muted     bool
-
-	EmitterBehavior
 }
 
 func (e *BaseEmitter) Copy() Node {
 	newNote := *e.note
 	return &BaseEmitter{
-		direction:       e.direction,
-		armed:           e.armed,
-		note:            &newNote,
-		EmitterBehavior: e.EmitterBehavior,
+		behavior:  e.behavior,
+		direction: e.direction,
+		armed:     e.armed,
+		note:      &newNote,
 	}
 }
 
@@ -61,7 +68,10 @@ func (e *BaseEmitter) Emit(g *Grid, x, y int) {
 	if e.updated(g.pulse) || !e.triggered {
 		return
 	}
-	e.EmitterBehavior.Emit(g, e.direction, x, y)
+	directions := e.behavior.EmitDirections(e.direction)
+	for _, dir := range directions.Decompose() {
+		g.Emit(x, y, dir)
+	}
 	e.triggered = false
 	e.pulse = g.pulse
 }
@@ -79,20 +89,20 @@ func (e *BaseEmitter) SetDirection(dir Direction) {
 }
 
 func (e *BaseEmitter) Symbol() string {
-	return e.EmitterBehavior.Symbol(e.direction)
+	return e.behavior.Symbol(e.direction)
 }
 
 func (e *BaseEmitter) Name() string {
-	return e.EmitterBehavior.Name()
+	return e.behavior.Name()
 }
 
 func (e *BaseEmitter) Color() string {
-	return e.EmitterBehavior.Color()
+	return e.behavior.Color()
 }
 
 func (e *BaseEmitter) Reset() {
 	e.pulse = 0
-	e.armed = e.EmitterBehavior.ArmedOnStart()
+	e.armed = e.behavior.ArmedOnStart()
 	e.triggered = false
 	e.Note().Stop()
 }
