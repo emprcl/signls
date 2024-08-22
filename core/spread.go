@@ -15,7 +15,7 @@ func NewSpreadEmitter(midi midi.Midi, direction Direction) *BaseEmitter {
 	}
 }
 
-func (e SpreadEmitter) EmitDirections(dir Direction) Direction {
+func (e SpreadEmitter) EmitDirections(dir Direction, pulse uint64) Direction {
 	return dir
 }
 
@@ -24,7 +24,7 @@ func (e SpreadEmitter) ArmedOnStart() bool {
 }
 
 func (e SpreadEmitter) Symbol(dir Direction) string {
-	return fmt.Sprintf("%s%s", "S", dir.Symbol())
+	return fmt.Sprintf("%s%s", "X", dir.Symbol())
 }
 
 func (e SpreadEmitter) Name() string {

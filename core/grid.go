@@ -149,6 +149,8 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	case "b":
 		g.AddNode(NewBangEmitter(g.midi, NONE, !g.Playing), x, y)
 	case "s":
+		g.AddNode(NewSequencialEmitter(g.midi, NONE), x, y)
+	case "x":
 		g.AddNode(NewSpreadEmitter(g.midi, NONE), x, y)
 	}
 }

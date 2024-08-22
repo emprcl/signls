@@ -20,7 +20,7 @@ func (e BangEmitter) ArmedOnStart() bool {
 	return true
 }
 
-func (e BangEmitter) EmitDirections(dir Direction) Direction {
+func (e BangEmitter) EmitDirections(dir Direction, pulse uint64) Direction {
 	return dir
 }
 

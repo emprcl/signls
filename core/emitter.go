@@ -2,7 +2,7 @@ package core
 
 type EmitterBehavior interface {
 	ArmedOnStart() bool
-	EmitDirections(dir Direction) Direction
+	EmitDirections(dir Direction, pulse uint64) Direction
 	Symbol(dir Direction) string
 	Name() string
 	Color() string
@@ -70,7 +70,7 @@ func (e *BaseEmitter) Emit(g *Grid, x, y int) {
 	if e.updated(g.pulse) || !e.triggered {
 		return
 	}
-	directions := e.behavior.EmitDirections(e.direction)
+	directions := e.behavior.EmitDirections(e.direction, g.pulse)
 	for _, dir := range directions.Decompose() {
 		g.Emit(x, y, dir)
 	}

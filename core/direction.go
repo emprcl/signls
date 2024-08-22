@@ -1,5 +1,7 @@
 package core
 
+import "math/bits"
+
 type Direction int
 
 const (
@@ -41,6 +43,10 @@ func (d Direction) Decompose() []Direction {
 		directions = append(directions, dir)
 	}
 	return directions
+}
+
+func (d Direction) Count() int {
+	return bits.OnesCount(uint(d))
 }
 
 func (d Direction) NextPosition(x, y int) (int, int) {
