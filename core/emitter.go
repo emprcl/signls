@@ -9,9 +9,11 @@ type EmitterBehavior interface {
 }
 
 type BaseEmitter struct {
-	behavior  EmitterBehavior
+	behavior EmitterBehavior
+
 	direction Direction
 	note      *Note
+
 	pulse     uint64
 	armed     bool
 	triggered bool

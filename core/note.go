@@ -18,7 +18,10 @@ const (
 )
 
 type Note struct {
-	midi     midi.Midi
+	Behavior NoteBehavior
+
+	midi midi.Midi
+
 	Key      Key
 	Interval int
 	Channel  uint8
@@ -28,18 +31,16 @@ type Note struct {
 	nextKey   Key
 	pulse     uint64
 	triggered bool
-
-	NoteBehavior
 }
 
 func NewNote(midi midi.Midi) *Note {
 	return &Note{
-		midi:         midi,
-		Channel:      defaultChannel,
-		Key:          defaultKey,
-		Velocity:     defaultVelocity,
-		Length:       defaultLength,
-		NoteBehavior: FixedNote{},
+		Behavior: FixedNote{},
+		midi:     midi,
+		Channel:  defaultChannel,
+		Key:      defaultKey,
+		Velocity: defaultVelocity,
+		Length:   defaultLength,
 	}
 }
 
@@ -72,7 +73,7 @@ func (n *Note) Transpose(root Key, scale Scale) {
 }
 
 func (n *Note) Play(key Key, scale Scale) {
-	n.NoteBehavior.Play(n, key, scale)
+	n.Behavior.Play(n, key, scale)
 	n.triggered = true
 	n.pulse = 0
 	n.nextKey = 0
