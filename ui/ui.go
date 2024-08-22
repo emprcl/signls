@@ -206,6 +206,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case "ctrl+v":
 			m.grid.Paste(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
+			m.params = param.NewParamsForNode(m.grid, m.selectedNode())
 			return m, nil
 		case "esc":
 			m.edit = false
