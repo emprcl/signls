@@ -14,7 +14,7 @@ func (k KeyMode) Name() string {
 }
 
 func (k KeyMode) Display() string {
-	return k.node.(core.Emitter).Note().Behavior.Name()
+	return k.node.(*core.Emitter).Note().Behavior.Name()
 }
 
 func (k KeyMode) Value() int {
@@ -39,12 +39,12 @@ func (k KeyMode) Set(value int) {
 	} else if value >= len(k.modes) {
 		value = 0
 	}
-	k.node.(core.Emitter).Note().Behavior = k.modes[value]
+	k.node.(*core.Emitter).Note().Behavior = k.modes[value]
 }
 
 func (k KeyMode) keyModeIndex() int {
 	for i := 0; i < len(k.modes); i++ {
-		if k.node.(core.Emitter).Note().Behavior == k.modes[i] {
+		if k.node.(*core.Emitter).Note().Behavior == k.modes[i] {
 			return i
 		}
 	}

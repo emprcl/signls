@@ -7,8 +7,8 @@ import (
 
 type BangEmitter struct{}
 
-func NewBangEmitter(midi midi.Midi, direction Direction, armed bool) *BaseEmitter {
-	return &BaseEmitter{
+func NewBangEmitter(midi midi.Midi, direction Direction, armed bool) *Emitter {
+	return &Emitter{
 		direction: direction,
 		armed:     armed,
 		note:      NewNote(midi),

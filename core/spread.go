@@ -7,8 +7,8 @@ import (
 
 type SpreadEmitter struct{}
 
-func NewSpreadEmitter(midi midi.Midi, direction Direction) *BaseEmitter {
-	return &BaseEmitter{
+func NewSpreadEmitter(midi midi.Midi, direction Direction) *Emitter {
+	return &Emitter{
 		direction: direction,
 		note:      NewNote(midi),
 		behavior:  &SpreadEmitter{},

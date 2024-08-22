@@ -27,14 +27,3 @@ type Node interface {
 type Movable interface {
 	Move(g *Grid, x, y int)
 }
-
-type Emitter interface {
-	Arm()
-	Copy() Node
-	Note() *Note
-	Muted() bool
-	SetMute(mute bool)
-	Trig(key Key, scale Scale, pulse uint64)
-	Emit(g *Grid, x, y int)
-	Reset()
-}

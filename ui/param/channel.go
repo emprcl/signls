@@ -14,11 +14,11 @@ func (c Channel) Name() string {
 }
 
 func (c Channel) Display() string {
-	return fmt.Sprintf("%d", c.node.(core.Emitter).Note().Channel+1)
+	return fmt.Sprintf("%d", c.node.(*core.Emitter).Note().Channel+1)
 }
 
 func (c Channel) Value() int {
-	return int(c.node.(core.Emitter).Note().Channel)
+	return int(c.node.(*core.Emitter).Note().Channel)
 }
 
 func (c Channel) Increment() {
@@ -34,5 +34,5 @@ func (c Channel) Left() {}
 func (c Channel) Right() {}
 
 func (c Channel) Set(value int) {
-	c.node.(core.Emitter).Note().SetChannel(uint8(value))
+	c.node.(*core.Emitter).Note().SetChannel(uint8(value))
 }

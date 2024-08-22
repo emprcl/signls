@@ -14,11 +14,11 @@ func (v Velocity) Name() string {
 }
 
 func (v Velocity) Display() string {
-	return fmt.Sprintf("%d", v.node.(core.Emitter).Note().Velocity)
+	return fmt.Sprintf("%d", v.node.(*core.Emitter).Note().Velocity)
 }
 
 func (v Velocity) Value() int {
-	return int(v.node.(core.Emitter).Note().Velocity)
+	return int(v.node.(*core.Emitter).Note().Velocity)
 }
 
 func (v Velocity) Increment() {
@@ -34,5 +34,5 @@ func (v Velocity) Left() {}
 func (v Velocity) Right() {}
 
 func (v Velocity) Set(value int) {
-	v.node.(core.Emitter).Note().SetVelocity(uint8(value))
+	v.node.(*core.Emitter).Note().SetVelocity(uint8(value))
 }

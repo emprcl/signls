@@ -108,7 +108,7 @@ func (g *Grid) CopyOrCut(startX, startY, endX, endY int, cut bool) {
 	count := 0
 	for y := startY; y <= endY; y++ {
 		for x := startX; x <= endX; x++ {
-			_, ok := g.nodes[y][x].(Emitter)
+			_, ok := g.nodes[y][x].(*Emitter)
 			if ok {
 				nodes[y-startY][x-startX] = g.nodes[y][x]
 				count++
@@ -128,10 +128,10 @@ func (g *Grid) Paste(startX, startY, endX, endY int) {
 	h, w := len(g.clipboard), len(g.clipboard[0])
 	for y := 0; y < h && startY+y <= endY; y++ {
 		for x := 0; x < w && startX+x <= endX; x++ {
-			if _, ok := g.clipboard[y][x].(Emitter); !ok {
+			if _, ok := g.clipboard[y][x].(*Emitter); !ok {
 				continue
 			}
-			g.nodes[startY+y][startX+x] = g.clipboard[y][x].(Emitter).Copy()
+			g.nodes[startY+y][startX+x] = g.clipboard[y][x].(*Emitter).Copy()
 		}
 	}
 }
@@ -155,7 +155,11 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	}
 }
 
-func (g *Grid) AddNode(node Node, x, y int) {
+func (g *Grid) AddNode(node *Emitter, x, y int) {
+	if n, ok := g.nodes[y][x].(*Emitter); g.nodes[y][x] != nil && ok {
+		n.behavior = node.behavior
+		return
+	}
 	g.nodes[y][x] = node
 }
 
@@ -170,10 +174,10 @@ func (g *Grid) RemoveNodes(startX, startY, endX, endY int) {
 func (g *Grid) ToggleNodeMutes(startX, startY, endX, endY int) {
 	for y := startY; y <= endY; y++ {
 		for x := startX; x <= endX; x++ {
-			if _, ok := g.nodes[y][x].(Emitter); !ok {
+			if _, ok := g.nodes[y][x].(*Emitter); !ok {
 				continue
 			}
-			g.nodes[y][x].(Emitter).SetMute(!g.nodes[y][x].(Emitter).Muted())
+			g.nodes[y][x].(*Emitter).SetMute(!g.nodes[y][x].(*Emitter).Muted())
 		}
 	}
 }
@@ -181,10 +185,10 @@ func (g *Grid) ToggleNodeMutes(startX, startY, endX, endY int) {
 func (g *Grid) SetAllNodeMutes(mute bool) {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
-			if _, ok := g.nodes[y][x].(Emitter); !ok {
+			if _, ok := g.nodes[y][x].(*Emitter); !ok {
 				continue
 			}
-			g.nodes[y][x].(Emitter).SetMute(mute)
+			g.nodes[y][x].(*Emitter).SetMute(mute)
 		}
 	}
 }
@@ -206,7 +210,7 @@ func (g *Grid) Update() {
 				n.Move(g, x, y)
 			}
 
-			if n, ok := g.nodes[y][x].(Emitter); ok {
+			if n, ok := g.nodes[y][x].(*Emitter); ok {
 				n.Trig(g.Key, g.Scale, g.pulse)
 				n.Emit(g, x, y)
 			}
@@ -218,7 +222,7 @@ func (g *Grid) Update() {
 func (g *Grid) Tick() {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
-			if n, ok := g.nodes[y][x].(Emitter); ok {
+			if n, ok := g.nodes[y][x].(*Emitter); ok {
 				n.Note().Tick()
 			}
 		}
@@ -229,7 +233,7 @@ func (g *Grid) Tick() {
 func (g *Grid) Transpose() {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
-			if n, ok := g.nodes[y][x].(Emitter); ok {
+			if n, ok := g.nodes[y][x].(*Emitter); ok {
 				n.Note().Transpose(g.Key, g.Scale)
 			}
 		}
@@ -247,7 +251,7 @@ func (g *Grid) Reset() {
 				g.nodes[y][x] = nil
 			}
 
-			if n, ok := g.nodes[y][x].(Emitter); ok {
+			if n, ok := g.nodes[y][x].(*Emitter); ok {
 				n.Reset()
 			}
 		}
@@ -259,7 +263,7 @@ func (g *Grid) Emit(x, y int, direction Direction) {
 	if newX == x && newY == y {
 		return
 	}
-	if n, ok := g.nodes[newY][newX].(Emitter); ok {
+	if n, ok := g.nodes[newY][newX].(*Emitter); ok {
 		n.Arm()
 		n.Trig(g.Key, g.Scale, g.pulse)
 		return
@@ -278,7 +282,7 @@ func (g *Grid) Move(x, y int, direction Direction) {
 
 	if g.nodes[newY][newX] == nil {
 		g.nodes[newY][newX] = g.nodes[y][x]
-	} else if n, ok := g.nodes[newY][newX].(Emitter); ok {
+	} else if n, ok := g.nodes[newY][newX].(*Emitter); ok {
 		n.Arm()
 		n.Trig(g.Key, g.Scale, g.pulse)
 	}

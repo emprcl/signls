@@ -8,7 +8,7 @@ type EmitterBehavior interface {
 	Color() string
 }
 
-type BaseEmitter struct {
+type Emitter struct {
 	behavior EmitterBehavior
 
 	direction Direction
@@ -20,9 +20,9 @@ type BaseEmitter struct {
 	muted     bool
 }
 
-func (e *BaseEmitter) Copy() Node {
+func (e *Emitter) Copy() Node {
 	newNote := *e.note
-	return &BaseEmitter{
+	return &Emitter{
 		behavior:  e.behavior,
 		direction: e.direction,
 		armed:     e.armed,
@@ -30,28 +30,28 @@ func (e *BaseEmitter) Copy() Node {
 	}
 }
 
-func (e *BaseEmitter) Activated() bool {
+func (e *Emitter) Activated() bool {
 	return e.armed || e.triggered
 }
 
-func (e *BaseEmitter) Note() *Note {
+func (e *Emitter) Note() *Note {
 	return e.note
 }
 
-func (e *BaseEmitter) Arm() {
+func (e *Emitter) Arm() {
 	e.armed = true
 }
 
-func (e *BaseEmitter) SetMute(mute bool) {
+func (e *Emitter) SetMute(mute bool) {
 	e.note.Stop()
 	e.muted = mute
 }
 
-func (e *BaseEmitter) Muted() bool {
+func (e *Emitter) Muted() bool {
 	return e.muted
 }
 
-func (e *BaseEmitter) Trig(key Key, scale Scale, pulse uint64) {
+func (e *Emitter) Trig(key Key, scale Scale, pulse uint64) {
 	if !e.updated(pulse) {
 		e.note.Tick()
 	}
@@ -66,7 +66,7 @@ func (e *BaseEmitter) Trig(key Key, scale Scale, pulse uint64) {
 	e.pulse = pulse
 }
 
-func (e *BaseEmitter) Emit(g *Grid, x, y int) {
+func (e *Emitter) Emit(g *Grid, x, y int) {
 	if e.updated(g.pulse) || !e.triggered {
 		return
 	}
@@ -78,11 +78,11 @@ func (e *BaseEmitter) Emit(g *Grid, x, y int) {
 	e.pulse = g.pulse
 }
 
-func (e *BaseEmitter) Direction() Direction {
+func (e *Emitter) Direction() Direction {
 	return e.direction
 }
 
-func (e *BaseEmitter) SetDirection(dir Direction) {
+func (e *Emitter) SetDirection(dir Direction) {
 	if e.direction.Contains(dir) {
 		e.direction = e.direction.Remove(dir)
 		return
@@ -90,25 +90,25 @@ func (e *BaseEmitter) SetDirection(dir Direction) {
 	e.direction = e.direction.Add(dir)
 }
 
-func (e *BaseEmitter) Symbol() string {
+func (e *Emitter) Symbol() string {
 	return e.behavior.Symbol(e.direction)
 }
 
-func (e *BaseEmitter) Name() string {
+func (e *Emitter) Name() string {
 	return e.behavior.Name()
 }
 
-func (e *BaseEmitter) Color() string {
+func (e *Emitter) Color() string {
 	return e.behavior.Color()
 }
 
-func (e *BaseEmitter) Reset() {
+func (e *Emitter) Reset() {
 	e.pulse = 0
 	e.armed = e.behavior.ArmedOnStart()
 	e.triggered = false
 	e.Note().Stop()
 }
 
-func (e *BaseEmitter) updated(pulse uint64) bool {
+func (e *Emitter) updated(pulse uint64) bool {
 	return e.pulse == pulse
 }

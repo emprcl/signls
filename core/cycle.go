@@ -9,8 +9,8 @@ type CycleEmitter struct {
 	next int
 }
 
-func NewCycleEmitter(midi midi.Midi, direction Direction) *BaseEmitter {
-	return &BaseEmitter{
+func NewCycleEmitter(midi midi.Midi, direction Direction) *Emitter {
+	return &Emitter{
 		direction: direction,
 		note:      NewNote(midi),
 		behavior:  &CycleEmitter{},

@@ -159,11 +159,11 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if !m.grid.Playing {
 				return m, nil
 			}
-			if _, ok := m.selectedNode().(core.Emitter); !ok {
+			if _, ok := m.selectedNode().(*core.Emitter); !ok {
 				return m, nil
 			}
-			m.selectedNode().(core.Emitter).Arm()
-			m.selectedNode().(core.Emitter).Trig(m.grid.Key, m.grid.Scale, m.grid.Pulse())
+			m.selectedNode().(*core.Emitter).Arm()
+			m.selectedNode().(*core.Emitter).Trig(m.grid.Key, m.grid.Scale, m.grid.Pulse())
 			return m, nil
 		case "*":
 			if m.edit {
