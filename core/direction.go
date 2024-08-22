@@ -13,7 +13,7 @@ const (
 )
 
 var (
-	allDirections = []Direction{UP, RIGHT, LEFT, DOWN}
+	allDirections = []Direction{UP, RIGHT, DOWN, LEFT}
 	symbols       = map[Direction]string{
 		NONE:                     "•",
 		UP:                       "╹",

@@ -12,26 +12,26 @@ func NewBangEmitter(midi midi.Midi, direction Direction, armed bool) *BaseEmitte
 		direction: direction,
 		armed:     armed,
 		note:      NewNote(midi),
-		behavior:  BangEmitter{},
+		behavior:  &BangEmitter{},
 	}
 }
 
-func (e BangEmitter) ArmedOnStart() bool {
+func (e *BangEmitter) ArmedOnStart() bool {
 	return true
 }
 
-func (e BangEmitter) EmitDirections(dir Direction, pulse uint64) Direction {
+func (e *BangEmitter) EmitDirections(dir Direction, pulse uint64) Direction {
 	return dir
 }
 
-func (e BangEmitter) Symbol(dir Direction) string {
+func (e *BangEmitter) Symbol(dir Direction) string {
 	return fmt.Sprintf("%s%s", "B", dir.Symbol())
 }
 
-func (e BangEmitter) Name() string {
+func (e *BangEmitter) Name() string {
 	return "bang"
 }
 
-func (e BangEmitter) Color() string {
+func (e *BangEmitter) Color() string {
 	return "165"
 }
