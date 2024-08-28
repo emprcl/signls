@@ -28,7 +28,7 @@ func (e *SpreadEmitter) Symbol(dir Direction) string {
 }
 
 func (e *SpreadEmitter) Name() string {
-	return "mult"
+	return "spread"
 }
 
 func (e *SpreadEmitter) Color() string {

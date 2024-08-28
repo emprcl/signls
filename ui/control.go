@@ -117,15 +117,16 @@ func (m mainModel) selectedNode() core.Node {
 }
 
 func (m mainModel) selectedNodeName() string {
-	if m.selectedNode() == nil {
+	node := m.selectedNode()
+	if node == nil {
 		return "empty"
 	}
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		emitterStyle.
 			MarginRight(1).
-			Background(lipgloss.Color(m.selectedNode().Color())).
-			Render(m.selectedNode().Symbol()),
-		m.selectedNode().Name(),
+			Background(lipgloss.Color(node.Color())).
+			Render(node.Symbol()),
+		node.Name(),
 	)
 }
