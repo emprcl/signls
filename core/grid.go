@@ -260,7 +260,7 @@ func (g *Grid) Reset() {
 
 func (g *Grid) Emit(x, y int, direction Direction) {
 	newX, newY := direction.NextPosition(x, y)
-	if newX == x && newY == y {
+	if (newX == x && newY == y) || g.outOfBounds(newX, newY) {
 		return
 	}
 	if n, ok := g.nodes[newY][newX].(*Emitter); ok {
@@ -274,8 +274,7 @@ func (g *Grid) Emit(x, y int, direction Direction) {
 func (g *Grid) Move(x, y int, direction Direction) {
 	newX, newY := direction.NextPosition(x, y)
 
-	if newX >= g.Width || newY >= g.Height ||
-		newX < 0 || newY < 0 {
+	if g.outOfBounds(newX, newY) {
 		g.nodes[y][x] = nil
 		return
 	}
@@ -315,4 +314,8 @@ func (g *Grid) Resize(newWidth, newHeight int) {
 	g.Width = newWidth
 	g.Height = newHeight
 	g.nodes = newNodes
+}
+
+func (g Grid) outOfBounds(x, y int) bool {
+	return x >= g.Width || y >= g.Height || x < 0 || y < 0
 }
