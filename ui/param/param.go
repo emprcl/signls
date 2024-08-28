@@ -17,22 +17,20 @@ type Param interface {
 	Right()
 }
 
-func NewParamsForNode(grid *core.Grid, node core.Node) []Param {
-	switch node.(type) {
-	case *core.Emitter:
-		return []Param{
-			Key{
-				node: node,
-				keys: core.AllKeysInScale(grid.Key, grid.Scale),
-				root: grid.Key,
-				mode: KeyMode{node: node, modes: core.AllNoteBehaviors()},
-			},
-			Velocity{node: node},
-			Length{node: node},
-			Channel{node: node},
-		}
-	default:
+func NewParamsForNodes(grid *core.Grid, nodes []core.Node) []Param {
+	if len(nodes) == 0 {
 		return []Param{}
+	}
+	return []Param{
+		Key{
+			nodes: nodes,
+			keys:  core.AllKeysInScale(grid.Key, grid.Scale),
+			root:  grid.Key,
+			mode:  KeyMode{nodes: nodes, modes: core.AllNoteBehaviors()},
+		},
+		Velocity{nodes: nodes},
+		Length{nodes: nodes},
+		Channel{nodes: nodes},
 	}
 }
 

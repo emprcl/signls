@@ -10,7 +10,6 @@
 TODO:
  - signals with different speeds
  - signal brings context
- - change parameters for multiple node at once
  - add random note octave spread
  - add randomness on every note param
  - add note probability

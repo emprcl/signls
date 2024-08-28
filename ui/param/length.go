@@ -10,7 +10,7 @@ const (
 )
 
 type Length struct {
-	node core.Node
+	nodes []core.Node
 }
 
 func (l Length) Name() string {
@@ -18,8 +18,8 @@ func (l Length) Name() string {
 }
 
 func (l Length) Display() string {
-	length := int(l.node.(*core.Emitter).Note().Length)
-	pulsesPerStep, stepsPerQuarterNote := l.node.(*core.Emitter).Note().ClockDivision()
+	length := int(l.nodes[0].(*core.Emitter).Note().Length)
+	pulsesPerStep, stepsPerQuarterNote := l.nodes[0].(*core.Emitter).Note().ClockDivision()
 	switch length {
 	case pulsesPerStep / 4:
 		return "1|64"
@@ -41,7 +41,7 @@ func (l Length) Display() string {
 }
 
 func (l Length) Value() int {
-	return int(l.node.(*core.Emitter).Note().Length)
+	return int(l.nodes[0].(*core.Emitter).Note().Length)
 }
 
 func (l Length) Increment() {
@@ -57,5 +57,7 @@ func (l Length) Left() {}
 func (l Length) Right() {}
 
 func (l Length) Set(value int) {
-	l.node.(*core.Emitter).Note().SetLength(uint8(value))
+	for _, node := range l.nodes {
+		node.(*core.Emitter).Note().SetLength(uint8(value))
+	}
 }

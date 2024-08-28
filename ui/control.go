@@ -116,17 +116,31 @@ func (m mainModel) selectedNode() core.Node {
 	return m.grid.Nodes()[m.cursorY][m.cursorX]
 }
 
+func (m mainModel) selectedEmitters() []core.Node {
+	nodes := []core.Node{}
+	for y := m.cursorY; y <= m.selectionY; y++ {
+		for x := m.cursorX; x <= m.selectionX; x++ {
+			if n, ok := m.grid.Nodes()[y][x].(*core.Emitter); ok {
+				nodes = append(nodes, n)
+			}
+		}
+	}
+	return nodes
+}
+
 func (m mainModel) selectedNodeName() string {
-	node := m.selectedNode()
-	if node == nil {
+	nodes := m.selectedEmitters()
+	if len(nodes) == 0 {
 		return "empty"
+	} else if len(nodes) > 1 {
+		return fmt.Sprintf("%d emit.", len(nodes))
 	}
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		emitterStyle.
 			MarginRight(1).
-			Background(lipgloss.Color(node.Color())).
-			Render(node.Symbol()),
-		node.Name(),
+			Background(lipgloss.Color(nodes[0].Color())).
+			Render(nodes[0].Symbol()),
+		nodes[0].Name(),
 	)
 }

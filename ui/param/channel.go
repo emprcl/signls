@@ -6,7 +6,7 @@ import (
 )
 
 type Channel struct {
-	node core.Node
+	nodes []core.Node
 }
 
 func (c Channel) Name() string {
@@ -14,11 +14,11 @@ func (c Channel) Name() string {
 }
 
 func (c Channel) Display() string {
-	return fmt.Sprintf("%d", c.node.(*core.Emitter).Note().Channel+1)
+	return fmt.Sprintf("%d", c.nodes[0].(*core.Emitter).Note().Channel+1)
 }
 
 func (c Channel) Value() int {
-	return int(c.node.(*core.Emitter).Note().Channel)
+	return int(c.nodes[0].(*core.Emitter).Note().Channel)
 }
 
 func (c Channel) Increment() {
@@ -34,5 +34,7 @@ func (c Channel) Left() {}
 func (c Channel) Right() {}
 
 func (c Channel) Set(value int) {
-	c.node.(*core.Emitter).Note().SetChannel(uint8(value))
+	for _, node := range c.nodes {
+		node.(*core.Emitter).Note().SetChannel(uint8(value))
+	}
 }

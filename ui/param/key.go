@@ -7,10 +7,10 @@ import (
 )
 
 type Key struct {
-	node core.Node
-	keys []core.Key
-	root core.Key
-	mode KeyMode
+	nodes []core.Node
+	keys  []core.Key
+	root  core.Key
+	mode  KeyMode
 }
 
 func (k Key) Name() string {
@@ -22,14 +22,14 @@ func (k Key) Display() string {
 	case "silent":
 		return "•"
 	case "random":
-		return fmt.Sprintf("%s%s", "r", k.node.(*core.Emitter).Note().KeyName())
+		return fmt.Sprintf("%s%s", "r", k.nodes[0].(*core.Emitter).Note().KeyName())
 	default:
-		return k.node.(*core.Emitter).Note().KeyName()
+		return k.nodes[0].(*core.Emitter).Note().KeyName()
 	}
 }
 
 func (k Key) Value() int {
-	return int(k.node.(*core.Emitter).Note().KeyValue())
+	return int(k.nodes[0].(*core.Emitter).Note().KeyValue())
 }
 
 func (k Key) Increment() {
@@ -49,12 +49,14 @@ func (k Key) Right() {
 }
 
 func (k Key) Set(value int) {
-	k.node.(*core.Emitter).Note().SetKey(k.keys[value], k.root)
+	for _, node := range k.nodes {
+		node.(*core.Emitter).Note().SetKey(k.keys[value], k.root)
+	}
 }
 
 func (k Key) Preview() {
 	go func() {
-		n := *k.node.(*core.Emitter).Note()
+		n := *k.nodes[0].(*core.Emitter).Note()
 		n.Play(core.Key(60), core.CHROMATIC)
 		time.Sleep(300 * time.Millisecond)
 		n.Stop()
@@ -63,7 +65,7 @@ func (k Key) Preview() {
 
 func (k Key) keyIndex() int {
 	for i := 0; i < len(k.keys); i++ {
-		if k.node.(*core.Emitter).Note().KeyValue() == k.keys[i] {
+		if k.nodes[0].(*core.Emitter).Note().KeyValue() == k.keys[i] {
 			return i
 		}
 	}

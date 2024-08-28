@@ -5,12 +5,12 @@ import (
 )
 
 type Direction struct {
-	node core.Node
+	nodes []core.Node
 }
 
-func NewDirection(node core.Node) Direction {
+func NewDirection(nodes []core.Node) Direction {
 	return Direction{
-		node: node,
+		nodes: nodes,
 	}
 }
 
@@ -19,11 +19,11 @@ func (d Direction) Name() string {
 }
 
 func (d Direction) Display() string {
-	return d.node.Direction().Symbol()
+	return d.nodes[0].Direction().Symbol()
 }
 
 func (d Direction) Value() int {
-	return int(d.node.Direction())
+	return int(d.nodes[0].Direction())
 }
 
 func (d Direction) Increment() {
@@ -39,7 +39,9 @@ func (d Direction) Left() {}
 func (d Direction) Right() {}
 
 func (d Direction) Set(value int) {
-	d.node.SetDirection(core.Direction(value))
+	for _, node := range d.nodes {
+		node.SetDirection(core.Direction(value))
+	}
 }
 
 func (d Direction) SetFromKeyString(key string) {
@@ -56,5 +58,7 @@ func (d Direction) SetFromKeyString(key string) {
 	default:
 		dir = core.UP
 	}
-	d.node.SetDirection(dir)
+	for _, node := range d.nodes {
+		node.SetDirection(dir)
+	}
 }

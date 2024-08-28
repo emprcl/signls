@@ -51,6 +51,8 @@ func New(grid *core.Grid) tea.Model {
 		gridParams: param.NewParamsForGrid(grid),
 		cursorX:    1,
 		cursorY:    1,
+		selectionX: 1,
+		selectionY: 1,
 	}
 	return model
 }
@@ -117,26 +119,30 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				msg.String(), 1, m.selectionX, m.selectionY,
 				m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
 			)
-			m.params = param.NewParamsForNode(m.grid, m.selectedNode())
+			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			return m, nil
 		case "shift+up", "shift+right", "shift+down", "shift+left":
+			if m.edit {
+				return m, nil
+			}
 			dir := strings.Replace(msg.String(), "shift+", "", 1)
 			m.selectionX, m.selectionY = moveCursor(
 				dir, 1, m.selectionX, m.selectionY,
 				m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
 			)
+			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			return m, nil
 		case "ctrl+up", "ctrl+right", "ctrl+down", "ctrl+left":
 			dir := strings.Replace(msg.String(), "ctrl+", "", 1)
-			if !m.edit && m.selectedNode() != nil {
-				param.NewDirection(m.selectedNode()).SetFromKeyString(dir)
+			if !m.edit {
+				param.NewDirection(m.selectedEmitters()).SetFromKeyString(dir)
 				return m, nil
 			}
 			m.handleParamEdit(dir)
 			return m, nil
 		case "b", "s", "c":
 			m.grid.AddNodeFromSymbol(msg.String(), m.cursorX, m.cursorY)
-			m.params = param.NewParamsForNode(m.grid, m.selectedNode())
+			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			return m, nil
 		case "m":
 			m.grid.ToggleNodeMutes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
@@ -150,7 +156,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.grid.RemoveNodes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			return m, nil
 		case "enter":
-			if m.selectedNode() == nil {
+			if len(m.selectedEmitters()) == 0 {
 				return m, nil
 			}
 			m.edit = !m.edit
@@ -206,7 +212,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case "ctrl+v":
 			m.grid.Paste(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
-			m.params = param.NewParamsForNode(m.grid, m.selectedNode())
+			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			return m, nil
 		case "esc":
 			m.edit = false

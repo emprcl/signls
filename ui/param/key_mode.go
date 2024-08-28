@@ -5,7 +5,7 @@ import (
 )
 
 type KeyMode struct {
-	node  core.Node
+	nodes []core.Node
 	modes []core.NoteBehavior
 }
 
@@ -14,7 +14,7 @@ func (k KeyMode) Name() string {
 }
 
 func (k KeyMode) Display() string {
-	return k.node.(*core.Emitter).Note().Behavior.Name()
+	return k.nodes[0].(*core.Emitter).Note().Behavior.Name()
 }
 
 func (k KeyMode) Value() int {
@@ -39,12 +39,14 @@ func (k KeyMode) Set(value int) {
 	} else if value >= len(k.modes) {
 		value = 0
 	}
-	k.node.(*core.Emitter).Note().Behavior = k.modes[value]
+	for _, node := range k.nodes {
+		node.(*core.Emitter).Note().Behavior = k.modes[value]
+	}
 }
 
 func (k KeyMode) keyModeIndex() int {
 	for i := 0; i < len(k.modes); i++ {
-		if k.node.(*core.Emitter).Note().Behavior == k.modes[i] {
+		if k.nodes[0].(*core.Emitter).Note().Behavior == k.modes[i] {
 			return i
 		}
 	}
