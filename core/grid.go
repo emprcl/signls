@@ -1,8 +1,9 @@
 package core
 
 import (
-	"cykl/midi"
 	"sync"
+
+	"cykl/midi"
 )
 
 // Constants for default settings
@@ -50,7 +51,7 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 		if !grid.Playing {
 			return
 		}
-		grid.Update() // Update the grid on each clock tick
+		grid.Update()
 	})
 
 	return grid
@@ -60,8 +61,8 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 func (g *Grid) TogglePlay() {
 	g.Playing = !g.Playing
 	if !g.Playing {
-		g.Reset()           // Reset the grid when stopping
-		g.midi.SilenceAll() // Silence all MIDI notes
+		g.Reset()
+		g.midi.SilenceAll()
 	}
 }
 
@@ -78,13 +79,13 @@ func (g *Grid) Tempo() float64 {
 // SetKey changes the root key of the grid and transposes all notes accordingly.
 func (g *Grid) SetKey(key Key) {
 	g.Key = key
-	g.Transpose() // Transpose all notes to the new key
+	g.Transpose()
 }
 
 // SetScale changes the scale of the grid and transposes all notes accordingly.
 func (g *Grid) SetScale(scale Scale) {
 	g.Scale = scale
-	g.Transpose() // Transpose all notes to the new scale
+	g.Transpose()
 }
 
 // MidiDevice returns the name of the currently active MIDI device.
@@ -124,18 +125,18 @@ func (g *Grid) CopyOrCut(startX, startY, endX, endY int, cut bool) {
 		for x := startX; x <= endX; x++ {
 			_, ok := g.nodes[y][x].(*Emitter)
 			if ok {
-				nodes[y-startY][x-startX] = g.nodes[y][x] // Copy node to clipboard
+				nodes[y-startY][x-startX] = g.nodes[y][x]
 				count++
 			}
 			if ok && cut {
-				g.nodes[y][x] = nil // Remove node from grid if cutting
+				g.nodes[y][x] = nil
 			}
 		}
 	}
 	if count == 0 {
-		return // If no nodes were copied, exit
+		return
 	}
-	g.clipboard = nodes // Store the copied nodes in the clipboard
+	g.clipboard = nodes
 }
 
 // Paste pastes nodes from the clipboard into the grid at the specified location.
@@ -144,9 +145,9 @@ func (g *Grid) Paste(startX, startY, endX, endY int) {
 	for y := 0; y < h && startY+y <= endY; y++ {
 		for x := 0; x < w && startX+x <= endX; x++ {
 			if _, ok := g.clipboard[y][x].(*Emitter); !ok {
-				continue // Skip if clipboard does not contain an Emitter
+				continue
 			}
-			g.nodes[startY+y][startX+x] = g.clipboard[y][x].(*Emitter).Copy() // Paste a copy of the node
+			g.nodes[startY+y][startX+x] = g.clipboard[y][x].(*Emitter).Copy()
 		}
 	}
 }
@@ -176,17 +177,17 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 // AddNode adds a node to the grid at the specified coordinates.
 func (g *Grid) AddNode(node *Emitter, x, y int) {
 	if n, ok := g.nodes[y][x].(*Emitter); g.nodes[y][x] != nil && ok {
-		n.behavior = node.behavior // Update existing node's behavior
+		n.behavior = node.behavior
 		return
 	}
-	g.nodes[y][x] = node // Add the new node to the grid
+	g.nodes[y][x] = node
 }
 
 // RemoveNodes removes nodes from a specified rectangular region of the grid.
 func (g *Grid) RemoveNodes(startX, startY, endX, endY int) {
 	for y := startY; y <= endY; y++ {
 		for x := startX; x <= endX; x++ {
-			g.nodes[y][x] = nil // Remove node from grid
+			g.nodes[y][x] = nil
 		}
 	}
 }
@@ -196,9 +197,9 @@ func (g *Grid) ToggleNodeMutes(startX, startY, endX, endY int) {
 	for y := startY; y <= endY; y++ {
 		for x := startX; x <= endX; x++ {
 			if _, ok := g.nodes[y][x].(*Emitter); !ok {
-				continue // Skip if not an Emitter
+				continue
 			}
-			g.nodes[y][x].(*Emitter).SetMute(!g.nodes[y][x].(*Emitter).Muted()) // Toggle mute
+			g.nodes[y][x].(*Emitter).SetMute(!g.nodes[y][x].(*Emitter).Muted())
 		}
 	}
 }
@@ -208,9 +209,9 @@ func (g *Grid) SetAllNodeMutes(mute bool) {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
 			if _, ok := g.nodes[y][x].(*Emitter); !ok {
-				continue // Skip if not an Emitter
+				continue
 			}
-			g.nodes[y][x].(*Emitter).SetMute(mute) // Set mute state
+			g.nodes[y][x].(*Emitter).SetMute(mute)
 		}
 	}
 }
@@ -220,26 +221,26 @@ func (g *Grid) Update() {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	if g.pulse%uint64(pulsesPerStep) != 0 {
-		g.Tick() // Handle partial pulse updates
+		g.Tick()
 		return
 	}
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
 			if g.nodes[y][x] == nil {
-				continue // Skip empty nodes
+				continue
 			}
 
 			if n, ok := g.nodes[y][x].(Movable); ok {
-				n.Move(g, x, y) // Move the node if it implements the Movable interface
+				n.Move(g, x, y)
 			}
 
 			if n, ok := g.nodes[y][x].(*Emitter); ok {
-				n.Trig(g.Key, g.Scale, g.pulse) // Trigger the emitter
-				n.Emit(g, x, y)                 // Emit signals from the emitter
+				n.Trig(g.Key, g.Scale, g.pulse)
+				n.Emit(g, x, y)
 			}
 		}
 	}
-	g.pulse++ // Increment the pulse counter
+	g.pulse++
 }
 
 // Tick updates all active notes within the grid on every pulse.
@@ -247,7 +248,7 @@ func (g *Grid) Tick() {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
 			if n, ok := g.nodes[y][x].(*Emitter); ok {
-				n.Note().Tick() // Advance the note's tick counter
+				n.Note().Tick()
 			}
 		}
 	}
@@ -259,7 +260,7 @@ func (g *Grid) Transpose() {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
 			if n, ok := g.nodes[y][x].(*Emitter); ok {
-				n.Note().Transpose(g.Key, g.Scale) // Transpose the note to the current key and scale
+				n.Note().Transpose(g.Key, g.Scale)
 			}
 		}
 	}
@@ -270,15 +271,15 @@ func (g *Grid) Reset() {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	g.Playing = false
-	g.pulse = 0 // Reset the pulse counter
+	g.pulse = 0
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
 			if _, ok := g.nodes[y][x].(Movable); ok {
-				g.nodes[y][x] = nil // Remove movable nodes from the grid
+				g.nodes[y][x] = nil
 			}
 
 			if n, ok := g.nodes[y][x].(*Emitter); ok {
-				n.Reset() // Reset the emitter
+				n.Reset()
 			}
 		}
 	}
@@ -288,14 +289,14 @@ func (g *Grid) Reset() {
 func (g *Grid) Emit(x, y int, direction Direction) {
 	newX, newY := direction.NextPosition(x, y)
 	if (newX == x && newY == y) || g.outOfBounds(newX, newY) {
-		return // Skip if the new position is out of bounds or unchanged
+		return
 	}
 	if n, ok := g.nodes[newY][newX].(*Emitter); ok {
 		n.Arm()
-		n.Trig(g.Key, g.Scale, g.pulse) // Trigger the emitter if it exists
+		n.Trig(g.Key, g.Scale, g.pulse)
 		return
 	}
-	g.nodes[newY][newX] = NewSignal(direction, g.pulse) // Create a new signal
+	g.nodes[newY][newX] = NewSignal(direction, g.pulse)
 }
 
 // Move moves a node in the specified direction.
@@ -303,18 +304,18 @@ func (g *Grid) Move(x, y int, direction Direction) {
 	newX, newY := direction.NextPosition(x, y)
 
 	if g.outOfBounds(newX, newY) {
-		g.nodes[y][x] = nil // Remove the node if it moves out of bounds
+		g.nodes[y][x] = nil
 		return
 	}
 
 	if g.nodes[newY][newX] == nil {
-		g.nodes[newY][newX] = g.nodes[y][x] // Move the node to the new position
+		g.nodes[newY][newX] = g.nodes[y][x]
 	} else if n, ok := g.nodes[newY][newX].(*Emitter); ok {
 		n.Arm()
-		n.Trig(g.Key, g.Scale, g.pulse) // Trigger the emitter if it exists at the new position
+		n.Trig(g.Key, g.Scale, g.pulse)
 	}
 
-	g.nodes[y][x] = nil // Clear the original position
+	g.nodes[y][x] = nil
 }
 
 // Resize changes the size of the grid and preserves existing nodes within the new dimensions.
@@ -326,26 +327,26 @@ func (g *Grid) Resize(newWidth, newHeight int) {
 
 	minWidth := g.Width
 	if newWidth < g.Width {
-		minWidth = newWidth // Determine the smaller of the current and new widths
+		minWidth = newWidth
 	}
 
 	minHeight := g.Height
 	if newHeight < g.Height {
-		minHeight = newHeight // Determine the smaller of the current and new heights
+		minHeight = newHeight
 	}
 
 	for y := 0; y < minHeight; y++ {
 		for x := 0; x < minWidth; x++ {
-			newNodes[y][x] = g.nodes[y][x] // Copy existing nodes to the resized grid
+			newNodes[y][x] = g.nodes[y][x]
 		}
 	}
 
 	g.Width = newWidth
 	g.Height = newHeight
-	g.nodes = newNodes // Update the grid with the resized node array
+	g.nodes = newNodes
 }
 
 // outOfBounds checks if the specified coordinates are outside the grid dimensions.
-func (g Grid) outOfBounds(x, y int) bool {
+func (g *Grid) outOfBounds(x, y int) bool {
 	return x >= g.Width || y >= g.Height || x < 0 || y < 0
 }

@@ -1,8 +1,9 @@
 package core
 
 import (
-	"cykl/midi"
 	"fmt"
+
+	"cykl/midi"
 )
 
 // CycleEmitter defines an emitter behavior that cycles through multiple directions
@@ -15,9 +16,9 @@ type CycleEmitter struct {
 // It initializes the emitter with the provided MIDI interface and direction.
 func NewCycleEmitter(midi midi.Midi, direction Direction) *Emitter {
 	return &Emitter{
-		direction: direction,       // The set of directions this emitter will cycle through.
-		note:      NewNote(midi),   // Create a new Note instance associated with this emitter.
-		behavior:  &CycleEmitter{}, // Set the behavior to CycleEmitter.
+		direction: direction,
+		note:      NewNote(midi),
+		behavior:  &CycleEmitter{},
 	}
 }
 
@@ -25,11 +26,11 @@ func NewCycleEmitter(midi midi.Midi, direction Direction) *Emitter {
 // If there are no directions, it returns NONE. The cycling is done in a round-robin manner.
 func (e *CycleEmitter) EmitDirections(dir Direction, pulse uint64) Direction {
 	if dir.Count() == 0 {
-		return NONE // Return NONE if no directions are available.
+		return NONE
 	}
-	d := e.next % dir.Count()           // Determine the next direction index.
-	e.next = (e.next + 1) % dir.Count() // Update the index to the next direction for future emissions.
-	return dir.Decompose()[d]           // Return the decomposed direction corresponding to the current index.
+	d := e.next % dir.Count()
+	e.next = (e.next + 1) % dir.Count()
+	return dir.Decompose()[d]
 }
 
 // ArmedOnStart returns false, indicating that the CycleEmitter is not armed when the grid starts.
@@ -39,7 +40,7 @@ func (e *CycleEmitter) ArmedOnStart() bool {
 
 // Symbol returns the visual representation of the emitter on the grid.
 func (e *CycleEmitter) Symbol(dir Direction) string {
-	return fmt.Sprintf("%s%s", "C", dir.Symbol()) // "C" for CycleEmitter plus direction symbol.
+	return fmt.Sprintf("%s%s", "C", dir.Symbol())
 }
 
 // Name returns the name of this emitter behavior.

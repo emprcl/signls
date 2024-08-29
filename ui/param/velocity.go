@@ -1,8 +1,9 @@
 package param
 
 import (
-	"cykl/core"
 	"fmt"
+
+	"cykl/core"
 )
 
 type Velocity struct {

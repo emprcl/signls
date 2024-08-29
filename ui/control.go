@@ -1,9 +1,10 @@
 package ui
 
 import (
+	"fmt"
+
 	"cykl/core"
 	"cykl/ui/param"
-	"fmt"
 
 	"github.com/charmbracelet/lipgloss"
 )
@@ -69,12 +70,10 @@ func (m mainModel) gridInfo() string {
 
 func (m mainModel) nodeEdit() string {
 	params := []string{}
-	style := cellStyle
 	for k, p := range m.params {
+		style := cellStyle
 		if k == m.param {
 			style = activeCellStyle
-		} else {
-			style = cellStyle
 		}
 		params = append(
 			params,

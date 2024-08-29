@@ -3,7 +3,7 @@ package core
 import "testing"
 
 func TestKeyTransposition(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		key          Key
 		previousRoot Key
 		root         Key

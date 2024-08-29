@@ -82,28 +82,28 @@ func (e *Emitter) Trig(key Key, scale Scale, pulse uint64) {
 		e.note.Tick() // Move the note's internal clock forward.
 	}
 	if !e.armed {
-		return // If not armed, don't do anything.
+		return
 	}
 	if !e.muted {
-		e.note.Play(key, scale) // Play the note if not muted.
+		e.note.Play(key, scale)
 	}
-	e.triggered = true // Mark as triggered.
-	e.armed = false    // Disarm the emitter.
-	e.pulse = pulse    // Update the pulse to the current one.
+	e.triggered = true
+	e.armed = false
+	e.pulse = pulse
 }
 
 // Emit handles the signal emission process. If the emitter was triggered on the current pulse,
 // it calculates the directions to emit signals and updates the grid accordingly.
 func (e *Emitter) Emit(g *Grid, x, y int) {
 	if e.updated(g.pulse) || !e.triggered {
-		return // If the emitter hasn't been triggered, do nothing.
+		return
 	}
-	directions := e.behavior.EmitDirections(e.direction, g.pulse) // Get emission directions.
+	directions := e.behavior.EmitDirections(e.direction, g.pulse)
 	for _, dir := range directions.Decompose() {
-		g.Emit(x, y, dir) // Emit signals in each direction.
+		g.Emit(x, y, dir)
 	}
-	e.triggered = false // Reset the triggered state after emitting.
-	e.pulse = g.pulse   // Update the pulse.
+	e.triggered = false
+	e.pulse = g.pulse
 }
 
 // Direction returns the current direction(s) the emitter is facing.
@@ -115,10 +115,10 @@ func (e *Emitter) Direction() Direction {
 // If the direction is already set, it removes it; otherwise, it adds it.
 func (e *Emitter) SetDirection(dir Direction) {
 	if e.direction.Contains(dir) {
-		e.direction = e.direction.Remove(dir) // Remove the direction if it exists.
+		e.direction = e.direction.Remove(dir)
 		return
 	}
-	e.direction = e.direction.Add(dir) // Add the direction if it doesn't exist.
+	e.direction = e.direction.Add(dir)
 }
 
 // Symbol returns a string representation of the emitter, typically used for visualization.
@@ -139,10 +139,10 @@ func (e *Emitter) Color() string {
 // Reset restores the emitter to its initial state, resetting the pulse count,
 // disarming the emitter, and stopping any playing notes.
 func (e *Emitter) Reset() {
-	e.pulse = 0                         // Reset pulse counter.
-	e.armed = e.behavior.ArmedOnStart() // Arm or disarm based on behavior.
-	e.triggered = false                 // Reset triggered state.
-	e.Note().Stop()                     // Stop any playing note.
+	e.pulse = 0
+	e.armed = e.behavior.ArmedOnStart()
+	e.triggered = false
+	e.Note().Stop()
 }
 
 // updated checks if the emitter was updated on the given pulse.

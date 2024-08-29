@@ -1,0 +1,13 @@
+run:
+  go: "1.23"
+linters:
+  enable:
+    - thelper
+    - gofumpt
+    - tparallel
+    - unconvert
+    - unparam
+
+linters-settings:
+  gofumpt:
+    module-path: cykl

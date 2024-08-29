@@ -1,11 +1,12 @@
 package main
 
 import (
+	"flag"
+	"log"
+
 	"cykl/core"
 	"cykl/midi"
 	"cykl/ui"
-	"flag"
-	"log"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

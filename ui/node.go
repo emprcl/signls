@@ -1,8 +1,9 @@
 package ui
 
 import (
-	"cykl/core"
 	"log"
+
+	"cykl/core"
 
 	"github.com/charmbracelet/lipgloss"
 )

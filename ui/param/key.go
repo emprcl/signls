@@ -1,9 +1,10 @@
 package param
 
 import (
-	"cykl/core"
 	"fmt"
 	"time"
+
+	"cykl/core"
 )
 
 type Key struct {

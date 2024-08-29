@@ -1,8 +1,9 @@
 package core
 
 import (
-	"cykl/midi"
 	"fmt"
+
+	"cykl/midi"
 )
 
 // BangEmitter defines a simple emitter behavior where it triggers and emits

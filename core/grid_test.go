@@ -1,9 +1,10 @@
 package core
 
 import (
-	"cykl/midi"
 	"fmt"
 	"testing"
+
+	"cykl/midi"
 )
 
 var benchmarks = []struct {
