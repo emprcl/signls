@@ -18,6 +18,8 @@ TODO:
   - Accumulation (trigger after x)
   - Zone for chord
  - add midi cc (note behavior?)
+ - add key mapping
+ - add file system
 
 Names:
   - Nyll
