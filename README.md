@@ -9,6 +9,8 @@
 
 TODO:
  - signal brings context
+   - store initial bang position to respawn?
+   - should the note be relative to the previous one instead?
  - add random note octave spread
  - add randomness on every note param
  - add note probability
