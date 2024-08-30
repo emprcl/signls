@@ -1,14 +1,14 @@
 package param
 
 import (
-	"cykl/core"
+	"cykl/core/common"
 )
 
 type Direction struct {
-	nodes []core.Node
+	nodes []common.Node
 }
 
-func NewDirection(nodes []core.Node) Direction {
+func NewDirection(nodes []common.Node) Direction {
 	return Direction{
 		nodes: nodes,
 	}
@@ -40,23 +40,23 @@ func (d Direction) Right() {}
 
 func (d Direction) Set(value int) {
 	for _, node := range d.nodes {
-		node.SetDirection(core.Direction(value))
+		node.SetDirection(common.Direction(value))
 	}
 }
 
 func (d Direction) SetFromKeyString(key string) {
-	var dir core.Direction
+	var dir common.Direction
 	switch key {
 	case "up":
-		dir = core.UP
+		dir = common.UP
 	case "right":
-		dir = core.RIGHT
+		dir = common.RIGHT
 	case "down":
-		dir = core.DOWN
+		dir = common.DOWN
 	case "left":
-		dir = core.LEFT
+		dir = common.LEFT
 	default:
-		dir = core.UP
+		dir = common.UP
 	}
 	for _, node := range d.nodes {
 		node.SetDirection(dir)

@@ -1,12 +1,13 @@
 package param
 
 import (
-	"cykl/core"
+	"cykl/core/field"
+	"cykl/core/music"
 )
 
 type Scale struct {
-	grid   *core.Grid
-	scales []core.Scale
+	grid   *field.Grid
+	scales []music.Scale
 }
 
 func (s Scale) Name() string {

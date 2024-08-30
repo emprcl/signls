@@ -4,7 +4,7 @@ import (
 	"flag"
 	"log"
 
-	"cykl/core"
+	"cykl/core/field"
 	"cykl/midi"
 	"cykl/ui"
 
@@ -21,7 +21,7 @@ func main() {
 	}
 	defer midi.Close()
 
-	grid := core.NewGrid(45, 25, midi)
+	grid := field.NewGrid(45, 25, midi)
 
 	if *debug {
 		f, err := tea.LogToFile("debug.log", "debug")

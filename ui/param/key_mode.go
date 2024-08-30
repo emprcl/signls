@@ -1,12 +1,14 @@
 package param
 
 import (
-	"cykl/core"
+	"cykl/core/common"
+	"cykl/core/music"
+	"cykl/core/node"
 )
 
 type KeyMode struct {
-	nodes []core.Node
-	modes []core.NoteBehavior
+	nodes []common.Node
+	modes []music.NoteBehavior
 }
 
 func (k KeyMode) Name() string {
@@ -14,7 +16,7 @@ func (k KeyMode) Name() string {
 }
 
 func (k KeyMode) Display() string {
-	return k.nodes[0].(*core.Emitter).Note().Behavior.Name()
+	return k.nodes[0].(*node.BaseEmitter).Note().Behavior.Name()
 }
 
 func (k KeyMode) Value() int {
@@ -39,14 +41,14 @@ func (k KeyMode) Set(value int) {
 	} else if value >= len(k.modes) {
 		value = 0
 	}
-	for _, node := range k.nodes {
-		node.(*core.Emitter).Note().Behavior = k.modes[value]
+	for _, n := range k.nodes {
+		n.(*node.BaseEmitter).Note().Behavior = k.modes[value]
 	}
 }
 
 func (k KeyMode) keyModeIndex() int {
 	for i := 0; i < len(k.modes); i++ {
-		if k.nodes[0].(*core.Emitter).Note().Behavior == k.modes[i] {
+		if k.nodes[0].(*node.BaseEmitter).Note().Behavior == k.modes[i] {
 			return i
 		}
 	}

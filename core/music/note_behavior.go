@@ -1,4 +1,4 @@
-package core
+package music
 
 import "math/rand"
 

@@ -1,4 +1,9 @@
-package core
+package node
+
+import (
+	"cykl/core/common"
+	"cykl/core/music"
+)
 
 // EmitterBehavior defines the behavior of different types of emitters.
 // This interface is implemented by different emitter types (e.g., BangEmitter).
@@ -8,11 +13,11 @@ type EmitterBehavior interface {
 
 	// EmitDirections determines which directions the emitter will emit signals
 	// based on its current direction and the pulse count.
-	EmitDirections(dir Direction, pulse uint64) Direction
+	EmitDirections(dir common.Direction, pulse uint64) common.Direction
 
 	// Symbol returns a string representation of the emitter, potentially
 	// taking its direction into account for visualization.
-	Symbol(dir Direction) string
+	Symbol(dir common.Direction) string
 
 	// Name returns the name of the emitter type.
 	Name() string
@@ -21,13 +26,13 @@ type EmitterBehavior interface {
 	Color() string
 }
 
-// Emitter represents a node that emits signals when triggered. It contains
+// BaseEmitter represents a node that emits signals when triggered. It contains
 // information about its behavior, direction, associated note, and state.
-type Emitter struct {
-	behavior EmitterBehavior // The specific behavior of this emitter.
+type BaseEmitter struct {
+	Behavior EmitterBehavior // The specific behavior of this emitter.
 
-	direction Direction // The direction(s) in which this emitter is facing.
-	note      *Note     // The musical note associated with this emitter.
+	direction common.Direction // The direction(s) in which this emitter is facing.
+	note      *music.Note      // The musical note associated with this emitter.
 
 	pulse     uint64 // The last pulse when the emitter was triggered.
 	armed     bool   // Whether the emitter is armed and ready to trigger.
@@ -37,10 +42,10 @@ type Emitter struct {
 
 // Copy creates a deep copy of the emitter, returning it as a Node interface.
 // It clones the associated note and keeps the same behavior and direction.
-func (e *Emitter) Copy() Node {
+func (e *BaseEmitter) Copy() common.Node {
 	newNote := *e.note // Deep copy the note to maintain state separately.
-	return &Emitter{
-		behavior:  e.behavior,
+	return &BaseEmitter{
+		Behavior:  e.Behavior,
 		direction: e.direction,
 		armed:     e.armed,
 		note:      &newNote,
@@ -49,35 +54,35 @@ func (e *Emitter) Copy() Node {
 
 // Activated checks if the emitter is currently active, meaning it's either
 // armed or has been triggered.
-func (e *Emitter) Activated() bool {
+func (e *BaseEmitter) Activated() bool {
 	return e.armed || e.triggered
 }
 
 // Note returns the pointer to the Note associated with the emitter.
-func (e *Emitter) Note() *Note {
+func (e *BaseEmitter) Note() *music.Note {
 	return e.note
 }
 
 // Arm sets the emitter to an armed state, meaning it is ready to trigger.
-func (e *Emitter) Arm() {
+func (e *BaseEmitter) Arm() {
 	e.armed = true
 }
 
 // SetMute mutes or unmutes the emitter. If muted, it stops any currently
 // playing note.
-func (e *Emitter) SetMute(mute bool) {
+func (e *BaseEmitter) SetMute(mute bool) {
 	e.note.Stop() // Stop the note if we're muting.
 	e.muted = mute
 }
 
 // Muted returns whether the emitter is currently muted.
-func (e *Emitter) Muted() bool {
+func (e *BaseEmitter) Muted() bool {
 	return e.muted
 }
 
 // Trig triggers the emitter, playing its note if it is armed and not muted.
 // It also updates the pulse to the current one, and disarms the emitter.
-func (e *Emitter) Trig(key Key, scale Scale, pulse uint64) {
+func (e *BaseEmitter) Trig(key music.Key, scale music.Scale, pulse uint64) {
 	if !e.updated(pulse) {
 		e.note.Tick() // Move the note's internal clock forward.
 	}
@@ -92,28 +97,24 @@ func (e *Emitter) Trig(key Key, scale Scale, pulse uint64) {
 	e.pulse = pulse
 }
 
-// Emit handles the signal emission process. If the emitter was triggered on the current pulse,
-// it calculates the directions to emit signals and updates the grid accordingly.
-func (e *Emitter) Emit(g *Grid, x, y int) {
-	if e.updated(g.pulse) || !e.triggered {
-		return
-	}
-	directions := e.behavior.EmitDirections(e.direction, g.pulse)
-	for _, dir := range directions.Decompose() {
-		g.Emit(x, y, dir)
+// Emit returns the directions to emits for a given pulse.
+func (e *BaseEmitter) Emit(pulse uint64) []common.Direction {
+	if e.updated(pulse) || !e.triggered {
+		return []common.Direction{}
 	}
 	e.triggered = false
-	e.pulse = g.pulse
+	e.pulse = pulse
+	return e.Behavior.EmitDirections(e.direction, pulse).Decompose()
 }
 
 // Direction returns the current direction(s) the emitter is facing.
-func (e *Emitter) Direction() Direction {
+func (e *BaseEmitter) Direction() common.Direction {
 	return e.direction
 }
 
 // SetDirection adds or removes a direction from the emitter's current direction(s).
 // If the direction is already set, it removes it; otherwise, it adds it.
-func (e *Emitter) SetDirection(dir Direction) {
+func (e *BaseEmitter) SetDirection(dir common.Direction) {
 	if e.direction.Contains(dir) {
 		e.direction = e.direction.Remove(dir)
 		return
@@ -122,30 +123,30 @@ func (e *Emitter) SetDirection(dir Direction) {
 }
 
 // Symbol returns a string representation of the emitter, typically used for visualization.
-func (e *Emitter) Symbol() string {
-	return e.behavior.Symbol(e.direction)
+func (e *BaseEmitter) Symbol() string {
+	return e.Behavior.Symbol(e.direction)
 }
 
 // Name returns the name of the emitter type.
-func (e *Emitter) Name() string {
-	return e.behavior.Name()
+func (e *BaseEmitter) Name() string {
+	return e.Behavior.Name()
 }
 
 // Color returns the color associated with the emitter.
-func (e *Emitter) Color() string {
-	return e.behavior.Color()
+func (e *BaseEmitter) Color() string {
+	return e.Behavior.Color()
 }
 
 // Reset restores the emitter to its initial state, resetting the pulse count,
 // disarming the emitter, and stopping any playing notes.
-func (e *Emitter) Reset() {
+func (e *BaseEmitter) Reset() {
 	e.pulse = 0
-	e.armed = e.behavior.ArmedOnStart()
+	e.armed = e.Behavior.ArmedOnStart()
 	e.triggered = false
 	e.Note().Stop()
 }
 
 // updated checks if the emitter was updated on the given pulse.
-func (e *Emitter) updated(pulse uint64) bool {
+func (e *BaseEmitter) updated(pulse uint64) bool {
 	return e.pulse == pulse
 }

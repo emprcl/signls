@@ -1,6 +1,7 @@
-package core
+package music
 
 import (
+	"cykl/core/common"
 	"cykl/midi"
 )
 
@@ -9,7 +10,7 @@ const (
 	defaultKey      Key   = 60 // Default MIDI key value (Middle C).
 	defaultChannel  uint8 = 0
 	defaultVelocity uint8 = 100
-	defaultLength   uint8 = uint8(pulsesPerStep)
+	defaultLength   uint8 = uint8(common.PulsesPerStep)
 
 	maxKey      Key   = 127
 	maxVelocity uint8 = 127
@@ -138,5 +139,5 @@ func (n *Note) SetChannel(channel uint8) {
 // ClockDivision returns the pulses per step and steps per quarter note,
 // which might be used for timing or synchronization purposes.
 func (n *Note) ClockDivision() (int, int) {
-	return pulsesPerStep, stepsPerQuarterNote
+	return common.PulsesPerStep, common.StepsPerQuarterNote
 }

@@ -1,7 +1,8 @@
 package param
 
 import (
-	"cykl/core"
+	"cykl/core/field"
+	"cykl/core/music"
 )
 
 const (
@@ -9,7 +10,7 @@ const (
 )
 
 type Root struct {
-	grid *core.Grid
+	grid *field.Grid
 }
 
 func (r Root) Name() string {
@@ -40,5 +41,5 @@ func (r Root) Set(value int) {
 	if value < 0 || value > maxKey {
 		return
 	}
-	r.grid.SetKey(core.Key(value))
+	r.grid.SetKey(music.Key(value))
 }

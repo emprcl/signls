@@ -1,7 +1,9 @@
 package param
 
 import (
-	"cykl/core"
+	"cykl/core/common"
+	"cykl/core/field"
+	"cykl/core/music"
 )
 
 type Values map[int]string
@@ -17,16 +19,16 @@ type Param interface {
 	Right()
 }
 
-func NewParamsForNodes(grid *core.Grid, nodes []core.Node) []Param {
+func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
 	if len(nodes) == 0 {
 		return []Param{}
 	}
 	return []Param{
 		Key{
 			nodes: nodes,
-			keys:  core.AllKeysInScale(grid.Key, grid.Scale),
+			keys:  music.AllKeysInScale(grid.Key, grid.Scale),
 			root:  grid.Key,
-			mode:  KeyMode{nodes: nodes, modes: core.AllNoteBehaviors()},
+			mode:  KeyMode{nodes: nodes, modes: music.AllNoteBehaviors()},
 		},
 		Velocity{nodes: nodes},
 		Length{nodes: nodes},
@@ -34,10 +36,10 @@ func NewParamsForNodes(grid *core.Grid, nodes []core.Node) []Param {
 	}
 }
 
-func NewParamsForGrid(grid *core.Grid) []Param {
+func NewParamsForGrid(grid *field.Grid) []Param {
 	return []Param{
 		Root{grid: grid},
-		Scale{grid: grid, scales: core.AllScales()},
+		Scale{grid: grid, scales: music.AllScales()},
 	}
 }
 

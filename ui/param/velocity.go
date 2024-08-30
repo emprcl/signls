@@ -3,11 +3,12 @@ package param
 import (
 	"fmt"
 
-	"cykl/core"
+	"cykl/core/common"
+	"cykl/core/node"
 )
 
 type Velocity struct {
-	nodes []core.Node
+	nodes []common.Node
 }
 
 func (v Velocity) Name() string {
@@ -15,11 +16,11 @@ func (v Velocity) Name() string {
 }
 
 func (v Velocity) Display() string {
-	return fmt.Sprintf("%d", v.nodes[0].(*core.Emitter).Note().Velocity)
+	return fmt.Sprintf("%d", v.nodes[0].(*node.BaseEmitter).Note().Velocity)
 }
 
 func (v Velocity) Value() int {
-	return int(v.nodes[0].(*core.Emitter).Note().Velocity)
+	return int(v.nodes[0].(*node.BaseEmitter).Note().Velocity)
 }
 
 func (v Velocity) Increment() {
@@ -35,7 +36,7 @@ func (v Velocity) Left() {}
 func (v Velocity) Right() {}
 
 func (v Velocity) Set(value int) {
-	for _, node := range v.nodes {
-		node.(*core.Emitter).Note().SetVelocity(uint8(value))
+	for _, n := range v.nodes {
+		n.(*node.BaseEmitter).Note().SetVelocity(uint8(value))
 	}
 }

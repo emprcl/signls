@@ -3,7 +3,8 @@ package ui
 import (
 	"log"
 
-	"cykl/core"
+	"cykl/core/common"
+	"cykl/core/node"
 
 	"github.com/charmbracelet/lipgloss"
 )
@@ -36,7 +37,7 @@ func (m mainModel) inSelectionRange(x, y int) bool {
 		y <= m.selectionY
 }
 
-func (m mainModel) renderNode(node core.Node, x, y int) string {
+func (m mainModel) renderNode(n common.Node, x, y int) string {
 	// render cursor
 	isCursor := false
 	if x == m.cursorX && y == m.cursorY {
@@ -44,11 +45,11 @@ func (m mainModel) renderNode(node core.Node, x, y int) string {
 	}
 
 	// render grid
-	if node == nil && isCursor {
+	if n == nil && isCursor {
 		return cursorStyle.Render("  ")
-	} else if node == nil && m.inSelectionRange(x, y) {
+	} else if n == nil && m.inSelectionRange(x, y) {
 		return selectionStyle.Render("..")
-	} else if node == nil {
+	} else if n == nil {
 		if (x+y)%2 == 0 {
 			return "  "
 		}
@@ -56,30 +57,30 @@ func (m mainModel) renderNode(node core.Node, x, y int) string {
 	}
 
 	// render node
-	switch t := node.(type) {
-	case core.Movable:
+	switch t := n.(type) {
+	case common.Movable:
 		if isCursor {
 			return cursorStyle.Render("  ")
 		}
 		return activeEmitterStyle.Render("  ")
-	case *core.Emitter:
-		symbol := node.Symbol()
+	case *node.BaseEmitter:
+		symbol := n.Symbol()
 
 		if isCursor && !m.edit {
 			return cursorStyle.Render(symbol)
 		} else if isCursor && m.edit && m.blink {
 			return cursorStyle.Render(symbol)
-		} else if node.Activated() && node.(*core.Emitter).Muted() {
+		} else if n.Activated() && n.(*node.BaseEmitter).Muted() {
 			return activeEmitterStyle.Render(symbol)
 		} else if t.Muted() {
 			return mutedEmitterStyle.Render(symbol)
-		} else if node.Activated() {
+		} else if n.Activated() {
 			return activeEmitterStyle.
-				Foreground(lipgloss.Color(node.Color())).
+				Foreground(lipgloss.Color(n.Color())).
 				Render(symbol)
 		} else {
 			return emitterStyle.
-				Background(lipgloss.Color(node.Color())).
+				Background(lipgloss.Color(n.Color())).
 				Render(symbol)
 		}
 	default:

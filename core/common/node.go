@@ -1,4 +1,4 @@
-package core
+package common
 
 // Node represents a general interface for any element that can exist on the grid.
 // It defines common behavior for all types of nodes, such as emitters or signals.
@@ -26,7 +26,12 @@ type Node interface {
 // Movable represents an interface for nodes that can move within the grid.
 // This could be implemented by any node that changes position over time.
 type Movable interface {
-	// Move is a method that takes a reference to the grid, and the current x, y
-	// position of the node. It defines how the node should move on the grid.
-	Move(g *Grid, x, y int)
+	// MustMove checks if the node should move for the current pulse.
+	MustMove(pulse uint64) bool
+}
+
+// Emitter represents an interface for nodes that can emit signals within the grid.
+type Emitter interface {
+	// Emit returns the directions to emits for a given pulse.
+	Emit(pulse uint64) []Direction
 }

@@ -3,7 +3,8 @@ package ui
 import (
 	"fmt"
 
-	"cykl/core"
+	"cykl/core/common"
+	"cykl/core/node"
 	"cykl/ui/param"
 
 	"github.com/charmbracelet/lipgloss"
@@ -111,15 +112,15 @@ func (m mainModel) modeName() string {
 	return "move"
 }
 
-func (m mainModel) selectedNode() core.Node {
+func (m mainModel) selectedNode() common.Node {
 	return m.grid.Nodes()[m.cursorY][m.cursorX]
 }
 
-func (m mainModel) selectedEmitters() []core.Node {
-	nodes := []core.Node{}
+func (m mainModel) selectedEmitters() []common.Node {
+	nodes := []common.Node{}
 	for y := m.cursorY; y <= m.selectionY; y++ {
 		for x := m.cursorX; x <= m.selectionX; x++ {
-			if n, ok := m.grid.Nodes()[y][x].(*core.Emitter); ok {
+			if n, ok := m.grid.Nodes()[y][x].(*node.BaseEmitter); ok {
 				nodes = append(nodes, n)
 			}
 		}

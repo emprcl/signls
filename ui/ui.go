@@ -4,7 +4,8 @@ import (
 	"strings"
 	"time"
 
-	"cykl/core"
+	"cykl/core/field"
+	"cykl/core/node"
 	"cykl/ui/param"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -28,7 +29,7 @@ type tickMsg time.Time
 type blinkMsg time.Time
 
 type mainModel struct {
-	grid       *core.Grid
+	grid       *field.Grid
 	params     []param.Param
 	gridParams []param.Param
 	cursorX    int
@@ -45,7 +46,7 @@ type mainModel struct {
 
 // New creates a new mainModel that hols the ui state. It takes a new grid.
 // Check the core package.
-func New(grid *core.Grid) tea.Model {
+func New(grid *field.Grid) tea.Model {
 	model := mainModel{
 		grid:       grid,
 		gridParams: param.NewParamsForGrid(grid),
@@ -165,11 +166,11 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if !m.grid.Playing {
 				return m, nil
 			}
-			if _, ok := m.selectedNode().(*core.Emitter); !ok {
+			if _, ok := m.selectedNode().(*node.BaseEmitter); !ok {
 				return m, nil
 			}
-			m.selectedNode().(*core.Emitter).Arm()
-			m.selectedNode().(*core.Emitter).Trig(m.grid.Key, m.grid.Scale, m.grid.Pulse())
+			m.selectedNode().(*node.BaseEmitter).Arm()
+			m.selectedNode().(*node.BaseEmitter).Trig(m.grid.Key, m.grid.Scale, m.grid.Pulse())
 			return m, nil
 		case "*":
 			if m.edit {

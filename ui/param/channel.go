@@ -3,11 +3,12 @@ package param
 import (
 	"fmt"
 
-	"cykl/core"
+	"cykl/core/common"
+	"cykl/core/node"
 )
 
 type Channel struct {
-	nodes []core.Node
+	nodes []common.Node
 }
 
 func (c Channel) Name() string {
@@ -15,11 +16,11 @@ func (c Channel) Name() string {
 }
 
 func (c Channel) Display() string {
-	return fmt.Sprintf("%d", c.nodes[0].(*core.Emitter).Note().Channel+1)
+	return fmt.Sprintf("%d", c.nodes[0].(*node.BaseEmitter).Note().Channel+1)
 }
 
 func (c Channel) Value() int {
-	return int(c.nodes[0].(*core.Emitter).Note().Channel)
+	return int(c.nodes[0].(*node.BaseEmitter).Note().Channel)
 }
 
 func (c Channel) Increment() {
@@ -35,7 +36,7 @@ func (c Channel) Left() {}
 func (c Channel) Right() {}
 
 func (c Channel) Set(value int) {
-	for _, node := range c.nodes {
-		node.(*core.Emitter).Note().SetChannel(uint8(value))
+	for _, n := range c.nodes {
+		n.(*node.BaseEmitter).Note().SetChannel(uint8(value))
 	}
 }

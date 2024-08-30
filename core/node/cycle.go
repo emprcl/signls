@@ -1,8 +1,10 @@
-package core
+package node
 
 import (
 	"fmt"
 
+	"cykl/core/common"
+	"cykl/core/music"
 	"cykl/midi"
 )
 
@@ -14,19 +16,19 @@ type CycleEmitter struct {
 
 // NewCycleEmitter creates and returns a new Emitter instance with the CycleEmitter behavior.
 // It initializes the emitter with the provided MIDI interface and direction.
-func NewCycleEmitter(midi midi.Midi, direction Direction) *Emitter {
-	return &Emitter{
+func NewCycleEmitter(midi midi.Midi, direction common.Direction) *BaseEmitter {
+	return &BaseEmitter{
 		direction: direction,
-		note:      NewNote(midi),
-		behavior:  &CycleEmitter{},
+		note:      music.NewNote(midi),
+		Behavior:  &CycleEmitter{},
 	}
 }
 
 // EmitDirections cycles through the provided directions, returning the next direction in sequence.
 // If there are no directions, it returns NONE. The cycling is done in a round-robin manner.
-func (e *CycleEmitter) EmitDirections(dir Direction, pulse uint64) Direction {
+func (e *CycleEmitter) EmitDirections(dir common.Direction, pulse uint64) common.Direction {
 	if dir.Count() == 0 {
-		return NONE
+		return common.NONE
 	}
 	d := e.next % dir.Count()
 	e.next = (e.next + 1) % dir.Count()
@@ -39,7 +41,7 @@ func (e *CycleEmitter) ArmedOnStart() bool {
 }
 
 // Symbol returns the visual representation of the emitter on the grid.
-func (e *CycleEmitter) Symbol(dir Direction) string {
+func (e *CycleEmitter) Symbol(dir common.Direction) string {
 	return fmt.Sprintf("%s%s", "C", dir.Symbol())
 }
 

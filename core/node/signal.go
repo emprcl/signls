@@ -1,38 +1,40 @@
-package core
+package node
+
+import "cykl/core/common"
 
 // Signal represents a directional pulse in a grid-based system.
 // It contains the direction in which it is moving and the pulse value,
 // which likely represents a timestamp or counter for synchronization.
 type Signal struct {
-	direction Direction // The current direction of the signal's movement.
-	pulse     uint64    // The pulse value representing the last time the signal was updated.
+	direction common.Direction // The current direction of the signal's movement.
+	pulse     uint64           // The pulse value representing the last time the signal was updated.
 }
 
 // NewSignal creates a new Signal with the specified direction and pulse value.
 // This function initializes the Signal with the provided parameters.
-func NewSignal(direction Direction, pulse uint64) *Signal {
+func NewSignal(direction common.Direction, pulse uint64) *Signal {
 	return &Signal{
 		direction: direction,
 		pulse:     pulse,
 	}
 }
 
-// Move attempts to move the signal in its current direction on the grid.
-// The movement only occurs if the signal has not already been updated during the current pulse.
-func (s *Signal) Move(g *Grid, x, y int) {
-	if !s.updated(g.pulse) {
-		g.Move(x, y, s.direction)
-		s.pulse = g.pulse
+// MustMove checks if the signal has to move in the grid.
+func (s *Signal) MustMove(pulse uint64) bool {
+	if !s.updated(pulse) {
+		s.pulse = pulse
+		return true
 	}
+	return false
 }
 
 // Direction returns the current direction of the signal's movement.
-func (s *Signal) Direction() Direction {
+func (s *Signal) Direction() common.Direction {
 	return s.direction
 }
 
 // SetDirection updates the direction of the signal's movement.
-func (s *Signal) SetDirection(dir Direction) {
+func (s *Signal) SetDirection(dir common.Direction) {
 	s.direction = dir
 }
 
@@ -57,8 +59,7 @@ func (s *Signal) Color() string {
 	return "15"
 }
 
-// updated checks if the signal has already been updated during the current pulse.
-// If the signal's pulse matches the provided pulse, it returns true.
-func (s Signal) updated(pulse uint64) bool {
+// updated checks if the signal was updated on the given pulse.
+func (s *Signal) updated(pulse uint64) bool {
 	return s.pulse == pulse
 }

@@ -1,8 +1,10 @@
-package core
+package node
 
 import (
 	"fmt"
 
+	"cykl/core/common"
+	"cykl/core/music"
 	"cykl/midi"
 )
 
@@ -12,17 +14,17 @@ type SpreadEmitter struct{}
 
 // NewSpreadEmitter creates a new Emitter configured with the SpreadEmitter behavior.
 // It initializes the emitter with the given MIDI interface and starting direction.
-func NewSpreadEmitter(midi midi.Midi, direction Direction) *Emitter {
-	return &Emitter{
+func NewSpreadEmitter(midi midi.Midi, direction common.Direction) *BaseEmitter {
+	return &BaseEmitter{
 		direction: direction,
-		note:      NewNote(midi),
-		behavior:  &SpreadEmitter{},
+		note:      music.NewNote(midi),
+		Behavior:  &SpreadEmitter{},
 	}
 }
 
 // EmitDirections determines the direction in which the emitter should propagate signals.
 // For SpreadEmitter, it returns the same direction as provided without modification.
-func (e *SpreadEmitter) EmitDirections(dir Direction, pulse uint64) Direction {
+func (e *SpreadEmitter) EmitDirections(dir common.Direction, pulse uint64) common.Direction {
 	return dir
 }
 
@@ -33,7 +35,7 @@ func (e *SpreadEmitter) ArmedOnStart() bool {
 }
 
 // Symbol returns a string representation of the emitter's symbol.
-func (e *SpreadEmitter) Symbol(dir Direction) string {
+func (e *SpreadEmitter) Symbol(dir common.Direction) string {
 	return fmt.Sprintf("%s%s", "S", dir.Symbol())
 }
 
