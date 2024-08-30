@@ -16,8 +16,8 @@ type CycleEmitter struct {
 
 // NewCycleEmitter creates and returns a new Emitter instance with the CycleEmitter behavior.
 // It initializes the emitter with the provided MIDI interface and direction.
-func NewCycleEmitter(midi midi.Midi, direction common.Direction) *BaseEmitter {
-	return &BaseEmitter{
+func NewCycleEmitter(midi midi.Midi, direction common.Direction) *Emitter {
+	return &Emitter{
 		direction: direction,
 		note:      music.NewNote(midi),
 		Behavior:  &CycleEmitter{},

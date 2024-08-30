@@ -14,8 +14,8 @@ type SpreadEmitter struct{}
 
 // NewSpreadEmitter creates a new Emitter configured with the SpreadEmitter behavior.
 // It initializes the emitter with the given MIDI interface and starting direction.
-func NewSpreadEmitter(midi midi.Midi, direction common.Direction) *BaseEmitter {
-	return &BaseEmitter{
+func NewSpreadEmitter(midi midi.Midi, direction common.Direction) *Emitter {
+	return &Emitter{
 		direction: direction,
 		note:      music.NewNote(midi),
 		Behavior:  &SpreadEmitter{},

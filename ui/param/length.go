@@ -20,8 +20,8 @@ func (l Length) Name() string {
 }
 
 func (l Length) Display() string {
-	length := int(l.nodes[0].(*node.BaseEmitter).Note().Length)
-	pulsesPerStep, stepsPerQuarterNote := l.nodes[0].(*node.BaseEmitter).Note().ClockDivision()
+	length := int(l.nodes[0].(*node.Emitter).Note().Length)
+	pulsesPerStep, stepsPerQuarterNote := l.nodes[0].(*node.Emitter).Note().ClockDivision()
 	switch length {
 	case pulsesPerStep / 4:
 		return "1|64"
@@ -43,7 +43,7 @@ func (l Length) Display() string {
 }
 
 func (l Length) Value() int {
-	return int(l.nodes[0].(*node.BaseEmitter).Note().Length)
+	return int(l.nodes[0].(*node.Emitter).Note().Length)
 }
 
 func (l Length) Increment() {
@@ -60,6 +60,6 @@ func (l Length) Right() {}
 
 func (l Length) Set(value int) {
 	for _, n := range l.nodes {
-		n.(*node.BaseEmitter).Note().SetLength(uint8(value))
+		n.(*node.Emitter).Note().SetLength(uint8(value))
 	}
 }

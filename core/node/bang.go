@@ -14,8 +14,8 @@ type BangEmitter struct{}
 
 // NewBangEmitter creates and returns a new Emitter instance with the BangEmitter behavior.
 // It initializes the emitter with the provided MIDI interface, direction, and armed state.
-func NewBangEmitter(midi midi.Midi, direction common.Direction, armed bool) *BaseEmitter {
-	return &BaseEmitter{
+func NewBangEmitter(midi midi.Midi, direction common.Direction, armed bool) *Emitter {
+	return &Emitter{
 		direction: direction,           // The direction this emitter will emit signals.
 		armed:     armed,               // Whether the emitter is armed at initialization.
 		note:      music.NewNote(midi), // Create a new Note instance associated with this emitter.

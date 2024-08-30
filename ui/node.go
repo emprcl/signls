@@ -63,14 +63,14 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 			return cursorStyle.Render("  ")
 		}
 		return activeEmitterStyle.Render("  ")
-	case *node.BaseEmitter:
+	case *node.Emitter:
 		symbol := n.Symbol()
 
 		if isCursor && !m.edit {
 			return cursorStyle.Render(symbol)
 		} else if isCursor && m.edit && m.blink {
 			return cursorStyle.Render(symbol)
-		} else if n.Activated() && n.(*node.BaseEmitter).Muted() {
+		} else if n.Activated() && n.(*node.Emitter).Muted() {
 			return activeEmitterStyle.Render(symbol)
 		} else if t.Muted() {
 			return mutedEmitterStyle.Render(symbol)

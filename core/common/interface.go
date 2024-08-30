@@ -29,13 +29,3 @@ type Movable interface {
 	// MustMove checks if the node should move for the current pulse.
 	MustMove(pulse uint64) bool
 }
-
-// Emitter represents an interface for nodes that can play notes and
-// emit signals within the grid.
-type Emitter interface {
-	// Emit returns the directions to emits for a given pulse.
-	Emit(pulse uint64) []Direction
-
-	// Reset resets the internal state of an emitter.
-	Reset()
-}

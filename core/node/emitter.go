@@ -26,9 +26,9 @@ type EmitterBehavior interface {
 	Color() string
 }
 
-// BaseEmitter represents a node that emits signals when triggered. It contains
+// Emitter represents a node that emits signals when triggered. It contains
 // information about its behavior, direction, associated note, and state.
-type BaseEmitter struct {
+type Emitter struct {
 	Behavior EmitterBehavior // The specific behavior of this emitter.
 
 	direction common.Direction // The direction(s) in which this emitter is facing.
@@ -42,9 +42,9 @@ type BaseEmitter struct {
 
 // Copy creates a deep copy of the emitter, returning it as a Node interface.
 // It clones the associated note and keeps the same behavior and direction.
-func (e *BaseEmitter) Copy() common.Node {
+func (e *Emitter) Copy() common.Node {
 	newNote := *e.note // Deep copy the note to maintain state separately.
-	return &BaseEmitter{
+	return &Emitter{
 		Behavior:  e.Behavior,
 		direction: e.direction,
 		armed:     e.armed,
@@ -54,35 +54,35 @@ func (e *BaseEmitter) Copy() common.Node {
 
 // Activated checks if the emitter is currently active, meaning it's either
 // armed or has been triggered.
-func (e *BaseEmitter) Activated() bool {
+func (e *Emitter) Activated() bool {
 	return e.armed || e.triggered
 }
 
 // Note returns the pointer to the Note associated with the emitter.
-func (e *BaseEmitter) Note() *music.Note {
+func (e *Emitter) Note() *music.Note {
 	return e.note
 }
 
 // Arm sets the emitter to an armed state, meaning it is ready to trigger.
-func (e *BaseEmitter) Arm() {
+func (e *Emitter) Arm() {
 	e.armed = true
 }
 
 // SetMute mutes or unmutes the emitter. If muted, it stops any currently
 // playing note.
-func (e *BaseEmitter) SetMute(mute bool) {
+func (e *Emitter) SetMute(mute bool) {
 	e.note.Stop() // Stop the note if we're muting.
 	e.muted = mute
 }
 
 // Muted returns whether the emitter is currently muted.
-func (e *BaseEmitter) Muted() bool {
+func (e *Emitter) Muted() bool {
 	return e.muted
 }
 
 // Trig triggers the emitter, playing its note if it is armed and not muted.
 // It also updates the pulse to the current one, and disarms the emitter.
-func (e *BaseEmitter) Trig(key music.Key, scale music.Scale, pulse uint64) {
+func (e *Emitter) Trig(key music.Key, scale music.Scale, pulse uint64) {
 	if !e.updated(pulse) {
 		e.note.Tick() // Move the note's internal clock forward.
 	}
@@ -98,7 +98,7 @@ func (e *BaseEmitter) Trig(key music.Key, scale music.Scale, pulse uint64) {
 }
 
 // Emit returns the directions to emits for a given pulse.
-func (e *BaseEmitter) Emit(pulse uint64) []common.Direction {
+func (e *Emitter) Emit(pulse uint64) []common.Direction {
 	if e.updated(pulse) || !e.triggered {
 		return []common.Direction{}
 	}
@@ -108,13 +108,13 @@ func (e *BaseEmitter) Emit(pulse uint64) []common.Direction {
 }
 
 // Direction returns the current direction(s) the emitter is facing.
-func (e *BaseEmitter) Direction() common.Direction {
+func (e *Emitter) Direction() common.Direction {
 	return e.direction
 }
 
 // SetDirection adds or removes a direction from the emitter's current direction(s).
 // If the direction is already set, it removes it; otherwise, it adds it.
-func (e *BaseEmitter) SetDirection(dir common.Direction) {
+func (e *Emitter) SetDirection(dir common.Direction) {
 	if e.direction.Contains(dir) {
 		e.direction = e.direction.Remove(dir)
 		return
@@ -123,23 +123,23 @@ func (e *BaseEmitter) SetDirection(dir common.Direction) {
 }
 
 // Symbol returns a string representation of the emitter, typically used for visualization.
-func (e *BaseEmitter) Symbol() string {
+func (e *Emitter) Symbol() string {
 	return e.Behavior.Symbol(e.direction)
 }
 
 // Name returns the name of the emitter type.
-func (e *BaseEmitter) Name() string {
+func (e *Emitter) Name() string {
 	return e.Behavior.Name()
 }
 
 // Color returns the color associated with the emitter.
-func (e *BaseEmitter) Color() string {
+func (e *Emitter) Color() string {
 	return e.Behavior.Color()
 }
 
 // Reset restores the emitter to its initial state, resetting the pulse count,
 // disarming the emitter, and stopping any playing notes.
-func (e *BaseEmitter) Reset() {
+func (e *Emitter) Reset() {
 	e.pulse = 0
 	e.armed = e.Behavior.ArmedOnStart()
 	e.triggered = false
@@ -147,6 +147,6 @@ func (e *BaseEmitter) Reset() {
 }
 
 // updated checks if the emitter was updated on the given pulse.
-func (e *BaseEmitter) updated(pulse uint64) bool {
+func (e *Emitter) updated(pulse uint64) bool {
 	return e.pulse == pulse
 }

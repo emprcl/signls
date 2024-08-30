@@ -126,7 +126,7 @@ func (g *Grid) CopyOrCut(startX, startY, endX, endY int, cut bool) {
 	count := 0
 	for y := startY; y <= endY; y++ {
 		for x := startX; x <= endX; x++ {
-			_, ok := g.nodes[y][x].(*node.BaseEmitter)
+			_, ok := g.nodes[y][x].(*node.Emitter)
 			if ok {
 				nodes[y-startY][x-startX] = g.nodes[y][x]
 				count++
@@ -147,10 +147,10 @@ func (g *Grid) Paste(startX, startY, endX, endY int) {
 	h, w := len(g.clipboard), len(g.clipboard[0])
 	for y := 0; y < h && startY+y <= endY; y++ {
 		for x := 0; x < w && startX+x <= endX; x++ {
-			if _, ok := g.clipboard[y][x].(*node.BaseEmitter); !ok {
+			if _, ok := g.clipboard[y][x].(*node.Emitter); !ok {
 				continue
 			}
-			g.nodes[startY+y][startX+x] = g.clipboard[y][x].(*node.BaseEmitter).Copy()
+			g.nodes[startY+y][startX+x] = g.clipboard[y][x].(*node.Emitter).Copy()
 		}
 	}
 }
@@ -178,8 +178,8 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 }
 
 // AddNode adds a node to the grid at the specified coordinates.
-func (g *Grid) AddNode(e *node.BaseEmitter, x, y int) {
-	if n, ok := g.nodes[y][x].(*node.BaseEmitter); g.nodes[y][x] != nil && ok {
+func (g *Grid) AddNode(e *node.Emitter, x, y int) {
+	if n, ok := g.nodes[y][x].(*node.Emitter); g.nodes[y][x] != nil && ok {
 		n.Behavior = e.Behavior
 		return
 	}
@@ -199,10 +199,10 @@ func (g *Grid) RemoveNodes(startX, startY, endX, endY int) {
 func (g *Grid) ToggleNodeMutes(startX, startY, endX, endY int) {
 	for y := startY; y <= endY; y++ {
 		for x := startX; x <= endX; x++ {
-			if _, ok := g.nodes[y][x].(*node.BaseEmitter); !ok {
+			if _, ok := g.nodes[y][x].(*node.Emitter); !ok {
 				continue
 			}
-			g.nodes[y][x].(*node.BaseEmitter).SetMute(!g.nodes[y][x].(*node.BaseEmitter).Muted())
+			g.nodes[y][x].(*node.Emitter).SetMute(!g.nodes[y][x].(*node.Emitter).Muted())
 		}
 	}
 }
@@ -211,10 +211,10 @@ func (g *Grid) ToggleNodeMutes(startX, startY, endX, endY int) {
 func (g *Grid) SetAllNodeMutes(mute bool) {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
-			if _, ok := g.nodes[y][x].(*node.BaseEmitter); !ok {
+			if _, ok := g.nodes[y][x].(*node.Emitter); !ok {
 				continue
 			}
-			g.nodes[y][x].(*node.BaseEmitter).SetMute(mute)
+			g.nodes[y][x].(*node.Emitter).SetMute(mute)
 		}
 	}
 }
@@ -237,7 +237,7 @@ func (g *Grid) Update() {
 				g.Move(n, x, y)
 			}
 
-			if n, ok := g.nodes[y][x].(*node.BaseEmitter); ok {
+			if n, ok := g.nodes[y][x].(*node.Emitter); ok {
 				n.Trig(g.Key, g.Scale, g.pulse)
 				g.Emit(n, x, y)
 			}
@@ -250,7 +250,7 @@ func (g *Grid) Update() {
 func (g *Grid) Tick() {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
-			if n, ok := g.nodes[y][x].(*node.BaseEmitter); ok {
+			if n, ok := g.nodes[y][x].(*node.Emitter); ok {
 				n.Note().Tick()
 			}
 		}
@@ -262,7 +262,7 @@ func (g *Grid) Tick() {
 func (g *Grid) Transpose() {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
-			if n, ok := g.nodes[y][x].(*node.BaseEmitter); ok {
+			if n, ok := g.nodes[y][x].(*node.Emitter); ok {
 				n.Note().Transpose(g.Key, g.Scale)
 			}
 		}
@@ -281,7 +281,7 @@ func (g *Grid) Reset() {
 				g.nodes[y][x] = nil
 			}
 
-			if n, ok := g.nodes[y][x].(*node.BaseEmitter); ok {
+			if n, ok := g.nodes[y][x].(*node.Emitter); ok {
 				n.Reset()
 			}
 		}
@@ -289,13 +289,13 @@ func (g *Grid) Reset() {
 }
 
 // Emit generates a signal at the specified coordinates and direction.
-func (g *Grid) Emit(emitter common.Emitter, x, y int) {
+func (g *Grid) Emit(emitter *node.Emitter, x, y int) {
 	for _, direction := range emitter.Emit(g.pulse) {
 		newX, newY := direction.NextPosition(x, y)
 		if (newX == x && newY == y) || g.outOfBounds(newX, newY) {
 			continue
 		}
-		if n, ok := g.nodes[newY][newX].(*node.BaseEmitter); ok {
+		if n, ok := g.nodes[newY][newX].(*node.Emitter); ok {
 			n.Arm()
 			n.Trig(g.Key, g.Scale, g.pulse)
 			continue
@@ -319,7 +319,7 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 
 	if g.nodes[newY][newX] == nil {
 		g.nodes[newY][newX] = g.nodes[y][x]
-	} else if n, ok := g.nodes[newY][newX].(*node.BaseEmitter); ok {
+	} else if n, ok := g.nodes[newY][newX].(*node.Emitter); ok {
 		n.Arm()
 		n.Trig(g.Key, g.Scale, g.pulse)
 	}
