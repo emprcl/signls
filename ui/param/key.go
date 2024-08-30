@@ -1,7 +1,6 @@
 package param
 
 import (
-	"fmt"
 	"time"
 
 	"cykl/core/common"
@@ -25,7 +24,9 @@ func (k Key) Display() string {
 	case "silent":
 		return "•"
 	case "random":
-		return fmt.Sprintf("%s%s", "r", k.nodes[0].(*node.Emitter).Note().KeyName())
+		return "random"
+	case "signal":
+		return "signal"
 	default:
 		return k.nodes[0].(*node.Emitter).Note().KeyName()
 	}

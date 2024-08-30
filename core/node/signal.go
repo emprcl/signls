@@ -1,11 +1,21 @@
 package node
 
-import "cykl/core/common"
+import (
+	"cykl/core/common"
+	"cykl/core/music"
+)
+
+type SignalContext struct {
+	lastKey  music.Key
+	position int
+	arp      []int8
+}
 
 // Signal represents a directional pulse in a grid-based system.
 // It contains the direction in which it is moving and the pulse value,
 // which likely represents a timestamp or counter for synchronization.
 type Signal struct {
+	context   *SignalContext
 	direction common.Direction // The current direction of the signal's movement.
 	pulse     uint64           // The pulse value representing the last time the signal was updated.
 }
@@ -14,6 +24,7 @@ type Signal struct {
 // This function initializes the Signal with the provided parameters.
 func NewSignal(direction common.Direction, pulse uint64) *Signal {
 	return &Signal{
+		context:   &SignalContext{},
 		direction: direction,
 		pulse:     pulse,
 	}

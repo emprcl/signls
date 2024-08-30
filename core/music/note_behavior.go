@@ -16,6 +16,7 @@ func AllNoteBehaviors() []NoteBehavior {
 		FixedNote{},
 		SilentNote{},
 		RandomNote{},
+		SignalNote{},
 	}
 }
 
@@ -67,4 +68,23 @@ func (b RandomNote) Play(n *Note, root Key, scale Scale) {
 // Name returns the name of the RandomNote behavior.
 func (b RandomNote) Name() string {
 	return "random"
+}
+
+// SignalNote is a behavior where the note plays following context transported
+// by the triggering signal.
+// It implements the NoteBehavior interface.
+type SignalNote struct{}
+
+// Play is the implementation of the SignalNote behavior, which selects
+// a random key within an octave and transposes it according to the scale and root key.
+func (b SignalNote) Play(n *Note, root Key, scale Scale) {
+	/*n.Key = root + Key(rand.Intn(12))
+	interval := n.Key.AllSemitonesFrom(root)
+	n.Key = n.Key.Transpose(root, scale, interval)
+	n.midi.NoteOn(n.Channel, uint8(n.Key), n.Velocity)*/
+}
+
+// Name returns the name of the RandomNote behavior.
+func (b SignalNote) Name() string {
+	return "signal"
 }

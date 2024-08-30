@@ -8,7 +8,6 @@
  	- A moving behavior ?
 
 TODO:
- - signals with different speeds
  - signal brings context
  - add random note octave spread
  - add randomness on every note param
@@ -20,6 +19,9 @@ TODO:
  - add midi cc (note behavior?)
  - add key mapping
  - add file system
+
+Unsure:
+ - signals with different speeds
 
 Names:
   - Nyll
