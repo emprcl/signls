@@ -11,6 +11,7 @@ TODO:
  - signal brings context
    - store initial bang position to respawn?
    - should the note be relative to the previous one instead?
+   - note relative to the grid !!!!
  - add random note octave spread
  - add randomness on every note param
  - add note probability
@@ -18,6 +19,7 @@ TODO:
   - Random (toss or dice)
   - Accumulation (trigger after x)
   - Zone for chord
+  - Cell for cellular automata rules ? (meh unsure maybe a separate project)
  - add midi cc (note behavior?)
  - add key mapping
  - add file system
