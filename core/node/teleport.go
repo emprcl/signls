@@ -5,14 +5,18 @@ import (
 )
 
 type TeleportEmitter struct {
-	direction common.Direction
-	pulse     uint64
+	direction    common.Direction
+	pulse        uint64
+	destinationX int
+	destinationY int
 }
 
-func NewTeleportEmitter(direction common.Direction, pulse uint64) *TeleportEmitter {
+func NewTeleportEmitter(direction common.Direction, pulse uint64, x, y int) *TeleportEmitter {
 	return &TeleportEmitter{
-		direction: direction,
-		pulse:     pulse,
+		direction:    direction,
+		pulse:        pulse,
+		destinationX: x,
+		destinationY: y,
 	}
 }
 
