@@ -25,8 +25,6 @@ func (k Key) Display() string {
 		return "•"
 	case "random":
 		return "random"
-	case "signal":
-		return "signal"
 	default:
 		return k.nodes[0].(*node.Emitter).Note().KeyName()
 	}
