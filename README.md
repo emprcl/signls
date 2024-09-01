@@ -10,14 +10,17 @@
 TODO:
  - signal brings context
    - store initial bang position to respawn?
-   - should the note be relative to the previous one instead?
    - note relative to the grid !!!!
  - add random note octave spread
  - add randomness on every note param
  - add note probability
+ - add new notes behaviors:
+   - note relative to the previous one (set true intervals? or relative to scale?)
+   - note relative to the grid
  - add new emitters
   - Random (toss or dice)
   - Accumulation (trigger after x)
+  - Teleport !!Does not trigger not, jump and triggers target right away
   - Zone for chord
   - Cell for cellular automata rules ? (meh unsure maybe a separate project)
  - add midi cc (note behavior?)
