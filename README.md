@@ -31,6 +31,7 @@ TODO:
   - Cell for cellular automata rules ? (meh unsure maybe a separate project)
  - add midi cc (note behavior?)
  - add commands (tempo, scale, root, others?)
+ - add theme
  - add key mapping
  - add file system
 
