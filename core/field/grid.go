@@ -299,6 +299,13 @@ func (g *Grid) Emit(emitter *node.Emitter, x, y int) {
 			n.Arm()
 			n.Trig(g.Key, g.Scale, g.pulse)
 			continue
+		} else if n, ok := g.nodes[newY][newX].(*node.TeleportEmitter); ok {
+			teleportX, teleportY := n.TeleportPosition()
+			if n, ok := g.nodes[teleportY][teleportX].(*node.Emitter); ok {
+				n.Arm()
+				n.Trig(g.Key, g.Scale, g.pulse)
+			}
+			continue
 		}
 		g.nodes[newY][newX] = node.NewSignal(direction, g.pulse)
 	}
@@ -322,6 +329,12 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 	} else if n, ok := g.nodes[newY][newX].(*node.Emitter); ok {
 		n.Arm()
 		n.Trig(g.Key, g.Scale, g.pulse)
+	} else if n, ok := g.nodes[newY][newX].(*node.TeleportEmitter); ok {
+		teleportX, teleportY := n.TeleportPosition()
+		if n, ok := g.nodes[teleportY][teleportX].(*node.Emitter); ok {
+			n.Arm()
+			n.Trig(g.Key, g.Scale, g.pulse)
+		}
 	}
 
 	g.nodes[y][x] = nil

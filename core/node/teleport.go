@@ -5,19 +5,27 @@ import (
 )
 
 type TeleportEmitter struct {
+	Behavior EmitterBehavior
+
 	direction    common.Direction
 	pulse        uint64
 	destinationX int
 	destinationY int
+	triggered    bool
 }
 
 func NewTeleportEmitter(direction common.Direction, pulse uint64, x, y int) *TeleportEmitter {
 	return &TeleportEmitter{
+		Behavior:     &SpreadEmitter{},
 		direction:    direction,
 		pulse:        pulse,
 		destinationX: x,
 		destinationY: y,
 	}
+}
+
+func (e *TeleportEmitter) Activated() bool {
+	return false
 }
 
 func (s *TeleportEmitter) Direction() common.Direction {
@@ -30,6 +38,10 @@ func (s *TeleportEmitter) SetDirection(dir common.Direction) {
 
 func (e *TeleportEmitter) ArmedOnStart() bool {
 	return false
+}
+
+func (e *TeleportEmitter) TeleportPosition() (int, int) {
+	return e.destinationX, e.destinationY
 }
 
 func (s *TeleportEmitter) Symbol() string {
