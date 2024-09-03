@@ -18,7 +18,7 @@ func NewSpreadEmitter(midi midi.Midi, direction common.Direction) *Emitter {
 	return &Emitter{
 		direction: direction,
 		note:      music.NewNote(midi),
-		Behavior:  &SpreadEmitter{},
+		behavior:  &SpreadEmitter{},
 	}
 }
 

@@ -19,7 +19,7 @@ func NewBangEmitter(midi midi.Midi, direction common.Direction, armed bool) *Emi
 		direction: direction,           // The direction this emitter will emit signals.
 		armed:     armed,               // Whether the emitter is armed at initialization.
 		note:      music.NewNote(midi), // Create a new Note instance associated with this emitter.
-		Behavior:  &BangEmitter{},      // Set the behavior to BangEmitter.
+		behavior:  &BangEmitter{},      // Set the behavior to BangEmitter.
 	}
 }
 

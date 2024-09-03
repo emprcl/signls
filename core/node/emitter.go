@@ -6,7 +6,6 @@ import (
 )
 
 // EmitterBehavior defines the behavior of different types of emitters.
-// This interface is implemented by different emitter types (e.g., BangEmitter).
 type EmitterBehavior interface {
 	// ArmedOnStart indicates if the emitter is armed when the grid starts.
 	ArmedOnStart() bool
@@ -29,7 +28,7 @@ type EmitterBehavior interface {
 // Emitter represents a node that emits signals when triggered. It contains
 // information about its behavior, direction, associated note, and state.
 type Emitter struct {
-	Behavior EmitterBehavior // The specific behavior of this emitter.
+	behavior EmitterBehavior // The specific behavior of this emitter.
 
 	direction common.Direction // The direction(s) in which this emitter is facing.
 	note      *music.Note      // The musical note associated with this emitter.
@@ -45,7 +44,7 @@ type Emitter struct {
 func (e *Emitter) Copy() common.Node {
 	newNote := *e.note // Deep copy the note to maintain state separately.
 	return &Emitter{
-		Behavior:  e.Behavior,
+		behavior:  e.behavior,
 		direction: e.direction,
 		armed:     e.armed,
 		note:      &newNote,
@@ -66,6 +65,14 @@ func (e *Emitter) Note() *music.Note {
 // Arm sets the emitter to an armed state, meaning it is ready to trigger.
 func (e *Emitter) Arm() {
 	e.armed = true
+}
+
+func (e *Emitter) Behavior() EmitterBehavior {
+	return e.behavior
+}
+
+func (e *Emitter) SetBehavior(behavior EmitterBehavior) {
+	e.behavior = behavior
 }
 
 // SetMute mutes or unmutes the emitter. If muted, it stops any currently
@@ -104,7 +111,7 @@ func (e *Emitter) Emit(pulse uint64) []common.Direction {
 	}
 	e.triggered = false
 	e.pulse = pulse
-	return e.Behavior.EmitDirections(e.direction, pulse).Decompose()
+	return e.behavior.EmitDirections(e.direction, pulse).Decompose()
 }
 
 // Direction returns the current direction(s) the emitter is facing.
@@ -124,24 +131,24 @@ func (e *Emitter) SetDirection(dir common.Direction) {
 
 // Symbol returns a string representation of the emitter, typically used for visualization.
 func (e *Emitter) Symbol() string {
-	return e.Behavior.Symbol(e.direction)
+	return e.behavior.Symbol(e.direction)
 }
 
 // Name returns the name of the emitter type.
 func (e *Emitter) Name() string {
-	return e.Behavior.Name()
+	return e.behavior.Name()
 }
 
 // Color returns the color associated with the emitter.
 func (e *Emitter) Color() string {
-	return e.Behavior.Color()
+	return e.behavior.Color()
 }
 
 // Reset restores the emitter to its initial state, resetting the pulse count,
 // disarming the emitter, and stopping any playing notes.
 func (e *Emitter) Reset() {
 	e.pulse = 0
-	e.armed = e.Behavior.ArmedOnStart()
+	e.armed = e.behavior.ArmedOnStart()
 	e.triggered = false
 	e.Note().Stop()
 }

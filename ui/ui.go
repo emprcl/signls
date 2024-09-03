@@ -141,7 +141,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.handleParamEdit(dir)
 			return m, nil
-		case "b", "s", "c":
+		case "&", "é", "\"", "'":
 			m.grid.AddNodeFromSymbol(msg.String(), m.cursorX, m.cursorY)
 			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			return m, nil

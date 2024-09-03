@@ -20,7 +20,7 @@ func NewCycleEmitter(midi midi.Midi, direction common.Direction) *Emitter {
 	return &Emitter{
 		direction: direction,
 		note:      music.NewNote(midi),
-		Behavior:  &CycleEmitter{},
+		behavior:  &CycleEmitter{},
 	}
 }
 

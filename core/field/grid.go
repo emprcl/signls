@@ -168,19 +168,21 @@ func (g *Grid) Node(x, y int) common.Node {
 // AddNodeFromSymbol adds a node to the grid based on a given symbol.
 func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	switch symbol {
-	case "b":
-		g.AddNode(node.NewBangEmitter(g.midi, common.NONE, !g.Playing), x, y)
-	case "c":
-		g.AddNode(node.NewCycleEmitter(g.midi, common.NONE), x, y)
-	case "s":
-		g.AddNode(node.NewSpreadEmitter(g.midi, common.NONE), x, y)
+	case "&":
+		g.AddEmitter(node.NewBangEmitter(g.midi, common.NONE, !g.Playing), x, y)
+	case "é":
+		g.AddEmitter(node.NewCycleEmitter(g.midi, common.NONE), x, y)
+	case "\"":
+		g.AddEmitter(node.NewSpreadEmitter(g.midi, common.NONE), x, y)
+	case "'":
+		g.nodes[y][x] = node.NewTeleportEmitter(common.NONE, 10, 10)
 	}
 }
 
-// AddNode adds a node to the grid at the specified coordinates.
-func (g *Grid) AddNode(e *node.Emitter, x, y int) {
+// AddEmitter adds an emitter to the grid at the specified coordinates.
+func (g *Grid) AddEmitter(e *node.Emitter, x, y int) {
 	if n, ok := g.nodes[y][x].(*node.Emitter); g.nodes[y][x] != nil && ok {
-		n.Behavior = e.Behavior
+		n.SetBehavior(e.Behavior())
 		return
 	}
 	g.nodes[y][x] = e
@@ -334,6 +336,8 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 		if n, ok := g.nodes[teleportY][teleportX].(*node.Emitter); ok {
 			n.Arm()
 			n.Trig(g.Key, g.Scale, g.pulse)
+		} else {
+			g.nodes[teleportY][teleportX] = g.nodes[y][x]
 		}
 	}
 

@@ -83,6 +83,22 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 				Background(lipgloss.Color(n.Color())).
 				Render(symbol)
 		}
+	case *node.TeleportEmitter:
+		symbol := n.Symbol()
+
+		if isCursor && !m.edit {
+			return cursorStyle.Render(symbol)
+		} else if isCursor && m.edit && m.blink {
+			return cursorStyle.Render(symbol)
+		} else if n.Activated() {
+			return activeEmitterStyle.
+				Foreground(lipgloss.Color(n.Color())).
+				Render(symbol)
+		} else {
+			return emitterStyle.
+				Background(lipgloss.Color(n.Color())).
+				Render(symbol)
+		}
 	default:
 		log.Fatalf("cannot render node: %+v", t)
 		return ""
