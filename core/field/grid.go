@@ -178,7 +178,7 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	case "\"":
 		g.AddEmitter(node.NewSpreadEmitter(g.midi, common.NONE), x, y)
 	case "'":
-		g.nodes[y][x] = node.NewTeleportEmitter(common.NONE, 10, 10)
+		g.nodes[y][x] = node.NewTeleportEmitter(common.NONE, x, y)
 	}
 }
 
@@ -309,11 +309,7 @@ func (g *Grid) Emit(emitter *node.Emitter, x, y int) {
 			n.Trig(g.Key, g.Scale, g.pulse)
 			continue
 		} else if n, ok := g.nodes[newY][newX].(*node.TeleportEmitter); ok {
-			teleportX, teleportY := n.Destination()
-			if n, ok := g.nodes[teleportY][teleportX].(*node.Emitter); ok {
-				n.Arm()
-				n.Trig(g.Key, g.Scale, g.pulse)
-			}
+			g.Teleport(n, node.NewSignal(direction, g.pulse), newX, newY)
 			continue
 		}
 		g.nodes[newY][newX] = node.NewSignal(direction, g.pulse)
@@ -339,20 +335,28 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 		n.Arm()
 		n.Trig(g.Key, g.Scale, g.pulse)
 	} else if n, ok := g.nodes[newY][newX].(*node.TeleportEmitter); ok {
-		teleportX, teleportY := n.Destination()
-		if g.outOfBounds(teleportX, teleportY) {
-			g.nodes[y][x] = nil
-			return
-		}
-		if n, ok := g.nodes[teleportY][teleportX].(*node.Emitter); ok {
-			n.Arm()
-			n.Trig(g.Key, g.Scale, g.pulse)
-		} else {
-			g.nodes[teleportY][teleportX] = g.nodes[y][x]
-		}
+		g.Teleport(n, g.nodes[y][x], newX, newY)
 	}
 
 	g.nodes[y][x] = nil
+}
+
+func (g *Grid) Teleport(t *node.TeleportEmitter, m common.Node, x, y int) {
+	teleportX, teleportY := t.Destination()
+	if g.outOfBounds(teleportX, teleportY) {
+		return
+	}
+	if x == teleportX && y == teleportY {
+		return
+	}
+	if n, ok := g.nodes[teleportY][teleportX].(*node.Emitter); ok {
+		n.Arm()
+		n.Trig(g.Key, g.Scale, g.pulse)
+	} else if n, ok := g.nodes[teleportY][teleportX].(*node.TeleportEmitter); ok {
+		g.Teleport(n, m, teleportX, teleportY)
+	} else if g.nodes[teleportY][teleportX] == nil {
+		g.nodes[teleportY][teleportX] = m
+	}
 }
 
 // Resize changes the size of the grid and preserves existing nodes within the new dimensions.

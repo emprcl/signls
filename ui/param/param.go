@@ -4,6 +4,7 @@ import (
 	"cykl/core/common"
 	"cykl/core/field"
 	"cykl/core/music"
+	"cykl/core/node"
 )
 
 type Values map[int]string
@@ -22,7 +23,12 @@ type Param interface {
 func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
 	if len(nodes) == 0 {
 		return []Param{}
+	} else if _, ok := nodes[0].(*node.TeleportEmitter); ok && len(nodes) == 1 {
+		return []Param{
+			Destination{nodes: nodes},
+		}
 	}
+
 	return []Param{
 		Key{
 			nodes: nodes,
