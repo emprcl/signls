@@ -35,7 +35,7 @@ func (s *TeleportEmitter) Direction() common.Direction {
 func (s *TeleportEmitter) SetDirection(dir common.Direction) {}
 
 func (e *TeleportEmitter) Destination() (int, int) {
-	e.activated = common.PulsesPerStep
+	e.activated = common.PulsesPerStep + 1
 	return e.destinationX, e.destinationY
 }
 

@@ -7,8 +7,6 @@ import (
 	"cykl/core/node"
 )
 
-type Values map[int]string
-
 type Param interface {
 	Name() string
 	Value() int
@@ -24,6 +22,7 @@ func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
 	if len(nodes) == 0 {
 		return []Param{}
 	} else if _, ok := nodes[0].(*node.TeleportEmitter); ok && len(nodes) == 1 {
+		// TODO: fix that (multiple selection with teleport inside)
 		return []Param{
 			Destination{nodes: nodes},
 		}
