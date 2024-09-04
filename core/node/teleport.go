@@ -6,10 +6,9 @@ import (
 
 type TeleportEmitter struct {
 	direction    common.Direction
-	pulse        uint64
+	activated    int
 	destinationX int
 	destinationY int
-	triggered    bool
 }
 
 func NewTeleportEmitter(direction common.Direction, x, y int) *TeleportEmitter {
@@ -21,7 +20,7 @@ func NewTeleportEmitter(direction common.Direction, x, y int) *TeleportEmitter {
 }
 
 func (e *TeleportEmitter) Activated() bool {
-	return false
+	return e.activated > 0
 }
 
 func (s *TeleportEmitter) Direction() common.Direction {
@@ -33,11 +32,23 @@ func (s *TeleportEmitter) SetDirection(dir common.Direction) {
 }
 
 func (e *TeleportEmitter) TeleportPosition() (int, int) {
+	e.activated = common.PulsesPerStep
 	return e.destinationX, e.destinationY
 }
 
+func (e *TeleportEmitter) Tick() {
+	if e.activated <= 0 {
+		return
+	}
+	e.activated--
+}
+
+func (e *TeleportEmitter) Reset() {
+	e.activated = 0
+}
+
 func (s *TeleportEmitter) Symbol() string {
-	return "⊆⊇"
+	return "T⬢"
 }
 
 func (s *TeleportEmitter) Name() string {
@@ -46,8 +57,4 @@ func (s *TeleportEmitter) Name() string {
 
 func (s *TeleportEmitter) Color() string {
 	return "88"
-}
-
-func (s *TeleportEmitter) updated(pulse uint64) bool {
-	return s.pulse == pulse
 }

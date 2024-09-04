@@ -29,3 +29,8 @@ type Movable interface {
 	// MustMove checks if the node should move for the current pulse.
 	MustMove(pulse uint64) bool
 }
+
+type Tickable interface {
+	Tick()
+	Reset()
+}

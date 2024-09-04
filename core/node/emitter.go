@@ -114,6 +114,10 @@ func (e *Emitter) Emit(pulse uint64) []common.Direction {
 	return e.behavior.EmitDirections(e.direction, pulse).Decompose()
 }
 
+func (e *Emitter) Tick() {
+	e.note.Tick()
+}
+
 // Direction returns the current direction(s) the emitter is facing.
 func (e *Emitter) Direction() common.Direction {
 	return e.direction

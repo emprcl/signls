@@ -235,6 +235,10 @@ func (g *Grid) Update() {
 				continue
 			}
 
+			if n, ok := g.nodes[y][x].(common.Tickable); ok {
+				n.Tick()
+			}
+
 			if n, ok := g.nodes[y][x].(common.Movable); ok {
 				g.Move(n, x, y)
 			}
@@ -252,8 +256,8 @@ func (g *Grid) Update() {
 func (g *Grid) Tick() {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
-			if n, ok := g.nodes[y][x].(*node.Emitter); ok {
-				n.Note().Tick()
+			if n, ok := g.nodes[y][x].(common.Tickable); ok {
+				n.Tick()
 			}
 		}
 	}
@@ -283,7 +287,7 @@ func (g *Grid) Reset() {
 				g.nodes[y][x] = nil
 			}
 
-			if n, ok := g.nodes[y][x].(*node.Emitter); ok {
+			if n, ok := g.nodes[y][x].(common.Tickable); ok {
 				n.Reset()
 			}
 		}
