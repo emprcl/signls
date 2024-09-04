@@ -34,3 +34,7 @@ type Tickable interface {
 	Tick()
 	Reset()
 }
+
+type Copyable interface {
+	Copy(dx, dy int) Node
+}

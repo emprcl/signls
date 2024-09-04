@@ -5,7 +5,6 @@ import (
 )
 
 type TeleportEmitter struct {
-	direction    common.Direction
 	activated    int
 	destinationX int
 	destinationY int
@@ -13,9 +12,15 @@ type TeleportEmitter struct {
 
 func NewTeleportEmitter(direction common.Direction, x, y int) *TeleportEmitter {
 	return &TeleportEmitter{
-		direction:    direction,
 		destinationX: x,
 		destinationY: y,
+	}
+}
+
+func (e *TeleportEmitter) Copy(dx, dy int) common.Node {
+	return &TeleportEmitter{
+		destinationX: e.destinationX + dx,
+		destinationY: e.destinationY + dy,
 	}
 }
 
@@ -24,16 +29,18 @@ func (e *TeleportEmitter) Activated() bool {
 }
 
 func (s *TeleportEmitter) Direction() common.Direction {
-	return s.direction
+	return common.NONE
 }
 
-func (s *TeleportEmitter) SetDirection(dir common.Direction) {
-	s.direction = dir
-}
+func (s *TeleportEmitter) SetDirection(dir common.Direction) {}
 
-func (e *TeleportEmitter) TeleportPosition() (int, int) {
+func (e *TeleportEmitter) Destination() (int, int) {
 	e.activated = common.PulsesPerStep
 	return e.destinationX, e.destinationY
+}
+
+func (e *TeleportEmitter) SetDestination(x, y int) {
+	e.destinationX, e.destinationY = x, y
 }
 
 func (e *TeleportEmitter) Tick() {

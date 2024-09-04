@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"cykl/core/common"
-	"cykl/core/node"
 	"cykl/ui/param"
 
 	"github.com/charmbracelet/lipgloss"
@@ -120,9 +119,12 @@ func (m mainModel) selectedEmitters() []common.Node {
 	nodes := []common.Node{}
 	for y := m.cursorY; y <= m.selectionY; y++ {
 		for x := m.cursorX; x <= m.selectionX; x++ {
-			if n, ok := m.grid.Nodes()[y][x].(*node.Emitter); ok {
-				nodes = append(nodes, n)
+			if m.grid.Nodes()[y][x] == nil {
+				continue
+			} else if _, ok := m.grid.Nodes()[y][x].(common.Movable); ok {
+				continue
 			}
+			nodes = append(nodes, m.grid.Nodes()[y][x])
 		}
 	}
 	return nodes

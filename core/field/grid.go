@@ -126,7 +126,7 @@ func (g *Grid) CopyOrCut(startX, startY, endX, endY int, cut bool) {
 	count := 0
 	for y := startY; y <= endY; y++ {
 		for x := startX; x <= endX; x++ {
-			_, ok := g.nodes[y][x].(*node.Emitter)
+			_, ok := g.nodes[y][x].(common.Copyable)
 			if ok {
 				nodes[y-startY][x-startX] = g.nodes[y][x]
 				count++
@@ -144,13 +144,16 @@ func (g *Grid) CopyOrCut(startX, startY, endX, endY int, cut bool) {
 
 // Paste pastes nodes from the clipboard into the grid at the specified location.
 func (g *Grid) Paste(startX, startY, endX, endY int) {
+	if len(g.clipboard) == 0 {
+		return
+	}
 	h, w := len(g.clipboard), len(g.clipboard[0])
 	for y := 0; y < h && startY+y <= endY; y++ {
 		for x := 0; x < w && startX+x <= endX; x++ {
-			if _, ok := g.clipboard[y][x].(*node.Emitter); !ok {
+			if _, ok := g.clipboard[y][x].(common.Copyable); !ok {
 				continue
 			}
-			g.nodes[startY+y][startX+x] = g.clipboard[y][x].(*node.Emitter).Copy()
+			g.nodes[startY+y][startX+x] = g.clipboard[y][x].(common.Copyable).Copy(startX, startY)
 		}
 	}
 }
@@ -306,7 +309,7 @@ func (g *Grid) Emit(emitter *node.Emitter, x, y int) {
 			n.Trig(g.Key, g.Scale, g.pulse)
 			continue
 		} else if n, ok := g.nodes[newY][newX].(*node.TeleportEmitter); ok {
-			teleportX, teleportY := n.TeleportPosition()
+			teleportX, teleportY := n.Destination()
 			if n, ok := g.nodes[teleportY][teleportX].(*node.Emitter); ok {
 				n.Arm()
 				n.Trig(g.Key, g.Scale, g.pulse)
@@ -336,7 +339,11 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 		n.Arm()
 		n.Trig(g.Key, g.Scale, g.pulse)
 	} else if n, ok := g.nodes[newY][newX].(*node.TeleportEmitter); ok {
-		teleportX, teleportY := n.TeleportPosition()
+		teleportX, teleportY := n.Destination()
+		if g.outOfBounds(teleportX, teleportY) {
+			g.nodes[y][x] = nil
+			return
+		}
 		if n, ok := g.nodes[teleportY][teleportX].(*node.Emitter); ok {
 			n.Arm()
 			n.Trig(g.Key, g.Scale, g.pulse)
