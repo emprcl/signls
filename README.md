@@ -26,6 +26,7 @@ TODO:
  - add new emitters
   - Random (toss or dice)
   - Accumulation (trigger after x)
+  - Opposite direction
   - Teleport !!Does not trigger not, jump and triggers target right away
   - Zone for chord
   - Cell for cellular automata rules ? (meh unsure maybe a separate project)
