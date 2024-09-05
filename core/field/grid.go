@@ -342,7 +342,7 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 }
 
 func (g *Grid) Teleport(t *node.TeleportEmitter, m common.Node, x, y int) {
-	teleportX, teleportY := t.Destination()
+	teleportX, teleportY := t.Teleport()
 	if g.outOfBounds(teleportX, teleportY) {
 		return
 	}

@@ -34,9 +34,12 @@ func (s *TeleportEmitter) Direction() common.Direction {
 
 func (s *TeleportEmitter) SetDirection(dir common.Direction) {}
 
-func (e *TeleportEmitter) Destination() (int, int) {
-	// TODO: should move this state in dedicated method
+func (e *TeleportEmitter) Teleport() (int, int) {
 	e.activated = common.PulsesPerStep + 1
+	return e.Destination()
+}
+
+func (e *TeleportEmitter) Destination() (int, int) {
 	return e.destinationX, e.destinationY
 }
 

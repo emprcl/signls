@@ -56,3 +56,15 @@ func Get(name string, params []Param) Param {
 	}
 	return params[0]
 }
+
+// TODO: wip
+func filterNodes[T any](nodes []common.Node) []common.Node {
+	filteredNodes := []common.Node{}
+	for _, n := range nodes {
+		if _, ok := n.(T); !ok {
+			continue
+		}
+		filteredNodes = append(filteredNodes, n)
+	}
+	return filteredNodes
+}
