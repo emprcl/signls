@@ -24,7 +24,6 @@ TODO:
    - note relative to the previous one (set true intervals? or relative to scale?)
    - note relative to the grid
  - add new emitters
-  - Random (toss or dice)
   - Accumulation (trigger after x)
   - Opposite direction
   - Zone for chord

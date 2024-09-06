@@ -178,6 +178,8 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	case "\"":
 		g.AddEmitter(node.NewSpreadEmitter(g.midi, common.NONE), x, y)
 	case "'":
+		g.AddEmitter(node.NewDiceEmitter(g.midi, common.NONE), x, y)
+	case "(":
 		g.nodes[y][x] = node.NewTeleportEmitter(common.NONE, x, y)
 	}
 }
