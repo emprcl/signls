@@ -160,6 +160,9 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if len(m.selectedEmitters()) == 0 {
 				return m, nil
 			}
+			if len(m.params) < m.param+1 {
+				m.param = 0
+			}
 			m.edit = !m.edit
 			return m, nil
 		case "!":

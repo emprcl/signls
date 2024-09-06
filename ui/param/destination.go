@@ -8,7 +8,9 @@ import (
 )
 
 type Destination struct {
-	nodes []common.Node
+	nodes  []common.Node
+	width  int
+	height int
 }
 
 func (d Destination) Name() string {
@@ -24,12 +26,16 @@ func (d Destination) Value() int {
 	return 0
 }
 
+func (d Destination) Position() (int, int) {
+	return d.nodes[0].(*node.TeleportEmitter).Destination()
+}
+
 func (d Destination) Increment() {
-	d.SetDestination(0, 1)
+	d.SetDestination(0, -1)
 }
 
 func (d Destination) Decrement() {
-	d.SetDestination(0, -1)
+	d.SetDestination(0, 1)
 }
 
 func (d Destination) Left() {
@@ -45,6 +51,14 @@ func (d Destination) Set(value int) {}
 func (d Destination) SetDestination(dx, dy int) {
 	for _, n := range d.nodes {
 		x, y := n.(*node.TeleportEmitter).Destination()
+		destinationX := x + dx
+		destinationY := y + dy
+		if destinationX < 0 ||
+			destinationX >= d.width ||
+			destinationY < 0 ||
+			destinationY >= d.height {
+			continue
+		}
 		n.(*node.TeleportEmitter).SetDestination(x+dx, y+dy)
 	}
 }

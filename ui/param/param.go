@@ -22,22 +22,26 @@ func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
 	if len(nodes) == 0 {
 		return []Param{}
 	} else if _, ok := nodes[0].(*node.TeleportEmitter); ok && len(nodes) == 1 {
-		// TODO: fix that (multiple selection with teleport inside)
 		return []Param{
-			Destination{nodes: nodes},
+			Destination{
+				nodes:  filterNodes[*node.TeleportEmitter](nodes),
+				width:  grid.Width,
+				height: grid.Height,
+			},
 		}
 	}
 
+	emitters := filterNodes[*node.Emitter](nodes)
 	return []Param{
 		Key{
-			nodes: nodes,
+			nodes: emitters,
 			keys:  music.AllKeysInScale(grid.Key, grid.Scale),
 			root:  grid.Key,
-			mode:  KeyMode{nodes: nodes, modes: music.AllNoteBehaviors()},
+			mode:  KeyMode{nodes: emitters, modes: music.AllNoteBehaviors()},
 		},
-		Velocity{nodes: nodes},
-		Length{nodes: nodes},
-		Channel{nodes: nodes},
+		Velocity{nodes: emitters},
+		Length{nodes: emitters},
+		Channel{nodes: emitters},
 	}
 }
 
@@ -57,7 +61,6 @@ func Get(name string, params []Param) Param {
 	return params[0]
 }
 
-// TODO: wip
 func filterNodes[T any](nodes []common.Node) []common.Node {
 	filteredNodes := []common.Node{}
 	for _, n := range nodes {

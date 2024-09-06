@@ -5,6 +5,7 @@ import (
 
 	"cykl/core/common"
 	"cykl/core/node"
+	"cykl/ui/param"
 
 	"github.com/charmbracelet/lipgloss"
 )
@@ -15,6 +16,9 @@ var (
 	cursorStyle = lipgloss.NewStyle().
 			Background(lipgloss.Color("190")).
 			Foreground(lipgloss.Color("0"))
+	teleportDestinationStyle = lipgloss.NewStyle().
+					Background(lipgloss.Color("88")).
+					Foreground(lipgloss.Color("15"))
 	selectionStyle = lipgloss.NewStyle().
 			Background(lipgloss.Color("238")).
 			Foreground(lipgloss.Color("244"))
@@ -44,9 +48,21 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 		isCursor = true
 	}
 
+	isTeleportDestination := false
+	if m.edit && len(m.params) > 0 {
+		p, ok := m.params[m.param].(param.Destination)
+		if ok {
+			destinationX, destinationY := p.Position()
+			isTeleportDestination = (destinationX == x && destinationY == y)
+		}
+	}
+
 	// render grid
+	teleportDestinationSymbol := "🠋🠋"
 	if n == nil && isCursor {
 		return cursorStyle.Render("  ")
+	} else if n == nil && isTeleportDestination {
+		return teleportDestinationStyle.Render(teleportDestinationSymbol)
 	} else if n == nil && m.inSelectionRange(x, y) {
 		return selectionStyle.Render("..")
 	} else if n == nil {
@@ -68,6 +84,8 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 
 		if isCursor && !m.edit {
 			return cursorStyle.Render(symbol)
+		} else if isTeleportDestination && m.edit && m.blink {
+			return teleportDestinationStyle.Render(teleportDestinationSymbol)
 		} else if isCursor && m.edit && m.blink {
 			return cursorStyle.Render(symbol)
 		} else if n.Activated() && n.(*node.Emitter).Muted() {
