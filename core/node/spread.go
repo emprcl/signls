@@ -28,6 +28,11 @@ func (e *SpreadEmitter) EmitDirections(dir common.Direction, inDir common.Direct
 	return dir
 }
 
+// ShouldPropagate indicates if triggers should be propagated to direct neighbors.
+func (e *SpreadEmitter) ShouldPropagate() bool {
+	return false
+}
+
 // ArmedOnStart indicates whether the emitter is armed and ready to emit at the start.
 // For SpreadEmitter, it returns false, meaning it is not armed initially.
 func (e *SpreadEmitter) ArmedOnStart() bool {

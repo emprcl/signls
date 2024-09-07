@@ -33,6 +33,11 @@ func (e *DiceEmitter) EmitDirections(dir common.Direction, inDir common.Directio
 	return dir.Decompose()[d]
 }
 
+// ShouldPropagate indicates if triggers should be propagated to direct neighbors.
+func (e *DiceEmitter) ShouldPropagate() bool {
+	return false
+}
+
 func (e *DiceEmitter) ArmedOnStart() bool {
 	return false
 }

@@ -34,6 +34,10 @@ func (e *QuotaEmitter) ArmedOnStart() bool {
 	return false
 }
 
+func (e *QuotaEmitter) ShouldPropagate() bool {
+	return false
+}
+
 func (e *QuotaEmitter) Copy() EmitterBehavior {
 	return &QuotaEmitter{
 		threshold: e.threshold,

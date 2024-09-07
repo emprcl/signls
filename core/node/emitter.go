@@ -17,6 +17,10 @@ type EmitterBehavior interface {
 	// based on its current direction, the incoming direction, and the pulse count.
 	EmitDirections(dir common.Direction, inDir common.Direction, pulse uint64) common.Direction
 
+	// ShouldPropagate indicates if triggers should be propagated to direct
+	// neighbors.
+	ShouldPropagate() bool
+
 	// Symbol returns a string representation of the emitter, potentially
 	// taking its direction into account for visualization.
 	Symbol(dir common.Direction) string

@@ -1,15 +1,12 @@
 package node
 
 import (
-	"fmt"
-
 	"cykl/core/common"
 	"cykl/core/music"
 	"cykl/midi"
 )
 
-type ZoneEmitter struct {
-}
+type ZoneEmitter struct{}
 
 func NewZoneEmitter(midi midi.Midi, direction common.Direction) *Emitter {
 	return &Emitter{
@@ -23,6 +20,10 @@ func (e *ZoneEmitter) EmitDirections(dir common.Direction, inDir common.Directio
 	return common.NONE
 }
 
+func (e *ZoneEmitter) ShouldPropagate() bool {
+	return true
+}
+
 func (e *ZoneEmitter) ArmedOnStart() bool {
 	return false
 }
@@ -32,7 +33,7 @@ func (e *ZoneEmitter) Copy() EmitterBehavior {
 }
 
 func (e *ZoneEmitter) Symbol(dir common.Direction) string {
-	return fmt.Sprintf("%s%s", "Z", "⇌")
+	return "Z∷"
 }
 
 func (e *ZoneEmitter) Name() string {
@@ -40,5 +41,5 @@ func (e *ZoneEmitter) Name() string {
 }
 
 func (e *ZoneEmitter) Color() string {
-	return "45"
+	return "204"
 }

@@ -39,6 +39,11 @@ func (e *BangEmitter) EmitDirections(dir common.Direction, inDir common.Directio
 	return dir // Emit in the same direction it's facing.
 }
 
+// ShouldPropagate indicates if triggers should be propagated to direct neighbors.
+func (e *BangEmitter) ShouldPropagate() bool {
+	return false
+}
+
 // Symbol returns the visual representation of the emitter on the grid.
 // It concatenates "B" with the direction's symbol for a complete identifier.
 func (e *BangEmitter) Symbol(dir common.Direction) string {

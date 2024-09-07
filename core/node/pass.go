@@ -26,6 +26,10 @@ func (e *PassEmitter) ArmedOnStart() bool {
 	return false
 }
 
+func (e *PassEmitter) ShouldPropagate() bool {
+	return false
+}
+
 func (e *PassEmitter) Copy() EmitterBehavior {
 	return &PassEmitter{}
 }

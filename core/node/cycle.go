@@ -35,6 +35,11 @@ func (e *CycleEmitter) EmitDirections(dir common.Direction, inDir common.Directi
 	return dir.Decompose()[d]
 }
 
+// ShouldPropagate indicates if triggers should be propagated to direct neighbors.
+func (e *CycleEmitter) ShouldPropagate() bool {
+	return false
+}
+
 // ArmedOnStart returns false, indicating that the CycleEmitter is not armed when the grid starts.
 func (e *CycleEmitter) ArmedOnStart() bool {
 	return false

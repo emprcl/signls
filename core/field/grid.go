@@ -184,6 +184,8 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	case "-":
 		g.AddEmitter(node.NewQuotaEmitter(g.midi, common.NONE), x, y)
 	case "è":
+		g.AddEmitter(node.NewZoneEmitter(g.midi, common.NONE), x, y)
+	case "_":
 		g.nodes[y][x] = node.NewHoleEmitter(common.NONE, x, y)
 	}
 }
@@ -310,7 +312,11 @@ func (g *Grid) Emit(emitter *node.Emitter, x, y int) {
 		if (newX == x && newY == y) || g.outOfBounds(newX, newY) {
 			continue
 		}
-		if n, ok := g.nodes[newY][newX].(*node.Emitter); ok {
+
+		if n, ok := g.nodes[newY][newX].(*node.Emitter); ok && n.Behavior().ShouldPropagate() {
+			g.PropagateZone(g.nodes[newY][newX].(*node.Emitter), direction, newX, newY)
+			continue
+		} else if n, ok := g.nodes[newY][newX].(*node.Emitter); ok {
 			n.Arm()
 			n.Trig(g.Key, g.Scale, direction, g.pulse)
 			continue
@@ -338,6 +344,8 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 
 	if g.nodes[newY][newX] == nil {
 		g.nodes[newY][newX] = g.nodes[y][x]
+	} else if n, ok := g.nodes[newY][newX].(*node.Emitter); ok && n.Behavior().ShouldPropagate() {
+		g.PropagateZone(g.nodes[newY][newX].(*node.Emitter), direction, newX, newY)
 	} else if n, ok := g.nodes[newY][newX].(*node.Emitter); ok {
 		n.Arm()
 		n.Trig(g.Key, g.Scale, direction, g.pulse)
@@ -346,6 +354,26 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 	}
 
 	g.nodes[y][x] = nil
+}
+
+func (g *Grid) PropagateZone(e *node.Emitter, direction common.Direction, x, y int) {
+	if e == nil {
+		return
+	}
+	e.Arm()
+	e.Trig(g.Key, g.Scale, direction, g.pulse)
+	for dy := -1; dy <= 1; dy++ {
+		for dx := -1; dx <= 1; dx++ {
+			newX, newY := x+dx, y+dy
+			if newX < 0 || newX >= g.Width ||
+				newY < 0 || newY >= g.Height {
+				continue
+			}
+			if n, ok := g.nodes[newY][newX].(*node.Emitter); ok && !n.Activated() {
+				g.PropagateZone(n, direction, newX, newY)
+			}
+		}
+	}
 }
 
 func (g *Grid) Teleport(t *node.HoleEmitter, m common.Node, x, y int) {
