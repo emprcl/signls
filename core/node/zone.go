@@ -33,7 +33,7 @@ func (e *ZoneEmitter) Copy() EmitterBehavior {
 }
 
 func (e *ZoneEmitter) Symbol(dir common.Direction) string {
-	return "Z∷"
+	return "Z╬"
 }
 
 func (e *ZoneEmitter) Name() string {
