@@ -11,8 +11,8 @@ type EmitterBehavior interface {
 	ArmedOnStart() bool
 
 	// EmitDirections determines which directions the emitter will emit signals
-	// based on its current direction and the pulse count.
-	EmitDirections(dir common.Direction, pulse uint64) common.Direction
+	// based on its current direction, the incoming direction, and the pulse count.
+	EmitDirections(dir common.Direction, inDir common.Direction, pulse uint64) common.Direction
 
 	// Symbol returns a string representation of the emitter, potentially
 	// taking its direction into account for visualization.
@@ -30,8 +30,9 @@ type EmitterBehavior interface {
 type Emitter struct {
 	behavior EmitterBehavior // The specific behavior of this emitter.
 
-	direction common.Direction // The direction(s) in which this emitter is facing.
-	note      *music.Note      // The musical note associated with this emitter.
+	direction         common.Direction // The signal emitting direction(s)
+	incomingDirection common.Direction // The direction from where the emitter has been triggered
+	note              *music.Note      // The musical note associated with this emitter.
 
 	pulse     uint64 // The last pulse when the emitter was triggered.
 	armed     bool   // Whether the emitter is armed and ready to trigger.
@@ -89,7 +90,7 @@ func (e *Emitter) Muted() bool {
 
 // Trig triggers the emitter, playing its note if it is armed and not muted.
 // It also updates the pulse to the current one, and disarms the emitter.
-func (e *Emitter) Trig(key music.Key, scale music.Scale, pulse uint64) {
+func (e *Emitter) Trig(key music.Key, scale music.Scale, inDir common.Direction, pulse uint64) {
 	if !e.updated(pulse) {
 		e.note.Tick() // Move the note's internal clock forward.
 	}
@@ -99,6 +100,7 @@ func (e *Emitter) Trig(key music.Key, scale music.Scale, pulse uint64) {
 	if !e.muted {
 		e.note.Play(key, scale)
 	}
+	e.incomingDirection = inDir
 	e.triggered = true
 	e.armed = false
 	e.pulse = pulse
@@ -111,7 +113,7 @@ func (e *Emitter) Emit(pulse uint64) []common.Direction {
 	}
 	e.triggered = false
 	e.pulse = pulse
-	return e.behavior.EmitDirections(e.direction, pulse).Decompose()
+	return e.behavior.EmitDirections(e.direction, e.incomingDirection, pulse).Decompose()
 }
 
 func (e *Emitter) Tick() {

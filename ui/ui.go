@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"cykl/core/common"
 	"cykl/core/field"
 	"cykl/core/node"
 	"cykl/ui/param"
@@ -141,7 +142,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.handleParamEdit(dir)
 			return m, nil
-		case "&", "é", "\"", "'", "(":
+		case "&", "é", "\"", "'", "(", "-":
 			m.grid.AddNodeFromSymbol(msg.String(), m.cursorX, m.cursorY)
 			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			return m, nil
@@ -173,7 +174,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			m.selectedNode().(*node.Emitter).Arm()
-			m.selectedNode().(*node.Emitter).Trig(m.grid.Key, m.grid.Scale, m.grid.Pulse())
+			m.selectedNode().(*node.Emitter).Trig(m.grid.Key, m.grid.Scale, common.NONE, m.grid.Pulse())
 			return m, nil
 		case "*":
 			if m.edit {

@@ -30,7 +30,7 @@ func (e *BangEmitter) ArmedOnStart() bool {
 
 // EmitDirections returns the current direction. For the BangEmitter, it always
 // emits in the direction it's facing without any modification.
-func (e *BangEmitter) EmitDirections(dir common.Direction, pulse uint64) common.Direction {
+func (e *BangEmitter) EmitDirections(dir common.Direction, inDir common.Direction, pulse uint64) common.Direction {
 	return dir // Emit in the same direction it's facing.
 }
 

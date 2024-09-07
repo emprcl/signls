@@ -24,7 +24,7 @@ func NewSpreadEmitter(midi midi.Midi, direction common.Direction) *Emitter {
 
 // EmitDirections determines the direction in which the emitter should propagate signals.
 // For SpreadEmitter, it returns the same direction as provided without modification.
-func (e *SpreadEmitter) EmitDirections(dir common.Direction, pulse uint64) common.Direction {
+func (e *SpreadEmitter) EmitDirections(dir common.Direction, inDir common.Direction, pulse uint64) common.Direction {
 	return dir
 }
 

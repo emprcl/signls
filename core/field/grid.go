@@ -180,6 +180,8 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	case "'":
 		g.AddEmitter(node.NewDiceEmitter(g.midi, common.NONE), x, y)
 	case "(":
+		g.AddEmitter(node.NewPassEmitter(g.midi, common.NONE), x, y)
+	case "-":
 		g.nodes[y][x] = node.NewTeleportEmitter(common.NONE, x, y)
 	}
 }
@@ -249,7 +251,7 @@ func (g *Grid) Update() {
 			}
 
 			if n, ok := g.nodes[y][x].(*node.Emitter); ok {
-				n.Trig(g.Key, g.Scale, g.pulse)
+				n.Trig(g.Key, g.Scale, common.NONE, g.pulse)
 				g.Emit(n, x, y)
 			}
 		}
@@ -308,7 +310,7 @@ func (g *Grid) Emit(emitter *node.Emitter, x, y int) {
 		}
 		if n, ok := g.nodes[newY][newX].(*node.Emitter); ok {
 			n.Arm()
-			n.Trig(g.Key, g.Scale, g.pulse)
+			n.Trig(g.Key, g.Scale, direction, g.pulse)
 			continue
 		} else if n, ok := g.nodes[newY][newX].(*node.TeleportEmitter); ok {
 			g.Teleport(n, node.NewSignal(direction, g.pulse), newX, newY)
@@ -324,7 +326,8 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 		return
 	}
 
-	newX, newY := movable.(common.Node).Direction().NextPosition(x, y)
+	direction := movable.(common.Node).Direction()
+	newX, newY := direction.NextPosition(x, y)
 
 	if g.outOfBounds(newX, newY) {
 		g.nodes[y][x] = nil
@@ -335,7 +338,7 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 		g.nodes[newY][newX] = g.nodes[y][x]
 	} else if n, ok := g.nodes[newY][newX].(*node.Emitter); ok {
 		n.Arm()
-		n.Trig(g.Key, g.Scale, g.pulse)
+		n.Trig(g.Key, g.Scale, direction, g.pulse)
 	} else if n, ok := g.nodes[newY][newX].(*node.TeleportEmitter); ok {
 		g.Teleport(n, g.nodes[y][x], newX, newY)
 	}
@@ -353,7 +356,7 @@ func (g *Grid) Teleport(t *node.TeleportEmitter, m common.Node, x, y int) {
 	}
 	if n, ok := g.nodes[teleportY][teleportX].(*node.Emitter); ok {
 		n.Arm()
-		n.Trig(g.Key, g.Scale, g.pulse)
+		n.Trig(g.Key, g.Scale, common.NONE, g.pulse)
 	} else if n, ok := g.nodes[teleportY][teleportX].(*node.TeleportEmitter); ok {
 		g.Teleport(n, m, teleportX, teleportY)
 	} else if g.nodes[teleportY][teleportX] == nil {

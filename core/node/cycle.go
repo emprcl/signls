@@ -26,7 +26,7 @@ func NewCycleEmitter(midi midi.Midi, direction common.Direction) *Emitter {
 
 // EmitDirections cycles through the provided directions, returning the next direction in sequence.
 // If there are no directions, it returns NONE. The cycling is done in a round-robin manner.
-func (e *CycleEmitter) EmitDirections(dir common.Direction, pulse uint64) common.Direction {
+func (e *CycleEmitter) EmitDirections(dir common.Direction, inDir common.Direction, pulse uint64) common.Direction {
 	if dir.Count() == 0 {
 		return common.NONE
 	}

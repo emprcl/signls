@@ -25,7 +25,6 @@ TODO:
    - note relative to the grid
  - add new emitters
   - Accumulation (trigger after x)
-  - Opposite direction
   - Zone for chord
   - Cell for cellular automata rules ? (meh unsure maybe a separate project)
  - add midi cc (note behavior?)

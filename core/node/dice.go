@@ -25,7 +25,7 @@ func NewDiceEmitter(midi midi.Midi, direction common.Direction) *Emitter {
 	}
 }
 
-func (e *DiceEmitter) EmitDirections(dir common.Direction, pulse uint64) common.Direction {
+func (e *DiceEmitter) EmitDirections(dir common.Direction, inDir common.Direction, pulse uint64) common.Direction {
 	if dir.Count() == 0 {
 		return common.NONE
 	}
