@@ -182,10 +182,12 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	case "(":
 		g.AddEmitter(node.NewQuotaEmitter(g.midi, common.NONE), x, y)
 	case "-":
-		g.AddEmitter(node.NewPassEmitter(g.midi, common.NONE), x, y)
+		g.AddEmitter(node.NewEuclidEmitter(g.midi, common.NONE), x, y)
 	case "è":
-		g.AddEmitter(node.NewZoneEmitter(g.midi, common.NONE), x, y)
+		g.AddEmitter(node.NewPassEmitter(g.midi, common.NONE), x, y)
 	case "_":
+		g.AddEmitter(node.NewZoneEmitter(g.midi, common.NONE), x, y)
+	case "ç":
 		g.nodes[y][x] = node.NewHoleEmitter(common.NONE, x, y)
 	}
 }
@@ -371,6 +373,8 @@ func (g *Grid) PropagateZone(e *node.Emitter, direction common.Direction, x, y i
 			}
 			if n, ok := g.nodes[newY][newX].(*node.Emitter); ok && !n.Activated() {
 				g.PropagateZone(n, direction, newX, newY)
+			} else if n, ok := g.nodes[newY][newX].(*node.HoleEmitter); ok {
+				g.Teleport(n, node.NewSignal(direction, g.pulse), newX, newY)
 			}
 		}
 	}
