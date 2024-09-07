@@ -34,6 +34,12 @@ func (e *QuotaEmitter) ArmedOnStart() bool {
 	return false
 }
 
+func (e *QuotaEmitter) Copy() EmitterBehavior {
+	return &QuotaEmitter{
+		threshold: e.threshold,
+	}
+}
+
 func (e *QuotaEmitter) Symbol(dir common.Direction) string {
 	return fmt.Sprintf("%s%s", "Q", dir.Symbol())
 }

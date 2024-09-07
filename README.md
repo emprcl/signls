@@ -24,7 +24,6 @@ TODO:
    - note relative to the previous one (set true intervals? or relative to scale?)
    - note relative to the grid
  - add new emitters
-  - Accumulation (trigger after x)
   - Zone for chord
   - Cell for cellular automata rules ? (meh unsure maybe a separate project)
  - add midi cc (note behavior?)

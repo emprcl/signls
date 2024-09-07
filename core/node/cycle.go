@@ -40,6 +40,13 @@ func (e *CycleEmitter) ArmedOnStart() bool {
 	return false
 }
 
+// Copy makes a copy of the behavior.
+func (e *CycleEmitter) Copy() EmitterBehavior {
+	return &CycleEmitter{
+		next: e.next,
+	}
+}
+
 // Symbol returns the visual representation of the emitter on the grid.
 func (e *CycleEmitter) Symbol(dir common.Direction) string {
 	return fmt.Sprintf("%s%s", "C", dir.Symbol())

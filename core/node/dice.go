@@ -37,6 +37,14 @@ func (e *DiceEmitter) ArmedOnStart() bool {
 	return false
 }
 
+// Copy makes a copy of the behavior.
+func (e *DiceEmitter) Copy() EmitterBehavior {
+	source := rand.NewSource(time.Now().UnixNano())
+	return &DiceEmitter{
+		rand: rand.New(source),
+	}
+}
+
 func (e *DiceEmitter) Symbol(dir common.Direction) string {
 	return fmt.Sprintf("%s%s", "D", dir.Symbol())
 }

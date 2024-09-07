@@ -2,16 +2,13 @@ package node
 
 import (
 	"fmt"
-	"math/rand"
 
 	"cykl/core/common"
 	"cykl/core/music"
 	"cykl/midi"
 )
 
-type PassEmitter struct {
-	rand *rand.Rand
-}
+type PassEmitter struct{}
 
 func NewPassEmitter(midi midi.Midi, direction common.Direction) *Emitter {
 	return &Emitter{
@@ -27,6 +24,10 @@ func (e *PassEmitter) EmitDirections(dir common.Direction, inDir common.Directio
 
 func (e *PassEmitter) ArmedOnStart() bool {
 	return false
+}
+
+func (e *PassEmitter) Copy() EmitterBehavior {
+	return &PassEmitter{}
 }
 
 func (e *PassEmitter) Symbol(dir common.Direction) string {

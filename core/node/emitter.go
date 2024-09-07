@@ -10,6 +10,9 @@ type EmitterBehavior interface {
 	// ArmedOnStart indicates if the emitter is armed when the grid starts.
 	ArmedOnStart() bool
 
+	// Copy makes a copy of the behavior.
+	Copy() EmitterBehavior
+
 	// EmitDirections determines which directions the emitter will emit signals
 	// based on its current direction, the incoming direction, and the pulse count.
 	EmitDirections(dir common.Direction, inDir common.Direction, pulse uint64) common.Direction
@@ -43,9 +46,9 @@ type Emitter struct {
 // Copy creates a deep copy of the emitter, returning it as a Node interface.
 // It clones the associated note and keeps the same behavior and direction.
 func (e *Emitter) Copy(dx, dy int) common.Node {
-	newNote := *e.note // Deep copy the note to maintain state separately.
+	newNote := *e.note
 	return &Emitter{
-		behavior:  e.behavior,
+		behavior:  e.behavior.Copy(),
 		direction: e.direction,
 		armed:     e.armed,
 		note:      &newNote,

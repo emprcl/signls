@@ -34,6 +34,10 @@ func (e *SpreadEmitter) ArmedOnStart() bool {
 	return false
 }
 
+func (e *SpreadEmitter) Copy() EmitterBehavior {
+	return &SpreadEmitter{}
+}
+
 // Symbol returns a string representation of the emitter's symbol.
 func (e *SpreadEmitter) Symbol(dir common.Direction) string {
 	return fmt.Sprintf("%s%s", "S", dir.Symbol())
