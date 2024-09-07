@@ -79,7 +79,7 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 			return cursorStyle.Render("  ")
 		}
 		return activeEmitterStyle.Render("  ")
-	case *node.Emitter:
+	case common.Audible:
 		symbol := n.Symbol()
 
 		if isCursor && !m.edit {

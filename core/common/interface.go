@@ -30,6 +30,11 @@ type Movable interface {
 	MustMove(pulse uint64) bool
 }
 
+type Audible interface {
+	Muted() bool
+	SetMute(mute bool)
+}
+
 type Tickable interface {
 	Tick()
 	Reset()
