@@ -260,6 +260,11 @@ func (g *Grid) Update() {
 				n.Trig(g.Key, g.Scale, common.NONE, g.pulse)
 				g.Emit(n, x, y)
 			}
+
+			if n, ok := g.nodes[y][x].(music.Audible); ok {
+				n.Trig(g.Key, g.Scale, common.NONE, g.pulse)
+				g.Emit(n, x, y)
+			}
 		}
 	}
 	g.pulse++
@@ -308,7 +313,7 @@ func (g *Grid) Reset() {
 }
 
 // Emit generates a signal at the specified coordinates and direction.
-func (g *Grid) Emit(emitter *node.Emitter, x, y int) {
+func (g *Grid) Emit(emitter music.Audible, x, y int) {
 	for _, direction := range emitter.Emit(g.pulse) {
 		newX, newY := direction.NextPosition(x, y)
 		if (newX == x && newY == y) || g.outOfBounds(newX, newY) {

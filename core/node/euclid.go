@@ -11,6 +11,10 @@ type EuclidEmitter struct {
 	direction common.Direction
 	note      *music.Note
 
+	steps    int
+	step     int
+	triggers int
+
 	pulse     uint64
 	armed     bool
 	triggered bool
@@ -19,6 +23,8 @@ type EuclidEmitter struct {
 
 func NewEuclidEmitter(midi midi.Midi, direction common.Direction) *EuclidEmitter {
 	return &EuclidEmitter{
+		steps:     8,
+		triggers:  7,
 		direction: direction,
 		note:      music.NewNote(midi),
 	}
@@ -42,7 +48,7 @@ func (e *EuclidEmitter) Note() *music.Note {
 }
 
 func (e *EuclidEmitter) Arm() {
-	e.armed = true
+	e.armed = false
 }
 
 func (e *EuclidEmitter) SetMute(mute bool) {
@@ -55,9 +61,6 @@ func (e *EuclidEmitter) Muted() bool {
 }
 
 func (e *EuclidEmitter) Trig(key music.Key, scale music.Scale, inDir common.Direction, pulse uint64) {
-	if !e.updated(pulse) {
-		e.note.Tick()
-	}
 	if !e.armed {
 		return
 	}
@@ -66,20 +69,46 @@ func (e *EuclidEmitter) Trig(key music.Key, scale music.Scale, inDir common.Dire
 	}
 	e.triggered = true
 	e.armed = false
-	e.pulse = pulse
 }
 
 func (e *EuclidEmitter) Emit(pulse uint64) []common.Direction {
-	if e.updated(pulse) || !e.triggered {
+	if !e.triggered {
 		return []common.Direction{}
 	}
 	e.triggered = false
-	e.pulse = pulse
 	return e.direction.Decompose()
 }
 
 func (e *EuclidEmitter) Tick() {
+	e.patternTrigger()
 	e.note.Tick()
+	e.pulse++
+}
+
+func (e *EuclidEmitter) patternTrigger() {
+	if e.pulse%uint64(common.PulsesPerStep) != 0 {
+		return
+	}
+	pattern := generateEuclideanPattern(e.steps, int(e.triggers))
+	if pattern[e.step] {
+		e.armed = true
+	}
+	e.step = (e.step + 1) % e.steps
+}
+
+func generateEuclideanPattern(steps, triggers int) []bool {
+	pattern := make([]bool, steps)
+	bucket := 0
+	for i := 0; i < steps; i++ {
+		bucket += triggers
+		if bucket >= steps {
+			bucket -= steps
+			pattern[i] = true
+		} else {
+			pattern[i] = false
+		}
+	}
+	return pattern
 }
 
 func (e *EuclidEmitter) Direction() common.Direction {
@@ -109,9 +138,7 @@ func (e *EuclidEmitter) Color() string {
 func (e *EuclidEmitter) Reset() {
 	e.pulse = 0
 	e.triggered = false
+	e.armed = false
+	e.step = 0
 	e.Note().Stop()
-}
-
-func (e *EuclidEmitter) updated(pulse uint64) bool {
-	return e.pulse == pulse
 }

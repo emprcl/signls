@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"cykl/core/common"
+	"cykl/core/music"
 	"cykl/core/node"
 	"cykl/ui/param"
 
@@ -79,7 +80,7 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 			return cursorStyle.Render("  ")
 		}
 		return activeEmitterStyle.Render("  ")
-	case common.Audible:
+	case music.Audible:
 		symbol := n.Symbol()
 
 		if isCursor && !m.edit {
@@ -88,7 +89,7 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 			return teleportDestinationStyle.Render(teleportDestinationSymbol)
 		} else if isCursor && m.edit && m.blink {
 			return cursorStyle.Render(symbol)
-		} else if n.Activated() && n.(*node.Emitter).Muted() {
+		} else if n.Activated() && t.Muted() {
 			return activeEmitterStyle.Render(symbol)
 		} else if t.Muted() {
 			return mutedEmitterStyle.Render(symbol)
