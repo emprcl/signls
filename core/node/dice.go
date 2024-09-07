@@ -46,5 +46,5 @@ func (e *DiceEmitter) Name() string {
 }
 
 func (e *DiceEmitter) Color() string {
-	return "27"
+	return "33"
 }

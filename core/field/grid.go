@@ -174,9 +174,9 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	case "&":
 		g.AddEmitter(node.NewBangEmitter(g.midi, common.NONE, !g.Playing), x, y)
 	case "é":
-		g.AddEmitter(node.NewCycleEmitter(g.midi, common.NONE), x, y)
-	case "\"":
 		g.AddEmitter(node.NewSpreadEmitter(g.midi, common.NONE), x, y)
+	case "\"":
+		g.AddEmitter(node.NewCycleEmitter(g.midi, common.NONE), x, y)
 	case "'":
 		g.AddEmitter(node.NewDiceEmitter(g.midi, common.NONE), x, y)
 	case "(":
