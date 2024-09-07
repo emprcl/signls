@@ -21,7 +21,7 @@ type Param interface {
 func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
 	if len(nodes) == 0 {
 		return []Param{}
-	} else if _, ok := nodes[0].(*node.TeleportEmitter); ok && len(nodes) == 1 {
+	} else if _, ok := nodes[0].(*node.HoleEmitter); ok && len(nodes) == 1 {
 		return []Param{
 			Destination{
 				nodes:  nodes,

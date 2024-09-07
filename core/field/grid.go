@@ -184,7 +184,7 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	case "-":
 		g.AddEmitter(node.NewQuotaEmitter(g.midi, common.NONE), x, y)
 	case "è":
-		g.nodes[y][x] = node.NewTeleportEmitter(common.NONE, x, y)
+		g.nodes[y][x] = node.NewHoleEmitter(common.NONE, x, y)
 	}
 }
 
@@ -314,7 +314,7 @@ func (g *Grid) Emit(emitter *node.Emitter, x, y int) {
 			n.Arm()
 			n.Trig(g.Key, g.Scale, direction, g.pulse)
 			continue
-		} else if n, ok := g.nodes[newY][newX].(*node.TeleportEmitter); ok {
+		} else if n, ok := g.nodes[newY][newX].(*node.HoleEmitter); ok {
 			g.Teleport(n, node.NewSignal(direction, g.pulse), newX, newY)
 			continue
 		}
@@ -341,14 +341,14 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 	} else if n, ok := g.nodes[newY][newX].(*node.Emitter); ok {
 		n.Arm()
 		n.Trig(g.Key, g.Scale, direction, g.pulse)
-	} else if n, ok := g.nodes[newY][newX].(*node.TeleportEmitter); ok {
+	} else if n, ok := g.nodes[newY][newX].(*node.HoleEmitter); ok {
 		g.Teleport(n, g.nodes[y][x], newX, newY)
 	}
 
 	g.nodes[y][x] = nil
 }
 
-func (g *Grid) Teleport(t *node.TeleportEmitter, m common.Node, x, y int) {
+func (g *Grid) Teleport(t *node.HoleEmitter, m common.Node, x, y int) {
 	teleportX, teleportY := t.Teleport()
 	if g.outOfBounds(teleportX, teleportY) {
 		return
@@ -359,7 +359,7 @@ func (g *Grid) Teleport(t *node.TeleportEmitter, m common.Node, x, y int) {
 	if n, ok := g.nodes[teleportY][teleportX].(*node.Emitter); ok {
 		n.Arm()
 		n.Trig(g.Key, g.Scale, common.NONE, g.pulse)
-	} else if n, ok := g.nodes[teleportY][teleportX].(*node.TeleportEmitter); ok {
+	} else if n, ok := g.nodes[teleportY][teleportX].(*node.HoleEmitter); ok {
 		g.Teleport(n, m, teleportX, teleportY)
 	} else if g.nodes[teleportY][teleportX] == nil {
 		g.nodes[teleportY][teleportX] = m

@@ -17,7 +17,7 @@ var (
 			Background(lipgloss.Color("190")).
 			Foreground(lipgloss.Color("0"))
 	teleportDestinationStyle = lipgloss.NewStyle().
-					Background(lipgloss.Color("88")).
+					Background(lipgloss.Color("160")).
 					Foreground(lipgloss.Color("15"))
 	selectionStyle = lipgloss.NewStyle().
 			Background(lipgloss.Color("238")).
@@ -58,7 +58,7 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 	}
 
 	// render grid
-	teleportDestinationSymbol := "🠋🠋"
+	teleportDestinationSymbol := "H🠋"
 	if n == nil && isCursor {
 		return cursorStyle.Render("  ")
 	} else if n == nil && isTeleportDestination {
@@ -101,7 +101,7 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 				Background(lipgloss.Color(n.Color())).
 				Render(symbol)
 		}
-	case *node.TeleportEmitter:
+	case *node.HoleEmitter:
 		symbol := n.Symbol()
 
 		if isCursor && !m.edit {
