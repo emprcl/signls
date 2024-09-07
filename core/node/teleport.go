@@ -67,5 +67,5 @@ func (s *TeleportEmitter) Name() string {
 }
 
 func (s *TeleportEmitter) Color() string {
-	return "88"
+	return "124"
 }

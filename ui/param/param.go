@@ -24,24 +24,32 @@ func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
 	} else if _, ok := nodes[0].(*node.TeleportEmitter); ok && len(nodes) == 1 {
 		return []Param{
 			Destination{
-				nodes:  filterNodes[*node.TeleportEmitter](nodes),
+				nodes:  nodes,
 				width:  grid.Width,
 				height: grid.Height,
 			},
 		}
+	} else if nodes[0].Name() == "quota" && len(nodes) == 1 {
+		return append([]Param{
+			Threshold{nodes: nodes},
+		}, DefaultEmitterParams(grid, nodes)...)
 	}
 
 	emitters := filterNodes[*node.Emitter](nodes)
+	return DefaultEmitterParams(grid, emitters)
+}
+
+func DefaultEmitterParams(grid *field.Grid, nodes []common.Node) []Param {
 	return []Param{
 		Key{
-			nodes: emitters,
+			nodes: nodes,
 			keys:  music.AllKeysInScale(grid.Key, grid.Scale),
 			root:  grid.Key,
-			mode:  KeyMode{nodes: emitters, modes: music.AllNoteBehaviors()},
+			mode:  KeyMode{nodes: nodes, modes: music.AllNoteBehaviors()},
 		},
-		Velocity{nodes: emitters},
-		Length{nodes: emitters},
-		Channel{nodes: emitters},
+		Velocity{nodes: nodes},
+		Length{nodes: nodes},
+		Channel{nodes: nodes},
 	}
 }
 

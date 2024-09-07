@@ -182,6 +182,8 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	case "(":
 		g.AddEmitter(node.NewPassEmitter(g.midi, common.NONE), x, y)
 	case "-":
+		g.AddEmitter(node.NewQuotaEmitter(g.midi, common.NONE), x, y)
+	case "è":
 		g.nodes[y][x] = node.NewTeleportEmitter(common.NONE, x, y)
 	}
 }
