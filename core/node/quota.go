@@ -63,3 +63,7 @@ func (e *QuotaEmitter) Threshold() int {
 func (e *QuotaEmitter) SetThreshold(threshold int) {
 	e.threshold = threshold
 }
+
+func (e *QuotaEmitter) Reset() {
+	e.count = 0
+}

@@ -66,3 +66,7 @@ func (e *CycleEmitter) Name() string {
 func (e *CycleEmitter) Color() string {
 	return "063"
 }
+
+func (e *CycleEmitter) Reset() {
+	e.next = 0
+}

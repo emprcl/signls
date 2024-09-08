@@ -45,3 +45,5 @@ func (e *PassEmitter) Name() string {
 func (e *PassEmitter) Color() string {
 	return "35"
 }
+
+func (e *PassEmitter) Reset() {}

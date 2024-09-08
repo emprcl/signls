@@ -21,6 +21,9 @@ type EmitterBehavior interface {
 	// neighbors.
 	ShouldPropagate() bool
 
+	// Reset resets the behavior state.
+	Reset()
+
 	// Symbol returns a string representation of the emitter, potentially
 	// taking its direction into account for visualization.
 	Symbol(dir common.Direction) string
@@ -164,6 +167,7 @@ func (e *Emitter) Reset() {
 	e.armed = e.behavior.ArmedOnStart()
 	e.triggered = false
 	e.Note().Stop()
+	e.behavior.Reset()
 }
 
 // updated checks if the emitter was updated on the given pulse.

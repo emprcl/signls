@@ -57,3 +57,5 @@ func (e *SpreadEmitter) Name() string {
 func (e *SpreadEmitter) Color() string {
 	return "177"
 }
+
+func (e *SpreadEmitter) Reset() {}

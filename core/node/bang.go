@@ -60,3 +60,5 @@ func (e *BangEmitter) Name() string {
 func (e *BangEmitter) Color() string {
 	return "165"
 }
+
+func (e *BangEmitter) Reset() {}
