@@ -356,6 +356,7 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 	} else if n, ok := g.nodes[newY][newX].(*node.HoleEmitter); ok {
 		g.Teleport(n, g.nodes[y][x], newX, newY)
 	} else if n, ok := g.nodes[newY][newX].(*node.Signal); ok {
+		// TODO: only force move when same direction
 		g.Move(n, newX, newY)
 		g.nodes[newY][newX] = g.nodes[y][x]
 	}
