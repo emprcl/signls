@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"cykl/core/common"
-	"cykl/core/node"
+	"cykl/core/music"
 )
 
 type Velocity struct {
@@ -16,11 +16,11 @@ func (v Velocity) Name() string {
 }
 
 func (v Velocity) Display() string {
-	return fmt.Sprintf("%d", v.nodes[0].(*node.Emitter).Note().Velocity)
+	return fmt.Sprintf("%d", v.nodes[0].(music.Audible).Note().Velocity)
 }
 
 func (v Velocity) Value() int {
-	return int(v.nodes[0].(*node.Emitter).Note().Velocity)
+	return int(v.nodes[0].(music.Audible).Note().Velocity)
 }
 
 func (v Velocity) Increment() {
@@ -37,6 +37,6 @@ func (v Velocity) Right() {}
 
 func (v Velocity) Set(value int) {
 	for _, n := range v.nodes {
-		n.(*node.Emitter).Note().SetVelocity(uint8(value))
+		n.(music.Audible).Note().SetVelocity(uint8(value))
 	}
 }

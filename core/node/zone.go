@@ -29,7 +29,7 @@ func (e *ZoneEmitter) ArmedOnStart() bool {
 	return false
 }
 
-func (e *ZoneEmitter) Copy() EmitterBehavior {
+func (e *ZoneEmitter) Copy() common.EmitterBehavior {
 	return &ZoneEmitter{}
 }
 

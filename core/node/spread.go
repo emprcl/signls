@@ -39,7 +39,7 @@ func (e *SpreadEmitter) ArmedOnStart() bool {
 	return false
 }
 
-func (e *SpreadEmitter) Copy() EmitterBehavior {
+func (e *SpreadEmitter) Copy() common.EmitterBehavior {
 	return &SpreadEmitter{}
 }
 

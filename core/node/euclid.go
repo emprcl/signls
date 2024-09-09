@@ -11,9 +11,11 @@ type EuclidEmitter struct {
 	direction common.Direction
 	note      *music.Note
 
-	steps    int
-	step     int
-	triggers int
+	Steps    int
+	Triggers int
+	Offset   int
+
+	step int
 
 	pulse     uint64
 	armed     bool
@@ -23,8 +25,9 @@ type EuclidEmitter struct {
 
 func NewEuclidEmitter(midi midi.Midi, direction common.Direction) *EuclidEmitter {
 	return &EuclidEmitter{
-		steps:     8,
-		triggers:  7,
+		Steps:     4,
+		Triggers:  1,
+		Offset:    0,
 		direction: direction,
 		note:      music.NewNote(midi),
 	}
@@ -89,11 +92,12 @@ func (e *EuclidEmitter) patternTrigger() {
 	if e.pulse%uint64(common.PulsesPerStep) != 0 {
 		return
 	}
-	pattern := generateEuclideanPattern(e.steps, int(e.triggers))
-	if pattern[e.step] {
+	pattern := generateEuclideanPattern(e.Steps, e.Triggers)
+	adjusetedStep := (e.step + e.Offset) % e.Steps
+	if pattern[adjusetedStep] {
 		e.armed = true
 	}
-	e.step = (e.step + 1) % e.steps
+	e.step = (e.step + 1) % e.Steps
 }
 
 func generateEuclideanPattern(steps, triggers int) []bool {

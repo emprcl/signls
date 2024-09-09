@@ -5,7 +5,6 @@ import (
 
 	"cykl/core/common"
 	"cykl/core/music"
-	"cykl/core/node"
 )
 
 type Key struct {
@@ -26,12 +25,12 @@ func (k Key) Display() string {
 	case "random":
 		return "random"
 	default:
-		return k.nodes[0].(*node.Emitter).Note().KeyName()
+		return k.nodes[0].(music.Audible).Note().KeyName()
 	}
 }
 
 func (k Key) Value() int {
-	return int(k.nodes[0].(*node.Emitter).Note().KeyValue())
+	return int(k.nodes[0].(music.Audible).Note().KeyValue())
 }
 
 func (k Key) Increment() {
@@ -52,13 +51,13 @@ func (k Key) Right() {
 
 func (k Key) Set(value int) {
 	for _, n := range k.nodes {
-		n.(*node.Emitter).Note().SetKey(k.keys[value], k.root)
+		n.(music.Audible).Note().SetKey(k.keys[value], k.root)
 	}
 }
 
 func (k Key) Preview() {
 	go func() {
-		n := *k.nodes[0].(*node.Emitter).Note()
+		n := *k.nodes[0].(music.Audible).Note()
 		n.Play(music.Key(60), music.CHROMATIC)
 		time.Sleep(300 * time.Millisecond)
 		n.Stop()
@@ -67,7 +66,7 @@ func (k Key) Preview() {
 
 func (k Key) keyIndex() int {
 	for i := 0; i < len(k.keys); i++ {
-		if k.nodes[0].(*node.Emitter).Note().KeyValue() == k.keys[i] {
+		if k.nodes[0].(music.Audible).Note().KeyValue() == k.keys[i] {
 			return i
 		}
 	}

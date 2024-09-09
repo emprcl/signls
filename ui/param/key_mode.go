@@ -3,7 +3,6 @@ package param
 import (
 	"cykl/core/common"
 	"cykl/core/music"
-	"cykl/core/node"
 )
 
 type KeyMode struct {
@@ -16,7 +15,7 @@ func (k KeyMode) Name() string {
 }
 
 func (k KeyMode) Display() string {
-	return k.nodes[0].(*node.Emitter).Note().Behavior.Name()
+	return k.nodes[0].(music.Audible).Note().Behavior.Name()
 }
 
 func (k KeyMode) Value() int {
@@ -42,13 +41,13 @@ func (k KeyMode) Set(value int) {
 		value = 0
 	}
 	for _, n := range k.nodes {
-		n.(*node.Emitter).Note().Behavior = k.modes[value]
+		n.(music.Audible).Note().Behavior = k.modes[value]
 	}
 }
 
 func (k KeyMode) keyModeIndex() int {
 	for i := 0; i < len(k.modes); i++ {
-		if k.nodes[0].(*node.Emitter).Note().Behavior == k.modes[i] {
+		if k.nodes[0].(music.Audible).Note().Behavior == k.modes[i] {
 			return i
 		}
 	}

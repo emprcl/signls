@@ -43,7 +43,7 @@ func (e *DiceEmitter) ArmedOnStart() bool {
 }
 
 // Copy makes a copy of the behavior.
-func (e *DiceEmitter) Copy() EmitterBehavior {
+func (e *DiceEmitter) Copy() common.EmitterBehavior {
 	source := rand.NewSource(time.Now().UnixNano())
 	return &DiceEmitter{
 		rand: rand.New(source),

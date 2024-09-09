@@ -9,7 +9,7 @@ import (
 )
 
 type QuotaEmitter struct {
-	threshold int
+	Threshold int
 	count     int
 }
 
@@ -23,7 +23,7 @@ func NewQuotaEmitter(midi midi.Midi, direction common.Direction) *Emitter {
 
 func (e *QuotaEmitter) EmitDirections(dir common.Direction, inDir common.Direction, pulse uint64) common.Direction {
 	e.count++
-	if e.count < e.threshold {
+	if e.count < e.Threshold {
 		return common.NONE
 	}
 	e.count = 0
@@ -38,9 +38,9 @@ func (e *QuotaEmitter) ShouldPropagate() bool {
 	return false
 }
 
-func (e *QuotaEmitter) Copy() EmitterBehavior {
+func (e *QuotaEmitter) Copy() common.EmitterBehavior {
 	return &QuotaEmitter{
-		threshold: e.threshold,
+		Threshold: e.Threshold,
 	}
 }
 
@@ -54,14 +54,6 @@ func (e *QuotaEmitter) Name() string {
 
 func (e *QuotaEmitter) Color() string {
 	return "197"
-}
-
-func (e *QuotaEmitter) Threshold() int {
-	return e.threshold
-}
-
-func (e *QuotaEmitter) SetThreshold(threshold int) {
-	e.threshold = threshold
 }
 
 func (e *QuotaEmitter) Reset() {

@@ -194,7 +194,7 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 
 // AddEmitter adds an emitter to the grid at the specified coordinates.
 func (g *Grid) AddEmitter(e *node.Emitter, x, y int) {
-	if n, ok := g.nodes[y][x].(*node.Emitter); g.nodes[y][x] != nil && ok {
+	if n, ok := g.nodes[y][x].(common.Behavioral); g.nodes[y][x] != nil && ok {
 		n.SetBehavior(e.Behavior())
 		return
 	}
@@ -315,7 +315,7 @@ func (g *Grid) Emit(emitter music.Audible, x, y int) {
 			continue
 		}
 
-		if n, ok := g.nodes[newY][newX].(*node.Emitter); ok && n.Behavior().ShouldPropagate() {
+		if n, ok := g.nodes[newY][newX].(common.Behavioral); ok && n.Behavior().ShouldPropagate() {
 			g.PropagateZone(g.nodes[newY][newX].(*node.Emitter), direction, newX, newY)
 			continue
 		} else if n, ok := g.nodes[newY][newX].(music.Audible); ok {
@@ -348,7 +348,7 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 
 	if g.nodes[newY][newX] == nil {
 		g.nodes[newY][newX] = g.nodes[y][x]
-	} else if n, ok := g.nodes[newY][newX].(*node.Emitter); ok && n.Behavior().ShouldPropagate() {
+	} else if n, ok := g.nodes[newY][newX].(common.Behavioral); ok && n.Behavior().ShouldPropagate() {
 		g.PropagateZone(g.nodes[newY][newX].(*node.Emitter), direction, newX, newY)
 	} else if n, ok := g.nodes[newY][newX].(music.Audible); ok {
 		n.Arm()

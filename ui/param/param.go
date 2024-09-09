@@ -21,7 +21,9 @@ type Param interface {
 func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
 	if len(nodes) == 0 {
 		return []Param{}
-	} else if _, ok := nodes[0].(*node.HoleEmitter); ok && len(nodes) == 1 {
+	}
+
+	if isHomogeneousNode[*node.HoleEmitter](nodes) {
 		return []Param{
 			Destination{
 				nodes:  nodes,
@@ -29,13 +31,19 @@ func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
 				height: grid.Height,
 			},
 		}
-	} else if nodes[0].Name() == "quota" && len(nodes) == 1 {
+	} else if isHomogeneousBehavior[*node.QuotaEmitter](nodes) {
 		return append([]Param{
 			Threshold{nodes: nodes},
 		}, DefaultEmitterParams(grid, nodes)...)
+	} else if isHomogeneousNode[*node.EuclidEmitter](nodes) {
+		return append([]Param{
+			Steps{nodes: nodes},
+			Triggers{nodes: nodes},
+			Offset{nodes: nodes},
+		}, DefaultEmitterParams(grid, nodes)...)
 	}
 
-	emitters := filterNodes[*node.Emitter](nodes)
+	emitters := filterNodes[music.Audible](nodes)
 	return DefaultEmitterParams(grid, emitters)
 }
 
@@ -78,4 +86,26 @@ func filterNodes[T any](nodes []common.Node) []common.Node {
 		filteredNodes = append(filteredNodes, n)
 	}
 	return filteredNodes
+}
+
+func isHomogeneousNode[T any](nodes []common.Node) bool {
+	for _, n := range nodes {
+		if _, ok := n.(T); !ok {
+			return false
+		}
+	}
+	return true
+}
+
+func isHomogeneousBehavior[T any](nodes []common.Node) bool {
+	for _, n := range nodes {
+		if _, ok := n.(common.Behavioral); !ok {
+			return false
+		}
+
+		if _, ok := n.(common.Behavioral).Behavior().(T); !ok {
+			return false
+		}
+	}
+	return true
 }

@@ -5,40 +5,10 @@ import (
 	"cykl/core/music"
 )
 
-// EmitterBehavior defines the behavior of different types of emitters.
-type EmitterBehavior interface {
-	// ArmedOnStart indicates if the emitter is armed when the grid starts.
-	ArmedOnStart() bool
-
-	// Copy makes a copy of the behavior.
-	Copy() EmitterBehavior
-
-	// EmitDirections determines which directions the emitter will emit signals
-	// based on its current direction, the incoming direction, and the pulse count.
-	EmitDirections(dir common.Direction, inDir common.Direction, pulse uint64) common.Direction
-
-	// ShouldPropagate indicates if triggers should be propagated to direct
-	// neighbors.
-	ShouldPropagate() bool
-
-	// Reset resets the behavior state.
-	Reset()
-
-	// Symbol returns a string representation of the emitter, potentially
-	// taking its direction into account for visualization.
-	Symbol(dir common.Direction) string
-
-	// Name returns the name of the emitter type.
-	Name() string
-
-	// Color returns the color code associated with the emitter.
-	Color() string
-}
-
 // Emitter represents a node that emits signals when triggered. It contains
 // information about its behavior, direction, associated note, and state.
 type Emitter struct {
-	behavior EmitterBehavior // The specific behavior of this emitter.
+	behavior common.EmitterBehavior // The specific behavior of this emitter.
 
 	direction         common.Direction // The signal emitting direction(s)
 	incomingDirection common.Direction // The direction from where the emitter has been triggered
@@ -79,11 +49,11 @@ func (e *Emitter) Arm() {
 	e.armed = true
 }
 
-func (e *Emitter) Behavior() EmitterBehavior {
+func (e *Emitter) Behavior() common.EmitterBehavior {
 	return e.behavior
 }
 
-func (e *Emitter) SetBehavior(behavior EmitterBehavior) {
+func (e *Emitter) SetBehavior(behavior common.EmitterBehavior) {
 	e.behavior = behavior
 }
 

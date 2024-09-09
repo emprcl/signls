@@ -21,7 +21,7 @@ func (t Threshold) Display() string {
 }
 
 func (t Threshold) Value() int {
-	return t.nodes[0].(*node.Emitter).Behavior().(*node.QuotaEmitter).Threshold()
+	return t.nodes[0].(*node.Emitter).Behavior().(*node.QuotaEmitter).Threshold
 }
 
 func (t Threshold) Increment() {
@@ -41,6 +41,6 @@ func (t Threshold) Set(value int) {
 		return
 	}
 	for _, n := range t.nodes {
-		n.(*node.Emitter).Behavior().(*node.QuotaEmitter).SetThreshold(value)
+		n.(*node.Emitter).Behavior().(*node.QuotaEmitter).Threshold = value
 	}
 }

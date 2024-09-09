@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"cykl/core/common"
+	"cykl/core/music"
 	"cykl/core/node"
 )
 
@@ -20,8 +21,8 @@ func (l Length) Name() string {
 }
 
 func (l Length) Display() string {
-	length := int(l.nodes[0].(*node.Emitter).Note().Length)
-	pulsesPerStep, stepsPerQuarterNote := l.nodes[0].(*node.Emitter).Note().ClockDivision()
+	length := int(l.nodes[0].(music.Audible).Note().Length)
+	pulsesPerStep, stepsPerQuarterNote := l.nodes[0].(music.Audible).Note().ClockDivision()
 	switch length {
 	case pulsesPerStep / 4:
 		return "1|64"
@@ -43,7 +44,7 @@ func (l Length) Display() string {
 }
 
 func (l Length) Value() int {
-	return int(l.nodes[0].(*node.Emitter).Note().Length)
+	return int(l.nodes[0].(music.Audible).Note().Length)
 }
 
 func (l Length) Increment() {

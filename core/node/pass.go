@@ -30,7 +30,7 @@ func (e *PassEmitter) ShouldPropagate() bool {
 	return false
 }
 
-func (e *PassEmitter) Copy() EmitterBehavior {
+func (e *PassEmitter) Copy() common.EmitterBehavior {
 	return &PassEmitter{}
 }
 

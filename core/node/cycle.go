@@ -46,7 +46,7 @@ func (e *CycleEmitter) ArmedOnStart() bool {
 }
 
 // Copy makes a copy of the behavior.
-func (e *CycleEmitter) Copy() EmitterBehavior {
+func (e *CycleEmitter) Copy() common.EmitterBehavior {
 	return &CycleEmitter{
 		next: e.next,
 	}

@@ -29,7 +29,7 @@ func (e *BangEmitter) ArmedOnStart() bool {
 }
 
 // Copy makes a copy of the behavior.
-func (e *BangEmitter) Copy() EmitterBehavior {
+func (e *BangEmitter) Copy() common.EmitterBehavior {
 	return &BangEmitter{}
 }
 

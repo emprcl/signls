@@ -23,11 +23,46 @@ type Node interface {
 	Color() string
 }
 
+// EmitterBehavior defines the behavior of different types of emitters.
+type EmitterBehavior interface {
+	// ArmedOnStart indicates if the emitter is armed when the grid starts.
+	ArmedOnStart() bool
+
+	// Copy makes a copy of the behavior.
+	Copy() EmitterBehavior
+
+	// EmitDirections determines which directions the emitter will emit signals
+	// based on its current direction, the incoming direction, and the pulse count.
+	EmitDirections(dir Direction, inDir Direction, pulse uint64) Direction
+
+	// ShouldPropagate indicates if triggers should be propagated to direct
+	// neighbors.
+	ShouldPropagate() bool
+
+	// Reset resets the behavior state.
+	Reset()
+
+	// Symbol returns a string representation of the emitter, potentially
+	// taking its direction into account for visualization.
+	Symbol(dir Direction) string
+
+	// Name returns the name of the emitter type.
+	Name() string
+
+	// Color returns the color code associated with the emitter.
+	Color() string
+}
+
 // Movable represents an interface for nodes that can move within the grid.
 // This could be implemented by any node that changes position over time.
 type Movable interface {
 	// MustMove checks if the node should move for the current pulse.
 	MustMove(pulse uint64) bool
+}
+
+type Behavioral interface {
+	Behavior() EmitterBehavior
+	SetBehavior(behavior EmitterBehavior)
 }
 
 type Tickable interface {
