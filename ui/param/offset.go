@@ -11,7 +11,7 @@ type Offset struct {
 }
 
 func (o Offset) Name() string {
-	return "offset"
+	return "off"
 }
 
 func (o Offset) Display() string {

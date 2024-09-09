@@ -16,7 +16,7 @@ type Probability struct {
 }
 
 func (p Probability) Name() string {
-	return "prob"
+	return "prb"
 }
 
 func (p Probability) Display() string {

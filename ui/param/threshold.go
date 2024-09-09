@@ -13,7 +13,7 @@ type Threshold struct {
 }
 
 func (t Threshold) Name() string {
-	return "thld"
+	return "thd"
 }
 
 func (t Threshold) Display() string {

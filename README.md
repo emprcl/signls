@@ -1,15 +1,6 @@
 # cykl
 :loop: a generative midi sequencer in the terminal
 
- - Represent port with quarter blocks characters
- - Each node can have 2 behaviors :
- 	- An emitter behavior
- 	- A trigger behavior
- 	- A moving behavior ?
-
-- can't represent 8 directions nicely in unicode on one character
- - focus on teleport and zone
-
 TODO:
  - add random note octave spread
  - add random based on perlin noise

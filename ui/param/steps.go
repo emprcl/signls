@@ -16,7 +16,7 @@ type Steps struct {
 }
 
 func (s Steps) Name() string {
-	return "steps"
+	return "stp"
 }
 
 func (s Steps) Display() string {

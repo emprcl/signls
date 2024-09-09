@@ -7,6 +7,12 @@ import (
 	"fmt"
 )
 
+const (
+	defaultSteps    = 16
+	defaultTriggers = 4
+	defaultOffset   = 0
+)
+
 type EuclidEmitter struct {
 	direction common.Direction
 	note      *music.Note
@@ -25,9 +31,9 @@ type EuclidEmitter struct {
 
 func NewEuclidEmitter(midi midi.Midi, direction common.Direction) *EuclidEmitter {
 	return &EuclidEmitter{
-		Steps:     4,
-		Triggers:  1,
-		Offset:    0,
+		Steps:     defaultSteps,
+		Triggers:  defaultTriggers,
+		Offset:    defaultOffset,
 		direction: direction,
 		note:      music.NewNote(midi),
 	}

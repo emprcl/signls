@@ -12,7 +12,7 @@ type Triggers struct {
 }
 
 func (t Triggers) Name() string {
-	return "trigs"
+	return "trg"
 }
 
 func (t Triggers) Display() string {
