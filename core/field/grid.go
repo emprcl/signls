@@ -184,9 +184,9 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	case "-":
 		g.nodes[y][x] = node.NewEuclidEmitter(g.midi, common.NONE)
 	case "è":
-		g.AddEmitter(node.NewPassEmitter(g.midi, common.NONE), x, y)
-	case "_":
 		g.AddEmitter(node.NewZoneEmitter(g.midi, common.NONE), x, y)
+	case "_":
+		g.AddEmitter(node.NewPassEmitter(g.midi, common.NONE), x, y)
 	case "ç":
 		g.nodes[y][x] = node.NewHoleEmitter(common.NONE, x, y)
 	}

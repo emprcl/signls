@@ -3,6 +3,8 @@ package music
 import (
 	"cykl/core/common"
 	"cykl/midi"
+	"math/rand"
+	"time"
 )
 
 // Constants defining default values for note properties and their limits.
@@ -12,11 +14,12 @@ const (
 	defaultVelocity uint8 = 100
 	defaultLength   uint8 = uint8(common.PulsesPerStep)
 
-	maxKey      Key   = 127
-	maxVelocity uint8 = 127
-	maxLength   uint8 = 127 // Maximum length of the note (127 is treated as infinity).
-	minLength   uint8 = 1
-	maxChannel  uint8 = 15
+	maxKey         Key   = 127
+	maxVelocity    uint8 = 127
+	maxLength      uint8 = 127 // Maximum length of the note (127 is treated as infinity).
+	minLength      uint8 = 1
+	maxChannel     uint8 = 15
+	maxProbability uint8 = 100
 )
 
 // Note represents a musical note with various properties such as key, velocity, and length.
@@ -26,11 +29,14 @@ type Note struct {
 
 	midi midi.Midi // Interface to interact with MIDI devices.
 
-	Key      Key   // The MIDI key (pitch) of the note.
-	Interval int   // Interval relative to a scale's root note.
-	Channel  uint8 // The MIDI channel on which the note is played.
-	Velocity uint8 // The velocity (volume) of the note.
-	Length   uint8 // The duration the note is held for.
+	rand *rand.Rand
+
+	Key         Key   // The MIDI key (pitch) of the note.
+	Interval    int   // Interval relative to a scale's root note.
+	Channel     uint8 // The MIDI channel on which the note is played.
+	Velocity    uint8 // The velocity (volume) of the note.
+	Length      uint8 // The duration the note is held for.
+	Probability uint8 // The probability of the note triggering.
 
 	nextKey   Key    // Next key to be played, used for transposition.
 	pulse     uint64 // Internal pulse counter to manage note length.
@@ -39,13 +45,16 @@ type Note struct {
 
 // NewNote initializes a new Note with default settings and the provided MIDI interface.
 func NewNote(midi midi.Midi) *Note {
+	source := rand.NewSource(time.Now().UnixNano())
 	return &Note{
-		Behavior: FixedNote{},
-		midi:     midi,
-		Channel:  defaultChannel,
-		Key:      defaultKey,
-		Velocity: defaultVelocity,
-		Length:   defaultLength,
+		Behavior:    FixedNote{},
+		midi:        midi,
+		rand:        rand.New(source),
+		Channel:     defaultChannel,
+		Key:         defaultKey,
+		Velocity:    defaultVelocity,
+		Length:      defaultLength,
+		Probability: maxProbability,
 	}
 }
 
@@ -85,7 +94,10 @@ func (n *Note) Transpose(root Key, scale Scale) {
 
 // Play triggers the note with a specific key and scale, resetting internal state.
 func (n *Note) Play(key Key, scale Scale) {
-	n.Behavior.Play(n, key, scale)
+	if n.Probability == maxProbability ||
+		uint8(rand.Int31n((100))) < n.Probability {
+		n.Behavior.Play(n, key, scale)
+	}
 	n.triggered = true
 	n.pulse = 0
 	n.nextKey = 0
