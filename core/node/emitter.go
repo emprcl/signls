@@ -47,6 +47,7 @@ type Emitter struct {
 	pulse     uint64 // The last pulse when the emitter was triggered.
 	armed     bool   // Whether the emitter is armed and ready to trigger.
 	triggered bool   // Whether the emitter has been triggered.
+	retrig    bool   // Whether the emitter is being retrigged a second time in a row.
 	muted     bool   // Whether the emitter is muted.
 }
 
@@ -110,10 +111,14 @@ func (e *Emitter) Trig(key music.Key, scale music.Scale, inDir common.Direction,
 	if !e.muted {
 		e.note.Play(key, scale)
 	}
+	if e.triggered {
+		e.retrig = true
+	} else {
+		e.pulse = pulse
+	}
 	e.incomingDirection = inDir
 	e.triggered = true
 	e.armed = false
-	e.pulse = pulse
 }
 
 // Emit returns the directions to emits for a given pulse.
@@ -121,7 +126,11 @@ func (e *Emitter) Emit(pulse uint64) []common.Direction {
 	if e.updated(pulse) || !e.triggered {
 		return []common.Direction{}
 	}
-	e.triggered = false
+	if e.retrig {
+		e.retrig = false
+	} else {
+		e.triggered = false
+	}
 	e.pulse = pulse
 	return e.behavior.EmitDirections(e.direction, e.incomingDirection, pulse).Decompose()
 }

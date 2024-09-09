@@ -351,7 +351,6 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 	} else if n, ok := g.nodes[newY][newX].(*node.Emitter); ok && n.Behavior().ShouldPropagate() {
 		g.PropagateZone(g.nodes[newY][newX].(*node.Emitter), direction, newX, newY)
 	} else if n, ok := g.nodes[newY][newX].(music.Audible); ok {
-		// TODO: fix continuous trigger
 		n.Arm()
 		n.Trig(g.Key, g.Scale, direction, g.pulse)
 	} else if n, ok := g.nodes[newY][newX].(*node.HoleEmitter); ok {
@@ -364,7 +363,6 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 	g.nodes[y][x] = nil
 }
 
-// TODO: accept music.Audible
 func (g *Grid) PropagateZone(e *node.Emitter, direction common.Direction, x, y int) {
 	if e == nil {
 		return
@@ -378,8 +376,11 @@ func (g *Grid) PropagateZone(e *node.Emitter, direction common.Direction, x, y i
 				newY < 0 || newY >= g.Height {
 				continue
 			}
-			if n, ok := g.nodes[newY][newX].(*node.Emitter); ok && !n.Activated() {
+			if n, ok := g.nodes[newY][newX].(*node.Emitter); ok && !n.Activated() && n.Behavior().ShouldPropagate() {
 				g.PropagateZone(n, direction, newX, newY)
+			} else if n, ok := g.nodes[newY][newX].(*node.Emitter); ok && !n.Activated() {
+				n.Arm()
+				n.Trig(g.Key, g.Scale, direction, g.pulse)
 			} else if n, ok := g.nodes[newY][newX].(*node.HoleEmitter); ok {
 				g.Teleport(n, node.NewSignal(direction, g.pulse), newX, newY)
 			}
