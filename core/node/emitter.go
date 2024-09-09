@@ -30,6 +30,7 @@ func (e *Emitter) Copy(dx, dy int) common.Node {
 		direction: e.direction,
 		armed:     e.armed,
 		note:      &newNote,
+		muted:     e.muted,
 	}
 }
 

@@ -45,6 +45,10 @@ func (e *EuclidEmitter) Copy(dx, dy int) common.Node {
 		direction: e.direction,
 		armed:     e.armed,
 		note:      &newNote,
+		muted:     e.muted,
+		Steps:     e.Steps,
+		Triggers:  e.Triggers,
+		Offset:    e.Offset,
 	}
 }
 
