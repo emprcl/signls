@@ -5,7 +5,6 @@ import (
 
 	"cykl/core/common"
 	"cykl/core/music"
-	"cykl/core/node"
 )
 
 const (
@@ -61,6 +60,6 @@ func (l Length) Right() {}
 
 func (l Length) Set(value int) {
 	for _, n := range l.nodes {
-		n.(*node.Emitter).Note().SetLength(uint8(value))
+		n.(music.Audible).Note().SetLength(uint8(value))
 	}
 }
