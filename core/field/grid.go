@@ -242,8 +242,8 @@ func (g *Grid) Update() {
 		g.Tick()
 		return
 	}
-	for y := 0; y < g.Height; y++ {
-		for x := 0; x < g.Width; x++ {
+	for y := g.Height - 1; y >= 0; y-- {
+		for x := g.Width - 1; x >= 0; x-- {
 			if g.nodes[y][x] == nil {
 				continue
 			}
@@ -356,7 +356,6 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 	} else if n, ok := g.nodes[newY][newX].(*node.HoleEmitter); ok {
 		g.Teleport(n, g.nodes[y][x], newX, newY)
 	} else if n, ok := g.nodes[newY][newX].(*node.Signal); ok {
-		// TODO: only force move when same direction
 		g.Move(n, newX, newY)
 		g.nodes[newY][newX] = g.nodes[y][x]
 	}
