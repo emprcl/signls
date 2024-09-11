@@ -125,7 +125,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 	return keyMap{
 		Play: key.NewBinding(
 			key.WithKeys(keys.Play),
-			key.WithHelp(keys.Play, "toggle play"),
+			key.WithHelp("space", "toggle play"),
 		),
 		Up: key.NewBinding(
 			key.WithKeys(keys.Up),
@@ -177,39 +177,39 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		AddBang: key.NewBinding(
 			key.WithKeys(keys.AddBang),
-			key.WithHelp(keys.AddBang, "add bang emitter: emits at startup in all directions"),
+			key.WithHelp(keys.AddBang, "add bang emitter"),
 		),
 		AddSpread: key.NewBinding(
 			key.WithKeys(keys.AddSpread),
-			key.WithHelp(keys.AddSpread, "add spread emitter: emits in all directions"),
+			key.WithHelp(keys.AddSpread, "add spread emitter"),
 		),
 		AddCycle: key.NewBinding(
 			key.WithKeys(keys.AddCycle),
-			key.WithHelp(keys.AddCycle, "add cycle emitter: emits in one direction after another, clockwise"),
+			key.WithHelp(keys.AddCycle, "add cycle emitter"),
 		),
 		AddDice: key.NewBinding(
 			key.WithKeys(keys.AddDice),
-			key.WithHelp(keys.AddDice, "add dice emitter: emits in one random direction"),
+			key.WithHelp(keys.AddDice, "add dice emitter"),
 		),
 		AddQuota: key.NewBinding(
 			key.WithKeys(keys.AddQuota),
-			key.WithHelp(keys.AddQuota, "add quota emitter: emits in all directions after x triggers"),
+			key.WithHelp(keys.AddQuota, "add quota emitter"),
 		),
 		AddEuclid: key.NewBinding(
 			key.WithKeys(keys.AddEuclid),
-			key.WithHelp(keys.AddEuclid, "add euclid emitter: emits in all directions periodically"),
+			key.WithHelp(keys.AddEuclid, "add euclid emitter"),
 		),
 		AddZone: key.NewBinding(
 			key.WithKeys(keys.AddZone),
-			key.WithHelp(keys.AddZone, "add zone emitter: emits in all directions, and triggers every emitters nearby at the same time."),
+			key.WithHelp(keys.AddZone, "add zone emitter"),
 		),
 		AddPass: key.NewBinding(
 			key.WithKeys(keys.AddPass),
-			key.WithHelp(keys.AddPass, "add pass emitter: emits in the opposite direction"),
+			key.WithHelp(keys.AddPass, "add pass emitter"),
 		),
 		AddHole: key.NewBinding(
 			key.WithKeys(keys.AddHole),
-			key.WithHelp(keys.AddHole, "add pass emitter: teleport incoming signal to a specific location"),
+			key.WithHelp(keys.AddHole, "add pass emitter"),
 		),
 		Copy: key.NewBinding(
 			key.WithKeys(keys.Copy),

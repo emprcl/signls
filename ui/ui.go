@@ -9,6 +9,7 @@ import (
 	"cykl/filesystem"
 	"cykl/ui/param"
 
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -33,6 +34,7 @@ type blinkMsg time.Time
 type mainModel struct {
 	grid       *field.Grid
 	keymap     keyMap
+	help       help.Model
 	params     []param.Param
 	gridParams []param.Param
 	cursorX    int
@@ -53,6 +55,7 @@ func New(config filesystem.Configuration, grid *field.Grid) tea.Model {
 	model := mainModel{
 		grid:       grid,
 		keymap:     newKeyMap(config.KeyMap),
+		help:       help.New(),
 		gridParams: param.NewParamsForGrid(grid),
 		cursorX:    1,
 		cursorY:    1,
@@ -82,9 +85,10 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 
 	case tea.WindowSizeMsg:
+		m.help.Width = msg.Width
 		m.width = msg.Width
 		m.height = msg.Height
-		m.grid.Resize(m.width/2, m.height-controlsHeight)
+		m.grid.Resize(m.width/2, m.height-controlsHeight-1)
 		if m.cursorX > m.grid.Width-1 {
 			m.cursorX = m.grid.Width - 1
 		}
@@ -224,6 +228,9 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.selectionX = m.cursorX
 			m.selectionY = m.cursorY
 			return m, nil
+		case key.Matches(msg, m.keymap.Help):
+			m.help.ShowAll = !m.help.ShowAll
+			return m, tea.ClearScreen
 		case key.Matches(msg, m.keymap.Quit):
 			m.grid.Reset()
 			return m, tea.Quit
@@ -239,16 +246,21 @@ func (m mainModel) View() string {
 		m.renderGrid(),
 	)
 
+	help := lipgloss.NewStyle().
+		MarginLeft(2).
+		Render(m.help.View(m.keymap))
+
 	// Cleanup gibber
 	cleanup := lipgloss.NewStyle().
 		Width(m.width).
-		Height(m.height - lipgloss.Height(mainView)).
+		Height(m.height - lipgloss.Height(mainView) - lipgloss.Height(help)).
 		Render("")
 
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		mainView,
 		cleanup,
+		help,
 	)
 }
 
