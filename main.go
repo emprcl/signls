@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"cykl/core/field"
+	"cykl/filesystem"
 	"cykl/midi"
 	"cykl/ui"
 
@@ -12,8 +13,12 @@ import (
 )
 
 func main() {
+	configFile := flag.String("config", "config.json", "config file to load or create")
+	keyboard := flag.String("keyboard", "", "keyboard layout (qwerty, qwerty-mac, azerty, azerty-mac)")
 	debug := flag.Bool("debug", false, "enable debug mode")
 	flag.Parse()
+
+	config := filesystem.NewConfiguration(*configFile, *keyboard)
 
 	midi, err := midi.New()
 	if err != nil {
@@ -31,7 +36,7 @@ func main() {
 		defer f.Close()
 	}
 
-	p := tea.NewProgram(ui.New(grid))
+	p := tea.NewProgram(ui.New(config, grid))
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
 	}

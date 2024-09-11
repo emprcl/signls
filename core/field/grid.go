@@ -171,31 +171,33 @@ func (g *Grid) Node(x, y int) common.Node {
 // AddNodeFromSymbol adds a node to the grid based on a given symbol.
 func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	switch symbol {
-	case "&":
-		g.AddEmitter(node.NewBangEmitter(g.midi, common.NONE, !g.Playing), x, y)
-	case "é":
-		g.AddEmitter(node.NewSpreadEmitter(g.midi, common.NONE), x, y)
-	case "\"":
-		g.AddEmitter(node.NewCycleEmitter(g.midi, common.NONE), x, y)
-	case "'":
-		g.AddEmitter(node.NewDiceEmitter(g.midi, common.NONE), x, y)
-	case "(":
-		g.AddEmitter(node.NewQuotaEmitter(g.midi, common.NONE), x, y)
-	case "-":
-		g.nodes[y][x] = node.NewEuclidEmitter(g.midi, common.NONE)
-	case "è":
-		g.AddEmitter(node.NewZoneEmitter(g.midi, common.NONE), x, y)
-	case "_":
-		g.AddEmitter(node.NewPassEmitter(g.midi, common.NONE), x, y)
-	case "ç":
-		g.nodes[y][x] = node.NewHoleEmitter(common.NONE, x, y)
+	case "b":
+		g.AddNode(node.NewBangEmitter(g.midi, common.NONE, !g.Playing), x, y)
+	case "s":
+		g.AddNode(node.NewSpreadEmitter(g.midi, common.NONE), x, y)
+	case "c":
+		g.AddNode(node.NewCycleEmitter(g.midi, common.NONE), x, y)
+	case "d":
+		g.AddNode(node.NewDiceEmitter(g.midi, common.NONE), x, y)
+	case "q":
+		g.AddNode(node.NewQuotaEmitter(g.midi, common.NONE), x, y)
+	case "e":
+		g.AddNode(node.NewEuclidEmitter(g.midi, common.NONE), x, y)
+	case "z":
+		g.AddNode(node.NewZoneEmitter(g.midi, common.NONE), x, y)
+	case "p":
+		g.AddNode(node.NewPassEmitter(g.midi, common.NONE), x, y)
+	case "h":
+		g.AddNode(node.NewHoleEmitter(common.NONE, x, y), x, y)
 	}
 }
 
-// AddEmitter adds an emitter to the grid at the specified coordinates.
-func (g *Grid) AddEmitter(e *node.Emitter, x, y int) {
-	if n, ok := g.nodes[y][x].(common.Behavioral); g.nodes[y][x] != nil && ok {
-		n.SetBehavior(e.Behavior())
+// AddNode adds a node to the grid at the specified coordinates.
+func (g *Grid) AddNode(e common.Node, x, y int) {
+	destinationNode, isDestBehavior := g.nodes[y][x].(common.Behavioral)
+	newNode, isNewBehavior := e.(common.Behavioral)
+	if isDestBehavior && isNewBehavior {
+		destinationNode.SetBehavior(newNode.Behavior())
 		return
 	}
 	g.nodes[y][x] = e

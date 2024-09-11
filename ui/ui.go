@@ -1,14 +1,15 @@
 package ui
 
 import (
-	"strings"
 	"time"
 
 	"cykl/core/common"
 	"cykl/core/field"
 	"cykl/core/node"
+	"cykl/filesystem"
 	"cykl/ui/param"
 
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -31,6 +32,7 @@ type blinkMsg time.Time
 
 type mainModel struct {
 	grid       *field.Grid
+	keymap     keyMap
 	params     []param.Param
 	gridParams []param.Param
 	cursorX    int
@@ -47,9 +49,10 @@ type mainModel struct {
 
 // New creates a new mainModel that hols the ui state. It takes a new grid.
 // Check the core package.
-func New(grid *field.Grid) tea.Model {
+func New(config filesystem.Configuration, grid *field.Grid) tea.Model {
 	model := mainModel{
 		grid:       grid,
+		keymap:     newKeyMap(config.KeyMap),
 		gridParams: param.NewParamsForGrid(grid),
 		cursorX:    1,
 		cursorY:    1,
@@ -98,66 +101,62 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, blink()
 
 	case tea.KeyMsg:
-		switch msg.String() {
-		case " ":
+		switch {
+		case key.Matches(msg, m.keymap.Play):
 			m.grid.TogglePlay()
 			return m, nil
-		case "tab":
+		case key.Matches(msg, m.keymap.Up, m.keymap.Right, m.keymap.Down, m.keymap.Left):
+			dir := m.keymap.Direction(msg)
 			if m.edit {
-				m.moveParam(msg)
-			}
-			return m, nil
-		case "up", "right", "down", "left":
-			if m.edit {
-				m.moveParam(msg)
+				m.moveParam(dir)
 				return m, nil
 			}
 			m.blink = true
 			m.cursorX, m.cursorY = moveCursor(
-				msg.String(), 1, m.cursorX, m.cursorY,
+				dir, 1, m.cursorX, m.cursorY,
 				0, m.grid.Width-1, 0, m.grid.Height-1,
 			)
-			m.selectionX, m.selectionY = moveCursor(
-				msg.String(), 1, m.selectionX, m.selectionY,
-				m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
-			)
-			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
-			return m, nil
-		case "shift+up", "shift+right", "shift+down", "shift+left":
-			if m.edit {
-				return m, nil
-			}
-			dir := strings.Replace(msg.String(), "shift+", "", 1)
 			m.selectionX, m.selectionY = moveCursor(
 				dir, 1, m.selectionX, m.selectionY,
 				m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
 			)
 			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			return m, nil
-		case "ctrl+up", "ctrl+right", "ctrl+down", "ctrl+left":
-			dir := strings.Replace(msg.String(), "ctrl+", "", 1)
+		case key.Matches(msg, m.keymap.SelectionUp, m.keymap.SelectionRight, m.keymap.SelectionDown, m.keymap.SelectionLeft):
+			if m.edit {
+				return m, nil
+			}
+			dir := m.keymap.Direction(msg)
+			m.selectionX, m.selectionY = moveCursor(
+				dir, 1, m.selectionX, m.selectionY,
+				m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
+			)
+			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
+			return m, nil
+		case key.Matches(msg, m.keymap.EditUp, m.keymap.EditRight, m.keymap.EditDown, m.keymap.EditLeft):
+			dir := m.keymap.Direction(msg)
 			if !m.edit {
 				param.NewDirection(m.selectedEmitters()).SetFromKeyString(dir)
 				return m, nil
 			}
 			m.handleParamEdit(dir)
 			return m, nil
-		case "&", "é", "\"", "'", "(", "-", "è", "_", "ç":
-			m.grid.AddNodeFromSymbol(msg.String(), m.cursorX, m.cursorY)
+		case key.Matches(msg, m.keymap.AddBang, m.keymap.AddSpread, m.keymap.AddCycle, m.keymap.AddDice, m.keymap.AddQuota, m.keymap.AddEuclid, m.keymap.AddZone, m.keymap.AddPass, m.keymap.AddHole):
+			m.grid.AddNodeFromSymbol(m.keymap.EmitterSymbol(msg), m.cursorX, m.cursorY)
 			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			return m, nil
-		case "m":
+		case key.Matches(msg, m.keymap.MuteNode):
 			m.grid.ToggleNodeMutes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			return m, nil
-		case "M":
+		case key.Matches(msg, m.keymap.MuteAllNode):
 			m.grid.SetAllNodeMutes(!m.mute)
 			m.mute = !m.mute
 			return m, nil
-		case "backspace":
+		case key.Matches(msg, m.keymap.RemoveNode):
 			m.edit = false
 			m.grid.RemoveNodes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			return m, nil
-		case "enter":
+		case key.Matches(msg, m.keymap.EditNode):
 			if len(m.selectedEmitters()) == 0 {
 				return m, nil
 			}
@@ -166,7 +165,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.edit = !m.edit
 			return m, nil
-		case "!":
+		case key.Matches(msg, m.keymap.TriggerNode):
 			if !m.grid.Playing {
 				return m, nil
 			}
@@ -176,59 +175,56 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.selectedNode().(*node.Emitter).Arm()
 			m.selectedNode().(*node.Emitter).Trig(m.grid.Key, m.grid.Scale, common.NONE, m.grid.Pulse())
 			return m, nil
-		case "*":
+		case key.Matches(msg, m.keymap.RootNoteUp):
 			if m.edit {
 				return m, nil
 			}
 			param.Get("root", m.gridParams).Increment()
 			return m, nil
-		case "ù":
+		case key.Matches(msg, m.keymap.RootNoteDown):
 			if m.edit {
 				return m, nil
 			}
 			param.Get("root", m.gridParams).Decrement()
 			return m, nil
-		case "µ":
+		case key.Matches(msg, m.keymap.ScaleUp):
 			if m.edit {
 				return m, nil
 			}
 			param.Get("scale", m.gridParams).Increment()
 			return m, nil
-		case "%":
+		case key.Matches(msg, m.keymap.ScaleDown):
 			if m.edit {
 				return m, nil
 			}
 			param.Get("scale", m.gridParams).Decrement()
 			return m, nil
-		case "=":
+		case key.Matches(msg, m.keymap.TempoUp):
 			m.grid.SetTempo(m.grid.Tempo() + 1)
 			return m, nil
-		case ")":
+		case key.Matches(msg, m.keymap.TempoDown):
 			m.grid.SetTempo(m.grid.Tempo() - 1)
 			return m, nil
-		case "f2":
+		case key.Matches(msg, m.keymap.SelectMidiDevice):
 			m.grid.CycleMidiDevice()
 			return m, nil
-		case "ctrl+c":
+		case key.Matches(msg, m.keymap.Copy):
 			m.grid.CopyOrCut(m.cursorX, m.cursorY, m.selectionX, m.selectionY, false)
 			return m, nil
-		case "ctrl+x":
+		case key.Matches(msg, m.keymap.Cut):
 			m.grid.CopyOrCut(m.cursorX, m.cursorY, m.selectionX, m.selectionY, true)
 			return m, nil
-		case "ctrl+v":
+		case key.Matches(msg, m.keymap.Paste):
 			m.grid.Paste(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			return m, nil
-		case "esc":
+		case key.Matches(msg, m.keymap.Cancel):
 			m.edit = false
 			m.param = 0
 			m.selectionX = m.cursorX
 			m.selectionY = m.cursorY
 			return m, nil
-		case "n":
-			m.grid.Update()
-			return m, nil
-		case "q":
+		case key.Matches(msg, m.keymap.Quit):
 			m.grid.Reset()
 			return m, tea.Quit
 		}
@@ -256,18 +252,18 @@ func (m mainModel) View() string {
 	)
 }
 
-func (m mainModel) handleParamEdit(key string) {
+func (m mainModel) handleParamEdit(dir string) {
 	if len(m.params) < m.param+1 {
 		return
 	}
 
 	switch p := m.params[m.param].(type) {
 	case param.Direction:
-		p.SetFromKeyString(key)
+		p.SetFromKeyString(dir)
 		return
 	}
 
-	switch key {
+	switch dir {
 	case "up":
 		m.params[m.param].Increment()
 	case "down":
@@ -300,11 +296,11 @@ func (m mainModel) renderGrid() string {
 	return lipgloss.JoinVertical(lipgloss.Left, lines...)
 }
 
-func (m *mainModel) moveParam(msg tea.KeyMsg) {
+func (m *mainModel) moveParam(dir string) {
 	if len(m.params) == 0 {
 		return
 	}
-	switch msg.String() {
+	switch dir {
 	case "right":
 		if m.param+1 >= len(m.params) {
 			return
@@ -315,8 +311,6 @@ func (m *mainModel) moveParam(msg tea.KeyMsg) {
 			return
 		}
 		m.param--
-	case "tab":
-		m.param = (m.param + 1) % len(m.params)
 	}
 }
 
