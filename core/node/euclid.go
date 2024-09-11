@@ -61,7 +61,7 @@ func (e *EuclidEmitter) Note() *music.Note {
 }
 
 func (e *EuclidEmitter) Arm() {
-	e.armed = false
+	e.armed = true
 }
 
 func (e *EuclidEmitter) SetMute(mute bool) {
