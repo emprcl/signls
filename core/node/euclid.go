@@ -26,6 +26,7 @@ type EuclidEmitter struct {
 	pulse     uint64
 	armed     bool
 	triggered bool
+	updated   bool
 	muted     bool
 }
 
@@ -81,11 +82,13 @@ func (e *EuclidEmitter) Trig(key music.Key, scale music.Scale, inDir common.Dire
 		e.note.Play(key, scale)
 	}
 	e.triggered = true
+	e.updated = true
 	e.armed = false
 }
 
 func (e *EuclidEmitter) Emit(pulse uint64) []common.Direction {
-	if !e.triggered {
+	if !e.triggered || e.updated {
+		e.updated = false
 		return []common.Direction{}
 	}
 	e.triggered = false
