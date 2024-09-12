@@ -23,11 +23,11 @@ type EuclidEmitter struct {
 
 	step int
 
-	pulse     uint64
-	armed     bool
-	triggered bool
-	updated   bool
-	muted     bool
+	pulse      uint64
+	armed      bool
+	triggered  bool
+	hasTrigged bool
+	muted      bool
 }
 
 func NewEuclidEmitter(midi midi.Midi, direction common.Direction) *EuclidEmitter {
@@ -54,7 +54,7 @@ func (e *EuclidEmitter) Copy(dx, dy int) common.Node {
 }
 
 func (e *EuclidEmitter) Activated() bool {
-	return e.armed || e.triggered
+	return e.hasTrigged
 }
 
 func (e *EuclidEmitter) Note() *music.Note {
@@ -82,13 +82,11 @@ func (e *EuclidEmitter) Trig(key music.Key, scale music.Scale, inDir common.Dire
 		e.note.Play(key, scale)
 	}
 	e.triggered = true
-	e.updated = true
 	e.armed = false
 }
 
 func (e *EuclidEmitter) Emit(pulse uint64) []common.Direction {
-	if !e.triggered || e.updated {
-		e.updated = false
+	if !e.triggered {
 		return []common.Direction{}
 	}
 	e.triggered = false
@@ -107,7 +105,11 @@ func (e *EuclidEmitter) patternTrigger() {
 	}
 	pattern := generateEuclideanPattern(e.Steps, e.Triggers)
 	adjusetedStep := (e.step + e.Offset) % e.Steps
+	if e.hasTrigged {
+		e.hasTrigged = false
+	}
 	if pattern[adjusetedStep] {
+		e.hasTrigged = true
 		e.armed = true
 	}
 	e.step = (e.step + 1) % e.Steps
