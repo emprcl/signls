@@ -54,6 +54,7 @@ type keyMap struct {
 	TempoDown    key.Binding
 
 	SelectMidiDevice key.Binding
+	FitGridToWindow  key.Binding
 
 	Cancel key.Binding
 
@@ -74,7 +75,7 @@ func (k keyMap) FullHelp() [][]key.Binding {
 		{k.AddBang, k.AddSpread, k.AddCycle, k.AddDice, k.AddQuota, k.AddEuclid, k.AddZone, k.AddPass, k.AddHole},
 		{k.Up, k.Right, k.Down, k.Left, k.SelectionUp, k.SelectionRight, k.SelectionDown, k.SelectionLeft, k.EditUp, k.EditRight, k.EditDown, k.EditLeft},
 		{k.Play, k.EditNode, k.RemoveNode, k.TriggerNode, k.MuteNode, k.MuteAllNode, k.Copy, k.Cut, k.Paste},
-		{k.RootNoteUp, k.RootNoteDown, k.ScaleUp, k.ScaleDown, k.Cancel, k.Help, k.Quit},
+		{k.RootNoteUp, k.RootNoteDown, k.ScaleUp, k.ScaleDown, k.Cancel, k.SelectMidiDevice, k.FitGridToWindow, k.Help, k.Quit},
 	}
 }
 
@@ -270,6 +271,10 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		SelectMidiDevice: key.NewBinding(
 			key.WithKeys(keys.SelectMidiDevice),
 			key.WithHelp(keys.SelectMidiDevice, "select midi device"),
+		),
+		FitGridToWindow: key.NewBinding(
+			key.WithKeys(keys.FitGridToWindow),
+			key.WithHelp(keys.FitGridToWindow, "fit grid to window"),
 		),
 		Cancel: key.NewBinding(
 			key.WithKeys(keys.Cancel),

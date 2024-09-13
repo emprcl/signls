@@ -26,7 +26,7 @@ func main() {
 	}
 	defer midi.Close()
 
-	grid := field.NewGrid(45, 25, midi)
+	grid := field.NewGrid(2, 2, midi)
 
 	if *debug {
 		f, err := tea.LogToFile("debug.log", "debug")

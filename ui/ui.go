@@ -33,6 +33,7 @@ type blinkMsg time.Time
 
 type mainModel struct {
 	grid       *field.Grid
+	viewport   Viewport
 	keymap     keyMap
 	help       help.Model
 	params     []param.Param
@@ -41,8 +42,6 @@ type mainModel struct {
 	cursorY    int
 	selectionX int
 	selectionY int
-	width      int
-	height     int
 	param      int
 	edit       bool
 	blink      bool
@@ -86,9 +85,12 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.WindowSizeMsg:
 		m.help.Width = msg.Width
-		m.width = msg.Width
-		m.height = msg.Height
-		m.grid.Resize(m.width/2, m.height-controlsHeight-1)
+		m.viewport.Width = msg.Width / 2
+		m.viewport.Height = msg.Height - controlsHeight - 1
+		if m.viewport.Width > m.grid.Width || m.viewport.Height > m.grid.Height {
+			m.grid.Resize(m.viewport.Width, m.viewport.Height)
+		}
+		m.viewport.Update(m.cursorX, m.cursorY, m.grid.Width, m.grid.Height)
 		if m.cursorX > m.grid.Width-1 {
 			m.cursorX = m.grid.Width - 1
 		}
@@ -125,6 +127,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
 			)
 			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
+			m.viewport.Update(m.cursorX, m.cursorY, m.grid.Width, m.grid.Height)
 			return m, nil
 		case key.Matches(msg, m.keymap.SelectionUp, m.keymap.SelectionRight, m.keymap.SelectionDown, m.keymap.SelectionLeft):
 			if m.edit {
@@ -228,6 +231,12 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.selectionX = m.cursorX
 			m.selectionY = m.cursorY
 			return m, nil
+		case key.Matches(msg, m.keymap.FitGridToWindow):
+			m.cursorX, m.cursorY = 1, 1
+			m.selectionX, m.selectionY = m.cursorX, m.cursorY
+			m.grid.Resize(m.viewport.Width, m.viewport.Height)
+			m.viewport.Update(m.cursorX, m.cursorY, m.grid.Width, m.grid.Height)
+			return m, nil
 		case key.Matches(msg, m.keymap.Help):
 			m.help.ShowAll = !m.help.ShowAll
 			return m, tea.ClearScreen
@@ -252,8 +261,8 @@ func (m mainModel) View() string {
 
 	// Cleanup gibber
 	cleanup := lipgloss.NewStyle().
-		Width(m.width).
-		Height(m.height - lipgloss.Height(mainView) - lipgloss.Height(help)).
+		Width(m.viewport.Width).
+		Height(m.viewport.Height - lipgloss.Height(mainView) - lipgloss.Height(help)).
 		Render("")
 
 	return lipgloss.JoinVertical(
@@ -297,10 +306,10 @@ func (m mainModel) handleParamEdit(dir string) {
 
 func (m mainModel) renderGrid() string {
 	var lines []string
-	for y, line := range m.grid.Nodes() {
+	for y := m.viewport.offsetY; y < m.viewport.offsetY+m.viewport.Height; y++ {
 		var nodes []string
-		for x, node := range line {
-			nodes = append(nodes, m.renderNode(node, x, y))
+		for x := m.viewport.offsetX; x < m.viewport.offsetX+m.viewport.Width; x++ {
+			nodes = append(nodes, m.renderNode(m.grid.Nodes()[y][x], x, y))
 		}
 		lines = append(lines, lipgloss.JoinHorizontal(lipgloss.Left, nodes...))
 	}

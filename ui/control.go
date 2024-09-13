@@ -48,7 +48,7 @@ func (m mainModel) gridInfo() string {
 		lipgloss.JoinVertical(
 			lipgloss.Left,
 			cellStyle.Render(fmt.Sprintf("%d,%d", m.cursorX, m.cursorY)),
-			cellStyle.Render(fmt.Sprintf("%d,%d", m.grid.Width, m.grid.Height)),
+			cellStyle.Render(fmt.Sprintf("%d,%d", m.grid.Width-1, m.grid.Height-1)),
 		),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
