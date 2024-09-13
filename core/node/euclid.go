@@ -103,6 +103,7 @@ func (e *EuclidEmitter) patternTrigger() {
 	if e.pulse%uint64(common.PulsesPerStep) != 0 {
 		return
 	}
+	// TODO: fix euclid not triggering right away at startup
 	pattern := generateEuclideanPattern(e.Steps, e.Triggers)
 	adjusetedStep := (e.step + e.Offset) % e.Steps
 	if e.hasTrigged {
