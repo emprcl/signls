@@ -16,9 +16,6 @@ TODO:
  - add toml configuration
  - add file system
 
-Unsure:
- - signals with different speeds
-
 Names:
   - Nyll
   - KYVL

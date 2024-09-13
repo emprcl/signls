@@ -33,7 +33,7 @@ type blinkMsg time.Time
 
 type mainModel struct {
 	grid       *field.Grid
-	viewport   Viewport
+	viewport   viewport
 	keymap     keyMap
 	help       help.Model
 	params     []param.Param

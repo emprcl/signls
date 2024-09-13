@@ -1,11 +1,11 @@
 package ui
 
-type Viewport struct {
+type viewport struct {
 	offsetX, offsetY int
 	Width, Height    int
 }
 
-func (v *Viewport) Update(cursorX, cursorY, gridWidth, gridHeight int) {
+func (v *viewport) Update(cursorX, cursorY, gridWidth, gridHeight int) {
 	if cursorX < v.offsetX {
 		v.offsetX = cursorX
 	} else if cursorX >= v.offsetX+v.Width {
