@@ -23,11 +23,11 @@ type EuclidEmitter struct {
 
 	step int
 
-	pulse      uint64
-	armed      bool
-	triggered  bool
-	hasTrigged bool
-	muted      bool
+	pulse     uint64
+	armed     bool
+	triggered bool
+	activated bool
+	muted     bool
 }
 
 func NewEuclidEmitter(midi midi.Midi, direction common.Direction) *EuclidEmitter {
@@ -54,7 +54,7 @@ func (e *EuclidEmitter) Copy(dx, dy int) common.Node {
 }
 
 func (e *EuclidEmitter) Activated() bool {
-	return e.hasTrigged
+	return e.activated
 }
 
 func (e *EuclidEmitter) Note() *music.Note {
@@ -106,11 +106,11 @@ func (e *EuclidEmitter) patternTrigger() {
 	// TODO: fix euclid not triggering right away at startup
 	pattern := generateEuclideanPattern(e.Steps, e.Triggers)
 	adjusetedStep := (e.step + e.Offset) % e.Steps
-	if e.hasTrigged {
-		e.hasTrigged = false
+	if e.activated {
+		e.activated = false
 	}
 	if pattern[adjusetedStep] {
-		e.hasTrigged = true
+		e.activated = true
 		e.armed = true
 	}
 	e.step = (e.step + 1) % e.Steps
@@ -119,7 +119,8 @@ func (e *EuclidEmitter) patternTrigger() {
 func generateEuclideanPattern(steps, triggers int) []bool {
 	pattern := make([]bool, steps)
 	bucket := 0
-	for i := 0; i < steps; i++ {
+	pattern[0] = true
+	for i := 1; i < steps; i++ {
 		bucket += triggers
 		if bucket >= steps {
 			bucket -= steps
