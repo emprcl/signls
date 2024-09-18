@@ -24,9 +24,10 @@ type EuclidEmitter struct {
 	step int
 
 	pulse     uint64
+	ticks     uint64
 	armed     bool
 	triggered bool
-	activated bool
+	retrig    bool
 	muted     bool
 }
 
@@ -36,6 +37,7 @@ func NewEuclidEmitter(midi midi.Midi, direction common.Direction) *EuclidEmitter
 		Triggers:  defaultTriggers,
 		Offset:    defaultOffset,
 		direction: direction,
+		armed:     true,
 		note:      music.NewNote(midi),
 	}
 }
@@ -54,7 +56,7 @@ func (e *EuclidEmitter) Copy(dx, dy int) common.Node {
 }
 
 func (e *EuclidEmitter) Activated() bool {
-	return e.activated
+	return e.armed || e.triggered
 }
 
 func (e *EuclidEmitter) Note() *music.Note {
@@ -81,36 +83,41 @@ func (e *EuclidEmitter) Trig(key music.Key, scale music.Scale, inDir common.Dire
 	if !e.muted {
 		e.note.Play(key, scale)
 	}
+	if e.triggered {
+		e.retrig = true
+	} else {
+		e.pulse = pulse
+	}
 	e.triggered = true
 	e.armed = false
 }
 
 func (e *EuclidEmitter) Emit(pulse uint64) []common.Direction {
-	if !e.triggered {
+	if e.updated(pulse) || !e.triggered {
 		return []common.Direction{}
 	}
-	e.triggered = false
+	if e.retrig {
+		e.retrig = false
+	} else {
+		e.triggered = false
+	}
+	e.pulse = pulse
 	return e.direction.Decompose()
 }
 
 func (e *EuclidEmitter) Tick() {
 	e.patternTrigger()
 	e.note.Tick()
-	e.pulse++
+	e.ticks++
 }
 
 func (e *EuclidEmitter) patternTrigger() {
-	if e.pulse%uint64(common.PulsesPerStep) != 0 {
+	if e.ticks%uint64(common.PulsesPerStep) != 0 {
 		return
 	}
-	// TODO: fix euclid not triggering right away at startup
 	pattern := generateEuclideanPattern(e.Steps, e.Triggers)
 	adjusetedStep := (e.step + e.Offset) % e.Steps
-	if e.activated {
-		e.activated = false
-	}
 	if pattern[adjusetedStep] {
-		e.activated = true
 		e.armed = true
 	}
 	e.step = (e.step + 1) % e.Steps
@@ -158,8 +165,15 @@ func (e *EuclidEmitter) Color() string {
 
 func (e *EuclidEmitter) Reset() {
 	e.pulse = 0
+	e.ticks = 0
 	e.triggered = false
 	e.armed = false
+	e.retrig = false
 	e.step = 0
 	e.Note().Stop()
+}
+
+// updated checks if the emitter was updated on the given pulse.
+func (e *EuclidEmitter) updated(pulse uint64) bool {
+	return e.pulse == pulse
 }
