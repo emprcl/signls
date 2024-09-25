@@ -1,8 +1,6 @@
 package node
 
 import (
-	"fmt"
-
 	"cykl/core/common"
 	"cykl/core/music"
 	"cykl/midi"
@@ -53,8 +51,8 @@ func (e *CycleEmitter) Copy() common.EmitterBehavior {
 }
 
 // Symbol returns the visual representation of the emitter on the grid.
-func (e *CycleEmitter) Symbol(dir common.Direction) string {
-	return fmt.Sprintf("%s%s", "C", dir.Symbol())
+func (e *CycleEmitter) Symbol() string {
+	return "C"
 }
 
 // Name returns the name of this emitter behavior.

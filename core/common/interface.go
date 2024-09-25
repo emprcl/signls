@@ -42,9 +42,8 @@ type EmitterBehavior interface {
 	// Reset resets the behavior state.
 	Reset()
 
-	// Symbol returns a string representation of the emitter, potentially
-	// taking its direction into account for visualization.
-	Symbol(dir Direction) string
+	// Symbol returns a string representation of the emitter
+	Symbol() string
 
 	// Name returns the name of the emitter type.
 	Name() string

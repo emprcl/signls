@@ -3,6 +3,8 @@ package node
 import (
 	"cykl/core/common"
 	"cykl/core/music"
+	"fmt"
+	"unicode/utf8"
 )
 
 // Emitter represents a node that emits signals when triggered. It contains
@@ -127,7 +129,14 @@ func (e *Emitter) SetDirection(dir common.Direction) {
 
 // Symbol returns a string representation of the emitter, typically used for visualization.
 func (e *Emitter) Symbol() string {
-	return e.behavior.Symbol(e.direction)
+	symbol := e.behavior.Symbol()
+	if utf8.RuneCountInString(symbol) >= 2 {
+		return fmt.Sprintf("%.2s", symbol)
+	}
+	if e.note == nil {
+		return fmt.Sprintf("%s%s", symbol, e.direction.Symbol())
+	}
+	return fmt.Sprintf("%s%s%s", symbol, e.note.Behavior.Symbol(), e.direction.Symbol())
 }
 
 // Name returns the name of the emitter type.

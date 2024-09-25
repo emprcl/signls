@@ -1,8 +1,6 @@
 package node
 
 import (
-	"fmt"
-
 	"cykl/core/common"
 	"cykl/core/music"
 	"cykl/midi"
@@ -44,8 +42,8 @@ func (e *RelayEmitter) Copy() common.EmitterBehavior {
 }
 
 // Symbol returns a string representation of the emitter's symbol.
-func (e *RelayEmitter) Symbol(dir common.Direction) string {
-	return fmt.Sprintf("%s%s", "R", dir.Symbol())
+func (e *RelayEmitter) Symbol() string {
+	return "R"
 }
 
 // Name returns the name of the emitter.
