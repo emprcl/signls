@@ -153,7 +153,7 @@ func (g *Grid) Paste(startX, startY, endX, endY int) {
 			if _, ok := g.clipboard[y][x].(common.Copyable); !ok {
 				continue
 			}
-			g.nodes[startY+y][startX+x] = g.clipboard[y][x].(common.Copyable).Copy(startX, startY)
+			g.nodes[startY+y][startX+x] = g.clipboard[y][x].(common.Copyable).Copy(startX+x, startY+y)
 		}
 	}
 }
