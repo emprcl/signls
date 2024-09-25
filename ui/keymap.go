@@ -26,7 +26,7 @@ type keyMap struct {
 	EditLeft  key.Binding
 
 	AddBang   key.Binding
-	AddSpread key.Binding
+	AddRelay  key.Binding
 	AddCycle  key.Binding
 	AddDice   key.Binding
 	AddQuota  key.Binding
@@ -72,7 +72,7 @@ func (k keyMap) ShortHelp() []key.Binding {
 // key.Map interface.
 func (k keyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
-		{k.AddBang, k.AddSpread, k.AddCycle, k.AddDice, k.AddQuota, k.AddEuclid, k.AddZone, k.AddPass, k.AddHole},
+		{k.AddBang, k.AddRelay, k.AddCycle, k.AddDice, k.AddQuota, k.AddEuclid, k.AddZone, k.AddPass, k.AddHole},
 		{k.Up, k.Right, k.Down, k.Left, k.SelectionUp, k.SelectionRight, k.SelectionDown, k.SelectionLeft, k.EditUp, k.EditRight, k.EditDown, k.EditLeft},
 		{k.Play, k.EditNode, k.RemoveNode, k.TriggerNode, k.MuteNode, k.MuteAllNode, k.Copy, k.Cut, k.Paste},
 		{k.RootNoteUp, k.RootNoteDown, k.ScaleUp, k.ScaleDown, k.Cancel, k.SelectMidiDevice, k.FitGridToWindow, k.Help, k.Quit},
@@ -102,7 +102,7 @@ func (k keyMap) EmitterSymbol(msg tea.KeyMsg) string {
 		return "b"
 	case key.Matches(msg, k.AddCycle):
 		return "c"
-	case key.Matches(msg, k.AddSpread):
+	case key.Matches(msg, k.AddRelay):
 		return "s"
 	case key.Matches(msg, k.AddDice):
 		return "d"
@@ -180,9 +180,9 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 			key.WithKeys(keys.AddBang),
 			key.WithHelp(keys.AddBang, "add bang emitter"),
 		),
-		AddSpread: key.NewBinding(
-			key.WithKeys(keys.AddSpread),
-			key.WithHelp(keys.AddSpread, "add spread emitter"),
+		AddRelay: key.NewBinding(
+			key.WithKeys(keys.AddRelay),
+			key.WithHelp(keys.AddRelay, "add relay emitter"),
 		),
 		AddCycle: key.NewBinding(
 			key.WithKeys(keys.AddCycle),

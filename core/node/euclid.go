@@ -167,7 +167,7 @@ func (e *EuclidEmitter) Reset() {
 	e.pulse = 0
 	e.ticks = 0
 	e.triggered = false
-	e.armed = false
+	e.armed = true
 	e.retrig = false
 	e.step = 0
 	e.Note().Stop()

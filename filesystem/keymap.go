@@ -20,7 +20,7 @@ type KeyMap struct {
 	EditLeft  string `json:"edit_left"`
 
 	AddBang   string `json:"add_bang"`
-	AddSpread string `json:"add_spread"`
+	AddRelay  string `json:"add_relay"`
 	AddCycle  string `json:"add_cycle"`
 	AddDice   string `json:"add_dice"`
 	AddQuota  string `json:"add_quota"`
@@ -77,7 +77,7 @@ func NewDefaultAzertyKeyMap() KeyMap {
 		EditLeft:  "ctrl+left",
 
 		AddBang:   "&",
-		AddSpread: "é",
+		AddRelay:  "é",
 		AddCycle:  "\"",
 		AddDice:   "'",
 		AddQuota:  "(",
@@ -136,7 +136,7 @@ func NewDefaultAzertyMacKeyMap() KeyMap {
 		EditLeft:  "ctrl+left",
 
 		AddBang:   "&",
-		AddSpread: "é",
+		AddRelay:  "é",
 		AddCycle:  "\"",
 		AddDice:   "'",
 		AddQuota:  "(",
@@ -194,7 +194,7 @@ func NewDefaultQwertyKeyMap() KeyMap {
 		EditLeft:  "ctrl+left",
 
 		AddBang:   "1",
-		AddSpread: "2",
+		AddRelay:  "2",
 		AddCycle:  "3",
 		AddDice:   "4",
 		AddQuota:  "5",
@@ -253,7 +253,7 @@ func NewDefaultQwertyMacKeyMap() KeyMap {
 		EditLeft:  "ctrl+left",
 
 		AddBang:   "1",
-		AddSpread: "2",
+		AddRelay:  "2",
 		AddCycle:  "3",
 		AddDice:   "4",
 		AddQuota:  "5",
