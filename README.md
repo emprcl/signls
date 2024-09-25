@@ -13,7 +13,6 @@ TODO:
  - add midi cc (note behavior?)
  - add commands (tempo, scale, root, others?)
  - add theme
- - add toml configuration
  - add file system
 
 Names:

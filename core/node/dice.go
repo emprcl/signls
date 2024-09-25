@@ -1,7 +1,6 @@
 package node
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -50,8 +49,8 @@ func (e *DiceEmitter) Copy() common.EmitterBehavior {
 	}
 }
 
-func (e *DiceEmitter) Symbol(dir common.Direction) string {
-	return fmt.Sprintf("%s%s", "D", dir.Symbol())
+func (e *DiceEmitter) Symbol() string {
+	return "D"
 }
 
 func (e *DiceEmitter) Name() string {

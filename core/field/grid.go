@@ -153,7 +153,7 @@ func (g *Grid) Paste(startX, startY, endX, endY int) {
 			if _, ok := g.clipboard[y][x].(common.Copyable); !ok {
 				continue
 			}
-			g.nodes[startY+y][startX+x] = g.clipboard[y][x].(common.Copyable).Copy(startX, startY)
+			g.nodes[startY+y][startX+x] = g.clipboard[y][x].(common.Copyable).Copy(startX+x, startY+y)
 		}
 	}
 }
@@ -174,7 +174,7 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	case "b":
 		g.AddNode(node.NewBangEmitter(g.midi, common.NONE, !g.Playing), x, y)
 	case "s":
-		g.AddNode(node.NewSpreadEmitter(g.midi, common.NONE), x, y)
+		g.AddNode(node.NewRelayEmitter(g.midi, common.NONE), x, y)
 	case "c":
 		g.AddNode(node.NewCycleEmitter(g.midi, common.NONE), x, y)
 	case "d":

@@ -34,7 +34,7 @@ func (e *PassEmitter) Copy() common.EmitterBehavior {
 	return &PassEmitter{}
 }
 
-func (e *PassEmitter) Symbol(dir common.Direction) string {
+func (e *PassEmitter) Symbol() string {
 	return fmt.Sprintf("%s%s", "P", "⇌")
 }
 

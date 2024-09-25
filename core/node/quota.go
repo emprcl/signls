@@ -1,8 +1,6 @@
 package node
 
 import (
-	"fmt"
-
 	"cykl/core/common"
 	"cykl/core/music"
 	"cykl/midi"
@@ -44,8 +42,8 @@ func (e *QuotaEmitter) Copy() common.EmitterBehavior {
 	}
 }
 
-func (e *QuotaEmitter) Symbol(dir common.Direction) string {
-	return fmt.Sprintf("%s%s", "Q", dir.Symbol())
+func (e *QuotaEmitter) Symbol() string {
+	return "Q"
 }
 
 func (e *QuotaEmitter) Name() string {

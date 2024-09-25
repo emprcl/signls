@@ -1,8 +1,6 @@
 package node
 
 import (
-	"fmt"
-
 	"cykl/core/common"
 	"cykl/core/music"
 	"cykl/midi"
@@ -45,9 +43,9 @@ func (e *BangEmitter) ShouldPropagate() bool {
 }
 
 // Symbol returns the visual representation of the emitter on the grid.
-// It concatenates "B" with the direction's symbol for a complete identifier.
-func (e *BangEmitter) Symbol(dir common.Direction) string {
-	return fmt.Sprintf("%s%s", "B", dir.Symbol()) // "B" for BangEmitter plus direction symbol.
+func (e *BangEmitter) Symbol() string {
+	return "B"
+
 }
 
 // Name returns the name of this emitter behavior, which is "bang".

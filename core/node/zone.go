@@ -4,7 +4,6 @@ import (
 	"cykl/core/common"
 	"cykl/core/music"
 	"cykl/midi"
-	"fmt"
 )
 
 type ZoneEmitter struct{}
@@ -33,8 +32,8 @@ func (e *ZoneEmitter) Copy() common.EmitterBehavior {
 	return &ZoneEmitter{}
 }
 
-func (e *ZoneEmitter) Symbol(dir common.Direction) string {
-	return fmt.Sprintf("%s%s", "Z", dir.Symbol())
+func (e *ZoneEmitter) Symbol() string {
+	return "Z"
 }
 
 func (e *ZoneEmitter) Name() string {

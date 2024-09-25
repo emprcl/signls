@@ -6,12 +6,16 @@ import (
 
 type HoleEmitter struct {
 	activated    int
+	originX      int
+	originY      int
 	destinationX int
 	destinationY int
 }
 
 func NewHoleEmitter(direction common.Direction, x, y int) *HoleEmitter {
 	return &HoleEmitter{
+		originX:      x,
+		originY:      y,
 		destinationX: x,
 		destinationY: y,
 	}
@@ -19,8 +23,10 @@ func NewHoleEmitter(direction common.Direction, x, y int) *HoleEmitter {
 
 func (e *HoleEmitter) Copy(dx, dy int) common.Node {
 	return &HoleEmitter{
-		destinationX: e.destinationX + dx,
-		destinationY: e.destinationY + dy,
+		originX:      dx,
+		originY:      dy,
+		destinationX: e.destinationX - e.originX + dx,
+		destinationY: e.destinationY - e.originY + dy,
 	}
 }
 

@@ -5,8 +5,9 @@ import "math/rand"
 // NoteBehavior defines an interface for various note behaviors.
 // Implementations of this interface define how a note is played.
 type NoteBehavior interface {
-	Name() string                        // Name returns the name of the behavior.
-	Play(n *Note, root Key, scale Scale) // Play executes the behavior's note-playing logic.
+	Name() string
+	Play(n *Note, root Key, scale Scale)
+	Symbol() string
 }
 
 // AllNoteBehaviors returns a slice containing all available note behaviors.
@@ -31,6 +32,10 @@ func (b SilentNote) Name() string {
 	return "silent"
 }
 
+func (b SilentNote) Symbol() string {
+	return "̥"
+}
+
 // FixedNote is a behavior where the note plays at a fixed pitch.
 // It implements the NoteBehavior interface.
 type FixedNote struct{}
@@ -51,6 +56,10 @@ func (b FixedNote) Name() string {
 	return "fixed"
 }
 
+func (b FixedNote) Symbol() string {
+	return ""
+}
+
 // RandomNote is a behavior where the note plays at a random pitch.
 // It implements the NoteBehavior interface.
 type RandomNote struct{}
@@ -67,4 +76,8 @@ func (b RandomNote) Play(n *Note, root Key, scale Scale) {
 // Name returns the name of the RandomNote behavior.
 func (b RandomNote) Name() string {
 	return "random"
+}
+
+func (b RandomNote) Symbol() string {
+	return "̰"
 }
