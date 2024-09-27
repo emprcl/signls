@@ -24,13 +24,10 @@ var (
 			Background(lipgloss.Color("238")).
 			Foreground(lipgloss.Color("244"))
 	emitterStyle = lipgloss.NewStyle().
-			Bold(true).
 			Foreground(lipgloss.Color("15"))
 	mutedEmitterStyle = lipgloss.NewStyle().
-				Bold(true).
 				Background(lipgloss.Color("243"))
 	activeEmitterStyle = lipgloss.NewStyle().
-				Bold(true).
 				Background(lipgloss.Color("15")).
 				Foreground(lipgloss.Color("0"))
 )

@@ -33,7 +33,7 @@ func (b SilentNote) Name() string {
 }
 
 func (b SilentNote) Symbol() string {
-	return "̥"
+	return "\u0353"
 }
 
 // FixedNote is a behavior where the note plays at a fixed pitch.
@@ -79,5 +79,5 @@ func (b RandomNote) Name() string {
 }
 
 func (b RandomNote) Symbol() string {
-	return "̰"
+	return "\u033c"
 }
