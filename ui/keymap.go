@@ -26,13 +26,13 @@ type keyMap struct {
 	EditLeft  key.Binding
 
 	AddBang   key.Binding
+	AddEuclid key.Binding
+	AddPass   key.Binding
 	AddRelay  key.Binding
 	AddCycle  key.Binding
 	AddDice   key.Binding
 	AddToll   key.Binding
-	AddEuclid key.Binding
 	AddZone   key.Binding
-	AddPass   key.Binding
 	AddHole   key.Binding
 
 	Copy  key.Binding
@@ -72,7 +72,7 @@ func (k keyMap) ShortHelp() []key.Binding {
 // key.Map interface.
 func (k keyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
-		{k.AddBang, k.AddRelay, k.AddCycle, k.AddDice, k.AddToll, k.AddEuclid, k.AddZone, k.AddPass, k.AddHole},
+		{k.AddBang, k.AddEuclid, k.AddPass, k.AddRelay, k.AddCycle, k.AddDice, k.AddToll, k.AddZone, k.AddHole},
 		{k.Up, k.Right, k.Down, k.Left, k.SelectionUp, k.SelectionRight, k.SelectionDown, k.SelectionLeft, k.EditUp, k.EditRight, k.EditDown, k.EditLeft},
 		{k.Play, k.EditNode, k.RemoveNode, k.TriggerNode, k.MuteNode, k.MuteAllNode, k.Copy, k.Cut, k.Paste},
 		{k.RootNoteUp, k.RootNoteDown, k.ScaleUp, k.ScaleDown, k.Cancel, k.SelectMidiDevice, k.FitGridToWindow, k.Help, k.Quit},
