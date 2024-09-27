@@ -56,7 +56,7 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 	}
 
 	// render grid
-	teleportDestinationSymbol := "H⌄"
+	teleportDestinationSymbol := node.HoleDestinationSymbol
 	if n == nil && isCursor {
 		return cursorStyle.Render("  ")
 	} else if n == nil && isTeleportDestination {

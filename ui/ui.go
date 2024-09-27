@@ -255,9 +255,12 @@ func (m mainModel) View() string {
 		m.renderGrid(),
 	)
 
-	help := lipgloss.NewStyle().
-		MarginLeft(2).
-		Render(m.help.View(m.keymap))
+	var help string
+	if m.help.ShowAll {
+		help = lipgloss.NewStyle().
+			MarginLeft(2).
+			Render(m.help.View(m.keymap))
+	}
 
 	// Cleanup gibber
 	cleanup := lipgloss.NewStyle().
