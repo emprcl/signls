@@ -23,7 +23,7 @@ type KeyMap struct {
 	AddRelay  string `json:"add_relay"`
 	AddCycle  string `json:"add_cycle"`
 	AddDice   string `json:"add_dice"`
-	AddQuota  string `json:"add_quota"`
+	AddToll   string `json:"add_toll"`
 	AddEuclid string `json:"add_euclid"`
 	AddZone   string `json:"add_zone"`
 	AddPass   string `json:"add_pass"`
@@ -80,7 +80,7 @@ func NewDefaultAzertyKeyMap() KeyMap {
 		AddRelay:  "é",
 		AddCycle:  "\"",
 		AddDice:   "'",
-		AddQuota:  "(",
+		AddToll:   "(",
 		AddEuclid: "-",
 		AddZone:   "è",
 		AddPass:   "_",
@@ -139,7 +139,7 @@ func NewDefaultAzertyMacKeyMap() KeyMap {
 		AddRelay:  "é",
 		AddCycle:  "\"",
 		AddDice:   "'",
-		AddQuota:  "(",
+		AddToll:   "(",
 		AddEuclid: "§",
 		AddZone:   "è",
 		AddPass:   "!",
@@ -197,7 +197,7 @@ func NewDefaultQwertyKeyMap() KeyMap {
 		AddRelay:  "2",
 		AddCycle:  "3",
 		AddDice:   "4",
-		AddQuota:  "5",
+		AddToll:   "5",
 		AddEuclid: "6",
 		AddZone:   "7",
 		AddPass:   "8",
@@ -256,7 +256,7 @@ func NewDefaultQwertyMacKeyMap() KeyMap {
 		AddRelay:  "2",
 		AddCycle:  "3",
 		AddDice:   "4",
-		AddQuota:  "5",
+		AddToll:   "5",
 		AddEuclid: "6",
 		AddZone:   "7",
 		AddPass:   "8",

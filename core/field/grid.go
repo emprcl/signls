@@ -179,8 +179,8 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 		g.AddNode(node.NewCycleEmitter(g.midi, common.NONE), x, y)
 	case "d":
 		g.AddNode(node.NewDiceEmitter(g.midi, common.NONE), x, y)
-	case "q":
-		g.AddNode(node.NewQuotaEmitter(g.midi, common.NONE), x, y)
+	case "t":
+		g.AddNode(node.NewTollEmitter(g.midi, common.NONE), x, y)
 	case "e":
 		g.AddNode(node.NewEuclidEmitter(g.midi, common.NONE), x, y)
 	case "z":

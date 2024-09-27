@@ -29,7 +29,7 @@ type keyMap struct {
 	AddRelay  key.Binding
 	AddCycle  key.Binding
 	AddDice   key.Binding
-	AddQuota  key.Binding
+	AddToll   key.Binding
 	AddEuclid key.Binding
 	AddZone   key.Binding
 	AddPass   key.Binding
@@ -72,7 +72,7 @@ func (k keyMap) ShortHelp() []key.Binding {
 // key.Map interface.
 func (k keyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
-		{k.AddBang, k.AddRelay, k.AddCycle, k.AddDice, k.AddQuota, k.AddEuclid, k.AddZone, k.AddPass, k.AddHole},
+		{k.AddBang, k.AddRelay, k.AddCycle, k.AddDice, k.AddToll, k.AddEuclid, k.AddZone, k.AddPass, k.AddHole},
 		{k.Up, k.Right, k.Down, k.Left, k.SelectionUp, k.SelectionRight, k.SelectionDown, k.SelectionLeft, k.EditUp, k.EditRight, k.EditDown, k.EditLeft},
 		{k.Play, k.EditNode, k.RemoveNode, k.TriggerNode, k.MuteNode, k.MuteAllNode, k.Copy, k.Cut, k.Paste},
 		{k.RootNoteUp, k.RootNoteDown, k.ScaleUp, k.ScaleDown, k.Cancel, k.SelectMidiDevice, k.FitGridToWindow, k.Help, k.Quit},
@@ -108,8 +108,8 @@ func (k keyMap) EmitterSymbol(msg tea.KeyMsg) string {
 		return "d"
 	case key.Matches(msg, k.AddEuclid):
 		return "e"
-	case key.Matches(msg, k.AddQuota):
-		return "q"
+	case key.Matches(msg, k.AddToll):
+		return "t"
 	case key.Matches(msg, k.AddPass):
 		return "p"
 	case key.Matches(msg, k.AddZone):
@@ -192,9 +192,9 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 			key.WithKeys(keys.AddDice),
 			key.WithHelp(keys.AddDice, "add dice emitter"),
 		),
-		AddQuota: key.NewBinding(
-			key.WithKeys(keys.AddQuota),
-			key.WithHelp(keys.AddQuota, "add quota emitter"),
+		AddToll: key.NewBinding(
+			key.WithKeys(keys.AddToll),
+			key.WithHelp(keys.AddToll, "add toll emitter"),
 		),
 		AddEuclid: key.NewBinding(
 			key.WithKeys(keys.AddEuclid),

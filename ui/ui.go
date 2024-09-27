@@ -148,7 +148,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.handleParamEdit(dir)
 			return m, nil
-		case key.Matches(msg, m.keymap.AddBang, m.keymap.AddRelay, m.keymap.AddCycle, m.keymap.AddDice, m.keymap.AddQuota, m.keymap.AddEuclid, m.keymap.AddZone, m.keymap.AddPass, m.keymap.AddHole):
+		case key.Matches(msg, m.keymap.AddBang, m.keymap.AddRelay, m.keymap.AddCycle, m.keymap.AddDice, m.keymap.AddToll, m.keymap.AddEuclid, m.keymap.AddZone, m.keymap.AddPass, m.keymap.AddHole):
 			m.grid.AddNodeFromSymbol(m.keymap.EmitterSymbol(msg), m.cursorX, m.cursorY)
 			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			return m, nil
