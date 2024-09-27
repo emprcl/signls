@@ -51,7 +51,7 @@ func (e *TollEmitter) Name() string {
 }
 
 func (e *TollEmitter) Color() string {
-	return "197"
+	return "39"
 }
 
 func (e *TollEmitter) Reset() {

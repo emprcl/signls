@@ -160,7 +160,7 @@ func (e *EuclidEmitter) Name() string {
 }
 
 func (e *EuclidEmitter) Color() string {
-	return "39"
+	return "162"
 }
 
 func (e *EuclidEmitter) Reset() {
