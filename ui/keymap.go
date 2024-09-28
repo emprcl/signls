@@ -132,7 +132,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		Right: key.NewBinding(
 			key.WithKeys(keys.Right),
-			key.WithHelp(keys.Right, "move cursor right | move selected parameter"),
+			key.WithHelp(keys.Right, "move cursor|selection right"),
 		),
 		Down: key.NewBinding(
 			key.WithKeys(keys.Down),
@@ -140,7 +140,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		Left: key.NewBinding(
 			key.WithKeys(keys.Left),
-			key.WithHelp(keys.Left, "move cursor left | move selected parameter"),
+			key.WithHelp(keys.Left, "move cursor|selection left"),
 		),
 		SelectionUp: key.NewBinding(
 			key.WithKeys(keys.SelectionUp),
@@ -276,7 +276,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		Cancel: key.NewBinding(
 			key.WithKeys(keys.Cancel),
-			key.WithHelp(keys.Cancel, "cancel selection | exit node parameter edition"),
+			key.WithHelp(keys.Cancel, "cancel selection | exit edit"),
 		),
 		Help: key.NewBinding(
 			key.WithKeys(keys.Help),

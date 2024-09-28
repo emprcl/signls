@@ -13,7 +13,6 @@ var (
 	controlStyle = lipgloss.NewStyle().
 			MarginTop(1).
 			MarginLeft(2)
-
 	cellStyle = lipgloss.NewStyle().
 			MarginRight(2)
 	activeCellStyle = cellStyle.

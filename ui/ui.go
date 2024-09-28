@@ -230,6 +230,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.param = 0
 			m.selectionX = m.cursorX
 			m.selectionY = m.cursorY
+			m.help.ShowAll = false
 			return m, nil
 		case key.Matches(msg, m.keymap.FitGridToWindow):
 			m.cursorX, m.cursorY = 1, 1
@@ -250,28 +251,18 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m mainModel) View() string {
-	mainView := lipgloss.JoinVertical(
-		lipgloss.Left,
-		m.renderGrid(),
-	)
+	help := lipgloss.NewStyle().
+		MarginLeft(2).
+		MarginTop(1).
+		Render(m.help.View(m.keymap))
 
-	var help string
 	if m.help.ShowAll {
-		help = lipgloss.NewStyle().
-			MarginLeft(2).
-			Render(m.help.View(m.keymap))
+		return help
 	}
-
-	// Cleanup gibber
-	cleanup := lipgloss.NewStyle().
-		Width(m.viewport.Width).
-		Height(m.viewport.Height - lipgloss.Height(mainView) - lipgloss.Height(help)).
-		Render("")
 
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
-		mainView,
-		cleanup,
+		m.renderGrid(),
 		help,
 	)
 }
