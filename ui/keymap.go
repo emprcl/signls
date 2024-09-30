@@ -26,13 +26,13 @@ type keyMap struct {
 	EditLeft  key.Binding
 
 	AddBang   key.Binding
+	AddEuclid key.Binding
+	AddPass   key.Binding
 	AddRelay  key.Binding
 	AddCycle  key.Binding
 	AddDice   key.Binding
-	AddQuota  key.Binding
-	AddEuclid key.Binding
+	AddToll   key.Binding
 	AddZone   key.Binding
-	AddPass   key.Binding
 	AddHole   key.Binding
 
 	Copy  key.Binding
@@ -72,10 +72,8 @@ func (k keyMap) ShortHelp() []key.Binding {
 // key.Map interface.
 func (k keyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
-		{k.AddBang, k.AddRelay, k.AddCycle, k.AddDice, k.AddQuota, k.AddEuclid, k.AddZone, k.AddPass, k.AddHole},
-		{k.Up, k.Right, k.Down, k.Left, k.SelectionUp, k.SelectionRight, k.SelectionDown, k.SelectionLeft, k.EditUp, k.EditRight, k.EditDown, k.EditLeft},
-		{k.Play, k.EditNode, k.RemoveNode, k.TriggerNode, k.MuteNode, k.MuteAllNode, k.Copy, k.Cut, k.Paste},
-		{k.RootNoteUp, k.RootNoteDown, k.ScaleUp, k.ScaleDown, k.Cancel, k.SelectMidiDevice, k.FitGridToWindow, k.Help, k.Quit},
+		{k.AddBang, k.AddEuclid, k.AddPass, k.AddRelay, k.AddCycle, k.AddDice, k.AddToll, k.AddZone, k.AddHole, k.RootNoteUp, k.RootNoteDown, k.ScaleUp, k.ScaleDown, k.Cancel, k.SelectMidiDevice, k.FitGridToWindow, k.Help, k.Quit},
+		{k.Play, k.EditNode, k.RemoveNode, k.TriggerNode, k.MuteNode, k.MuteAllNode, k.Copy, k.Cut, k.Paste, k.Up, k.Right, k.Down, k.Left, k.SelectionUp, k.SelectionRight, k.SelectionDown, k.SelectionLeft, k.EditUp, k.EditDown, k.EditRight, k.EditLeft},
 	}
 }
 
@@ -108,8 +106,8 @@ func (k keyMap) EmitterSymbol(msg tea.KeyMsg) string {
 		return "d"
 	case key.Matches(msg, k.AddEuclid):
 		return "e"
-	case key.Matches(msg, k.AddQuota):
-		return "q"
+	case key.Matches(msg, k.AddToll):
+		return "t"
 	case key.Matches(msg, k.AddPass):
 		return "p"
 	case key.Matches(msg, k.AddZone):
@@ -134,7 +132,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		Right: key.NewBinding(
 			key.WithKeys(keys.Right),
-			key.WithHelp(keys.Right, "move cursor right | move selected parameter"),
+			key.WithHelp(keys.Right, "move cursor|selection right"),
 		),
 		Down: key.NewBinding(
 			key.WithKeys(keys.Down),
@@ -142,7 +140,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		Left: key.NewBinding(
 			key.WithKeys(keys.Left),
-			key.WithHelp(keys.Left, "move cursor left | move selected parameter"),
+			key.WithHelp(keys.Left, "move cursor|selection left"),
 		),
 		SelectionUp: key.NewBinding(
 			key.WithKeys(keys.SelectionUp),
@@ -192,9 +190,9 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 			key.WithKeys(keys.AddDice),
 			key.WithHelp(keys.AddDice, "add dice emitter"),
 		),
-		AddQuota: key.NewBinding(
-			key.WithKeys(keys.AddQuota),
-			key.WithHelp(keys.AddQuota, "add quota emitter"),
+		AddToll: key.NewBinding(
+			key.WithKeys(keys.AddToll),
+			key.WithHelp(keys.AddToll, "add toll emitter"),
 		),
 		AddEuclid: key.NewBinding(
 			key.WithKeys(keys.AddEuclid),
@@ -278,7 +276,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		Cancel: key.NewBinding(
 			key.WithKeys(keys.Cancel),
-			key.WithHelp(keys.Cancel, "cancel selection | exit node parameter edition"),
+			key.WithHelp(keys.Cancel, "cancel selection | exit edit"),
 		),
 		Help: key.NewBinding(
 			key.WithKeys(keys.Help),

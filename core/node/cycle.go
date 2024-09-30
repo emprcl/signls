@@ -62,7 +62,7 @@ func (e *CycleEmitter) Name() string {
 
 // Color returns the color code associated with this emitter behavior.
 func (e *CycleEmitter) Color() string {
-	return "063"
+	return "63"
 }
 
 func (e *CycleEmitter) Reset() {

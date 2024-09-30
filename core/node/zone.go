@@ -41,7 +41,7 @@ func (e *ZoneEmitter) Name() string {
 }
 
 func (e *ZoneEmitter) Color() string {
-	return "204"
+	return "197"
 }
 
 func (e *ZoneEmitter) Reset() {}

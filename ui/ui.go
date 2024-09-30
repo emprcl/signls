@@ -148,7 +148,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.handleParamEdit(dir)
 			return m, nil
-		case key.Matches(msg, m.keymap.AddBang, m.keymap.AddRelay, m.keymap.AddCycle, m.keymap.AddDice, m.keymap.AddQuota, m.keymap.AddEuclid, m.keymap.AddZone, m.keymap.AddPass, m.keymap.AddHole):
+		case key.Matches(msg, m.keymap.AddBang, m.keymap.AddRelay, m.keymap.AddCycle, m.keymap.AddDice, m.keymap.AddToll, m.keymap.AddEuclid, m.keymap.AddZone, m.keymap.AddPass, m.keymap.AddHole):
 			m.grid.AddNodeFromSymbol(m.keymap.EmitterSymbol(msg), m.cursorX, m.cursorY)
 			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			return m, nil
@@ -230,6 +230,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.param = 0
 			m.selectionX = m.cursorX
 			m.selectionY = m.cursorY
+			m.help.ShowAll = false
 			return m, nil
 		case key.Matches(msg, m.keymap.FitGridToWindow):
 			m.cursorX, m.cursorY = 1, 1
@@ -250,25 +251,18 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m mainModel) View() string {
-	mainView := lipgloss.JoinVertical(
-		lipgloss.Left,
-		m.renderGrid(),
-	)
-
 	help := lipgloss.NewStyle().
 		MarginLeft(2).
+		MarginTop(1).
 		Render(m.help.View(m.keymap))
 
-	// Cleanup gibber
-	cleanup := lipgloss.NewStyle().
-		Width(m.viewport.Width).
-		Height(m.viewport.Height - lipgloss.Height(mainView) - lipgloss.Height(help)).
-		Render("")
+	if m.help.ShowAll {
+		return help
+	}
 
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
-		mainView,
-		cleanup,
+		m.renderGrid(),
 		help,
 	)
 }

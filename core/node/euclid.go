@@ -152,7 +152,7 @@ func (e *EuclidEmitter) SetDirection(dir common.Direction) {
 }
 
 func (e *EuclidEmitter) Symbol() string {
-	return fmt.Sprintf("%s%s", "E", e.direction.Symbol())
+	return fmt.Sprintf("%s%s%s", "E", e.note.Behavior.Symbol(), e.direction.Symbol())
 }
 
 func (e *EuclidEmitter) Name() string {
@@ -160,7 +160,7 @@ func (e *EuclidEmitter) Name() string {
 }
 
 func (e *EuclidEmitter) Color() string {
-	return "39"
+	return "162"
 }
 
 func (e *EuclidEmitter) Reset() {

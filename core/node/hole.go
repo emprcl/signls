@@ -4,6 +4,10 @@ import (
 	"cykl/core/common"
 )
 
+const (
+	HoleDestinationSymbol = "H+"
+)
+
 type HoleEmitter struct {
 	activated    int
 	originX      int

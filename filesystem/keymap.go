@@ -20,13 +20,13 @@ type KeyMap struct {
 	EditLeft  string `json:"edit_left"`
 
 	AddBang   string `json:"add_bang"`
+	AddEuclid string `json:"add_euclid"`
+	AddPass   string `json:"add_pass"`
 	AddRelay  string `json:"add_relay"`
 	AddCycle  string `json:"add_cycle"`
 	AddDice   string `json:"add_dice"`
-	AddQuota  string `json:"add_quota"`
-	AddEuclid string `json:"add_euclid"`
+	AddToll   string `json:"add_toll"`
 	AddZone   string `json:"add_zone"`
-	AddPass   string `json:"add_pass"`
 	AddHole   string `json:"add_hole"`
 
 	Copy  string `json:"copy"`
@@ -77,13 +77,13 @@ func NewDefaultAzertyKeyMap() KeyMap {
 		EditLeft:  "ctrl+left",
 
 		AddBang:   "&",
-		AddRelay:  "é",
-		AddCycle:  "\"",
-		AddDice:   "'",
-		AddQuota:  "(",
-		AddEuclid: "-",
-		AddZone:   "è",
-		AddPass:   "_",
+		AddEuclid: "é",
+		AddPass:   "\"",
+		AddRelay:  "'",
+		AddCycle:  "(",
+		AddDice:   "-",
+		AddToll:   "è",
+		AddZone:   "_",
 		AddHole:   "ç",
 
 		Copy:  "ctrl+c",
@@ -136,13 +136,13 @@ func NewDefaultAzertyMacKeyMap() KeyMap {
 		EditLeft:  "ctrl+left",
 
 		AddBang:   "&",
-		AddRelay:  "é",
-		AddCycle:  "\"",
-		AddDice:   "'",
-		AddQuota:  "(",
-		AddEuclid: "§",
-		AddZone:   "è",
-		AddPass:   "!",
+		AddEuclid: "é",
+		AddPass:   "\"",
+		AddRelay:  "'",
+		AddCycle:  "(",
+		AddDice:   "§",
+		AddToll:   "è",
+		AddZone:   "!",
 		AddHole:   "ç",
 
 		Copy:  "ctrl+c",
@@ -194,13 +194,13 @@ func NewDefaultQwertyKeyMap() KeyMap {
 		EditLeft:  "ctrl+left",
 
 		AddBang:   "1",
-		AddRelay:  "2",
-		AddCycle:  "3",
-		AddDice:   "4",
-		AddQuota:  "5",
-		AddEuclid: "6",
-		AddZone:   "7",
-		AddPass:   "8",
+		AddEuclid: "2",
+		AddPass:   "3",
+		AddRelay:  "4",
+		AddCycle:  "5",
+		AddDice:   "6",
+		AddToll:   "7",
+		AddZone:   "8",
 		AddHole:   "9",
 
 		Copy:  "ctrl+c",
@@ -253,13 +253,13 @@ func NewDefaultQwertyMacKeyMap() KeyMap {
 		EditLeft:  "ctrl+left",
 
 		AddBang:   "1",
-		AddRelay:  "2",
-		AddCycle:  "3",
-		AddDice:   "4",
-		AddQuota:  "5",
-		AddEuclid: "6",
-		AddZone:   "7",
-		AddPass:   "8",
+		AddEuclid: "2",
+		AddPass:   "3",
+		AddRelay:  "4",
+		AddCycle:  "5",
+		AddDice:   "6",
+		AddToll:   "7",
+		AddZone:   "8",
 		AddHole:   "9",
 
 		Copy:  "ctrl+c",

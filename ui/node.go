@@ -24,13 +24,10 @@ var (
 			Background(lipgloss.Color("238")).
 			Foreground(lipgloss.Color("244"))
 	emitterStyle = lipgloss.NewStyle().
-			Bold(true).
 			Foreground(lipgloss.Color("15"))
 	mutedEmitterStyle = lipgloss.NewStyle().
-				Bold(true).
 				Background(lipgloss.Color("243"))
 	activeEmitterStyle = lipgloss.NewStyle().
-				Bold(true).
 				Background(lipgloss.Color("15")).
 				Foreground(lipgloss.Color("0"))
 )
@@ -59,7 +56,7 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 	}
 
 	// render grid
-	teleportDestinationSymbol := "H⌄"
+	teleportDestinationSymbol := node.HoleDestinationSymbol
 	if n == nil && isCursor {
 		return cursorStyle.Render("  ")
 	} else if n == nil && isTeleportDestination {

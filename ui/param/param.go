@@ -31,7 +31,7 @@ func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
 				height: grid.Height,
 			},
 		}
-	} else if isHomogeneousBehavior[*node.QuotaEmitter](nodes) {
+	} else if isHomogeneousBehavior[*node.TollEmitter](nodes) {
 		return append([]Param{
 			Threshold{nodes: nodes},
 		}, DefaultEmitterParams(grid, nodes)...)

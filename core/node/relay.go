@@ -53,7 +53,7 @@ func (e *RelayEmitter) Name() string {
 
 // Color returns a string representing the color code for the emitter.
 func (e *RelayEmitter) Color() string {
-	return "177"
+	return "56"
 }
 
 func (e *RelayEmitter) Reset() {}
