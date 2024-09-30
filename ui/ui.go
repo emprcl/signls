@@ -31,7 +31,11 @@ type tickMsg time.Time
 // blinkMsg is a message that triggers blinking ui elements
 type blinkMsg time.Time
 
+// saveMsg is a message that notify a successfull save
+type saveMsg bool
+
 type mainModel struct {
+	bank       *filesystem.Bank
 	grid       *field.Grid
 	viewport   viewport
 	keymap     keyMap
@@ -50,8 +54,9 @@ type mainModel struct {
 
 // New creates a new mainModel that hols the ui state. It takes a new grid.
 // Check the core package.
-func New(config filesystem.Configuration, grid *field.Grid) tea.Model {
+func New(config filesystem.Configuration, grid *field.Grid, bank *filesystem.Bank) tea.Model {
 	model := mainModel{
+		bank:       bank,
 		grid:       grid,
 		keymap:     newKeyMap(config.KeyMap),
 		help:       help.New(),
@@ -74,6 +79,13 @@ func blink() tea.Cmd {
 	return tea.Tick(blinkFrequency, func(t time.Time) tea.Msg {
 		return blinkMsg(t)
 	})
+}
+
+func save(m mainModel) tea.Cmd {
+	return func() tea.Msg {
+		m.grid.Save(m.bank)
+		return saveMsg(true)
+	}
 }
 
 func (m mainModel) Init() tea.Cmd {
@@ -147,22 +159,22 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			m.handleParamEdit(dir)
-			return m, nil
+			return m, save(m)
 		case key.Matches(msg, m.keymap.AddBang, m.keymap.AddRelay, m.keymap.AddCycle, m.keymap.AddDice, m.keymap.AddToll, m.keymap.AddEuclid, m.keymap.AddZone, m.keymap.AddPass, m.keymap.AddHole):
 			m.grid.AddNodeFromSymbol(m.keymap.EmitterSymbol(msg), m.cursorX, m.cursorY)
 			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
-			return m, nil
+			return m, save(m)
 		case key.Matches(msg, m.keymap.MuteNode):
 			m.grid.ToggleNodeMutes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
-			return m, nil
+			return m, save(m)
 		case key.Matches(msg, m.keymap.MuteAllNode):
 			m.grid.SetAllNodeMutes(!m.mute)
 			m.mute = !m.mute
-			return m, nil
+			return m, save(m)
 		case key.Matches(msg, m.keymap.RemoveNode):
 			m.edit = false
 			m.grid.RemoveNodes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
-			return m, nil
+			return m, save(m)
 		case key.Matches(msg, m.keymap.EditNode):
 			if len(m.selectedEmitters()) == 0 {
 				return m, nil
@@ -187,31 +199,31 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			param.Get("root", m.gridParams).Increment()
-			return m, nil
+			return m, save(m)
 		case key.Matches(msg, m.keymap.RootNoteDown):
 			if m.edit {
 				return m, nil
 			}
 			param.Get("root", m.gridParams).Decrement()
-			return m, nil
+			return m, save(m)
 		case key.Matches(msg, m.keymap.ScaleUp):
 			if m.edit {
 				return m, nil
 			}
 			param.Get("scale", m.gridParams).Increment()
-			return m, nil
+			return m, save(m)
 		case key.Matches(msg, m.keymap.ScaleDown):
 			if m.edit {
 				return m, nil
 			}
 			param.Get("scale", m.gridParams).Decrement()
-			return m, nil
+			return m, save(m)
 		case key.Matches(msg, m.keymap.TempoUp):
 			m.grid.SetTempo(m.grid.Tempo() + 1)
-			return m, nil
+			return m, save(m)
 		case key.Matches(msg, m.keymap.TempoDown):
 			m.grid.SetTempo(m.grid.Tempo() - 1)
-			return m, nil
+			return m, save(m)
 		case key.Matches(msg, m.keymap.SelectMidiDevice):
 			m.grid.CycleMidiDevice()
 			return m, nil
@@ -224,7 +236,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keymap.Paste):
 			m.grid.Paste(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
-			return m, nil
+			return m, save(m)
 		case key.Matches(msg, m.keymap.Cancel):
 			m.edit = false
 			m.param = 0
@@ -237,13 +249,13 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.selectionX, m.selectionY = m.cursorX, m.cursorY
 			m.grid.Resize(m.viewport.Width, m.viewport.Height)
 			m.viewport.Update(m.cursorX, m.cursorY, m.grid.Width, m.grid.Height)
-			return m, nil
+			return m, save(m)
 		case key.Matches(msg, m.keymap.Help):
 			m.help.ShowAll = !m.help.ShowAll
 			return m, tea.ClearScreen
 		case key.Matches(msg, m.keymap.Quit):
 			m.grid.Reset()
-			return m, tea.Quit
+			return m, tea.Batch(save(m), tea.Quit)
 		}
 	}
 

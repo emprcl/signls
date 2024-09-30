@@ -14,6 +14,7 @@ import (
 
 func main() {
 	configFile := flag.String("config", "config.json", "config file to load or create")
+	bankFile := flag.String("bank", "default.json", "bank file to store grids")
 	keyboard := flag.String("keyboard", "", "keyboard layout (qwerty, qwerty-mac, azerty, azerty-mac)")
 	debug := flag.Bool("debug", false, "enable debug mode")
 	flag.Parse()
@@ -26,8 +27,6 @@ func main() {
 	}
 	defer midi.Close()
 
-	grid := field.NewGrid(2, 2, midi)
-
 	if *debug {
 		f, err := tea.LogToFile("debug.log", "debug")
 		if err != nil {
@@ -36,7 +35,10 @@ func main() {
 		defer f.Close()
 	}
 
-	p := tea.NewProgram(ui.New(config, grid))
+	bank := filesystem.New(*bankFile)
+	grid := field.NewFromBank(bank.ActiveGrid(), midi)
+
+	p := tea.NewProgram(ui.New(config, grid, bank))
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
