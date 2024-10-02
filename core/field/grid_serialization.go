@@ -13,7 +13,29 @@ func NewFromBank(grid filesystem.Grid, midi midi.Midi) *Grid {
 }
 
 func (g *Grid) Save(bank *filesystem.Bank) {
+	nodes := []filesystem.Node{}
+
+	for y := range g.nodes {
+		for x, n := range g.nodes[y] {
+			if n == nil {
+				continue
+			}
+
+			node := filesystem.Node{}
+			node.Type = n.Name()
+			node.Direction = n.Direction()
+
+			switch node.Type {
+			case "bang":
+
+			}
+
+			nodes = append(nodes)
+		}
+	}
+
 	bank.Save(filesystem.Grid{
+		Nodes:  nodes,
 		Tempo:  g.Tempo(),
 		Height: g.Height,
 		Width:  g.Width,

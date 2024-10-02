@@ -31,8 +31,8 @@ type Bank struct {
 
 // Grid holds a grid in memory
 type Grid struct {
-	Nodes [][]Node `json:"nodes"`
-	Tempo float64  `json:"tempo"`
+	Nodes []Node  `json:"nodes"`
+	Tempo float64 `json:"tempo"`
 
 	Height int `json:"height"`
 	Width  int `json:"width"`
@@ -43,10 +43,18 @@ type Grid struct {
 
 // Node represents a grid node that is json serializable.
 type Node struct {
-	Note Note `json:"note"`
+	Note      Note   `json:"note"`
+	Type      string `json:"type"`
+	Direction int    `json:"direction"`
 }
 
 type Note struct {
+	Behavior string `json:"behavior"`
+	Channel ,
+	Key:         defaultKey,
+	Velocity:    defaultVelocity,
+	Length:      defaultLength,
+	Probability: maxProbability,
 }
 
 type Params struct {
@@ -55,7 +63,9 @@ type Params struct {
 // New creates and loads a new bank from a given file.
 func New(filename string) *Bank {
 	grids := make([]Grid, maxGrids)
+	nodes := []Node{}
 	for k := range grids {
+		grids[k].Nodes = nodes
 		grids[k].Height = defaultSize
 		grids[k].Width = defaultSize
 		grids[k].Tempo = defaultTempo
