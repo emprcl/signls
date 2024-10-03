@@ -23,16 +23,22 @@ func (k KeyMode) Value() int {
 }
 
 func (k KeyMode) Increment() {
-	k.Set(k.keyModeIndex() + 1)
+	val := k.nodes[0].(music.Audible).Note().Behavior.Value() + 1
+	k.nodes[0].(music.Audible).Note().Behavior.Set(val)
 }
 
 func (k KeyMode) Decrement() {
+	val := k.nodes[0].(music.Audible).Note().Behavior.Value() - 1
+	k.nodes[0].(music.Audible).Note().Behavior.Set(val)
+}
+
+func (k KeyMode) Left() {
 	k.Set(k.keyModeIndex() - 1)
 }
 
-func (k KeyMode) Left() {}
-
-func (k KeyMode) Right() {}
+func (k KeyMode) Right() {
+	k.Set(k.keyModeIndex() + 1)
+}
 
 func (k KeyMode) Set(value int) {
 	if value < 0 {

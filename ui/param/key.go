@@ -1,6 +1,7 @@
 package param
 
 import (
+	"fmt"
 	"time"
 
 	"cykl/core/common"
@@ -15,15 +16,19 @@ type Key struct {
 }
 
 func (k Key) Name() string {
-	return "key"
+	return k.mode.Display()
 }
 
 func (k Key) Display() string {
-	switch k.mode.Display() {
-	case "silent":
+	switch k.nodes[0].(music.Audible).Note().Behavior.(type) {
+	case music.SilentNote:
 		return "•"
-	case "random":
-		return "random"
+	case *music.RandomNote:
+		return fmt.Sprintf(
+			"%d oct. from %s",
+			k.nodes[0].(music.Audible).Note().Behavior.Value(),
+			k.nodes[0].(music.Audible).Note().KeyName(),
+		)
 	default:
 		return k.nodes[0].(music.Audible).Note().KeyName()
 	}
@@ -34,19 +39,29 @@ func (k Key) Value() int {
 }
 
 func (k Key) Increment() {
-	k.Set(k.keyIndex() + 1)
+	switch k.nodes[0].(music.Audible).Note().Behavior.(type) {
+	case music.FixedNote:
+		k.Set(k.keyIndex() + 1)
+	default:
+		k.mode.Increment()
+	}
 }
 
 func (k Key) Decrement() {
-	k.Set(k.keyIndex() - 1)
+	switch k.nodes[0].(music.Audible).Note().Behavior.(type) {
+	case music.FixedNote:
+		k.Set(k.keyIndex() + -1)
+	default:
+		k.mode.Decrement()
+	}
 }
 
 func (k Key) Left() {
-	k.mode.Decrement()
+	k.mode.Left()
 }
 
 func (k Key) Right() {
-	k.mode.Increment()
+	k.mode.Right()
 }
 
 func (k Key) Set(value int) {

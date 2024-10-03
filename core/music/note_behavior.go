@@ -1,12 +1,21 @@
 package music
 
-import "math/rand"
+import (
+	"math/rand"
+)
+
+const (
+	minRandomOctaves = 1
+	maxRandomOctaves = 10
+)
 
 // NoteBehavior defines an interface for various note behaviors.
 // Implementations of this interface define how a note is played.
 type NoteBehavior interface {
 	Name() string
 	Play(n *Note, root Key, scale Scale)
+	Set(value int)
+	Value() int
 	Symbol() string
 }
 
@@ -16,7 +25,9 @@ func AllNoteBehaviors() []NoteBehavior {
 	return []NoteBehavior{
 		FixedNote{},
 		SilentNote{},
-		RandomNote{},
+		&RandomNote{
+			octaves: minRandomOctaves,
+		},
 	}
 }
 
@@ -29,7 +40,13 @@ func (b SilentNote) Play(n *Note, root Key, scale Scale) {}
 
 // Name returns the name of the SilentNote behavior.
 func (b SilentNote) Name() string {
-	return "silent"
+	return "key silent"
+}
+
+func (b SilentNote) Set(value int) {}
+
+func (b SilentNote) Value() int {
+	return 0
 }
 
 func (b SilentNote) Symbol() string {
@@ -53,7 +70,13 @@ func (b FixedNote) Play(n *Note, root Key, scale Scale) {
 
 // Name returns the name of the FixedNote behavior.
 func (b FixedNote) Name() string {
-	return "fixed"
+	return "key"
+}
+
+func (b FixedNote) Set(value int) {}
+
+func (b FixedNote) Value() int {
+	return 0
 }
 
 func (b FixedNote) Symbol() string {
@@ -62,22 +85,36 @@ func (b FixedNote) Symbol() string {
 
 // RandomNote is a behavior where the note plays at a random pitch.
 // It implements the NoteBehavior interface.
-type RandomNote struct{}
+type RandomNote struct {
+	octaves int
+}
 
 // Play is the implementation of the RandomNote behavior, which selects
 // a random key within an octave and transposes it according to the scale and root key.
-func (b RandomNote) Play(n *Note, root Key, scale Scale) {
-	n.Key = root + Key(rand.Intn(12))
-	interval := n.Key.AllSemitonesFrom(root)
-	n.Key = n.Key.Transpose(root, scale, interval)
-	n.midi.NoteOn(n.Channel, uint8(n.Key), n.Velocity)
+func (b *RandomNote) Play(n *Note, root Key, scale Scale) {
+	spread := (b.octaves/2)*12 + (b.octaves%2)*12
+	key := n.Key + Key(rand.Intn(spread))
+	interval := key.AllSemitonesFrom(root)
+	key = n.Key.Transpose(root, scale, interval)
+	n.midi.NoteOn(n.Channel, uint8(key), n.Velocity)
 }
 
 // Name returns the name of the RandomNote behavior.
-func (b RandomNote) Name() string {
-	return "random"
+func (b *RandomNote) Name() string {
+	return "key random"
 }
 
-func (b RandomNote) Symbol() string {
+func (b *RandomNote) Set(value int) {
+	if value < minRandomOctaves || value > maxRandomOctaves {
+		return
+	}
+	b.octaves = value
+}
+
+func (b *RandomNote) Value() int {
+	return b.octaves
+}
+
+func (b *RandomNote) Symbol() string {
 	return "\u033c"
 }
