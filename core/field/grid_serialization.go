@@ -23,7 +23,8 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 
 			node := filesystem.Node{}
 			node.Type = n.Name()
-			node.Direction = n.Direction()
+			node.Direction = int(n.Direction())
+			node.Note = filesystem.Note{}
 
 			switch node.Type {
 			case "bang":

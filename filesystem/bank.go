@@ -49,12 +49,12 @@ type Node struct {
 }
 
 type Note struct {
-	Behavior string `json:"behavior"`
-	Channel ,
-	Key:         defaultKey,
-	Velocity:    defaultVelocity,
-	Length:      defaultLength,
-	Probability: maxProbability,
+	Behavior    string `json:"behavior"`
+	Channel     uint8
+	Key         uint8
+	Velocity    uint8
+	Length      uint8
+	Probability uint8
 }
 
 type Params struct {
