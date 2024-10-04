@@ -16,11 +16,18 @@ func (c Channel) Name() string {
 }
 
 func (c Channel) Display() string {
-	return fmt.Sprintf("%d", c.nodes[0].(music.Audible).Note().Channel+1)
+	if c.nodes[0].(music.Audible).Note().Channel.RandomAmount() != 0 {
+		return fmt.Sprintf(
+			"%d%+d\u033c",
+			c.nodes[0].(music.Audible).Note().Channel.Value()+1,
+			c.nodes[0].(music.Audible).Note().Channel.RandomAmount(),
+		)
+	}
+	return fmt.Sprintf("%d", c.nodes[0].(music.Audible).Note().Channel.Value()+1)
 }
 
 func (c Channel) Value() int {
-	return int(c.nodes[0].(music.Audible).Note().Channel)
+	return int(c.nodes[0].(music.Audible).Note().Channel.Value())
 }
 
 func (c Channel) Increment() {
@@ -31,9 +38,15 @@ func (c Channel) Decrement() {
 	c.Set(c.Value() - 1)
 }
 
-func (c Channel) Left() {}
+func (c Channel) Left() {
+	rand := c.nodes[0].(music.Audible).Note().Channel
+	rand.SetRandomAmount(rand.RandomAmount() - 1)
+}
 
-func (c Channel) Right() {}
+func (c Channel) Right() {
+	rand := c.nodes[0].(music.Audible).Note().Channel
+	rand.SetRandomAmount(rand.RandomAmount() + 1)
+}
 
 func (c Channel) Set(value int) {
 	for _, n := range c.nodes {

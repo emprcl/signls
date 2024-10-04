@@ -75,6 +75,8 @@ type Copyable interface {
 
 type Parameter[T any] interface {
 	Value() T
+	Computed() T
+	Last() T
 	Set(value T)
 	RandomAmount() int
 	SetRandomAmount(amount int)

@@ -31,12 +31,12 @@ type Note struct {
 
 	rand *rand.Rand
 
-	Key         Key   // The MIDI key (pitch) of the note.
-	Interval    int   // Interval relative to a scale's root note.
-	Channel     uint8 // The MIDI channel on which the note is played.
-	Velocity    uint8 // The velocity (volume) of the note.
-	Length      uint8 // The duration the note is held for.
-	Probability uint8 // The probability of the note triggering.
+	Key         Key                     // The MIDI key (pitch) of the note.
+	Interval    int                     // Interval relative to a scale's root note.
+	Channel     common.Parameter[uint8] // The MIDI channel on which the note is played.
+	Velocity    uint8                   // The velocity (volume) of the note.
+	Length      uint8                   // The duration the note is held for.
+	Probability uint8                   // The probability of the note triggering.
 
 	nextKey   Key    // Next key to be played, used for transposition.
 	pulse     uint64 // Internal pulse counter to manage note length.
@@ -50,7 +50,7 @@ func NewNote(midi midi.Midi) *Note {
 		Behavior:    FixedNote{},
 		midi:        midi,
 		rand:        rand.New(source),
-		Channel:     defaultChannel,
+		Channel:     NewMidiParam(defaultChannel, 0, maxChannel),
 		Key:         defaultKey,
 		Velocity:    defaultVelocity,
 		Length:      defaultLength,
@@ -105,7 +105,7 @@ func (n *Note) Play(key Key, scale Scale) {
 
 // Stop sends a MIDI Note Off message and resets the triggered state.
 func (n *Note) Stop() {
-	n.midi.NoteOff(n.Channel, uint8(n.Key))
+	n.midi.NoteOff(n.Channel.Last(), uint8(n.Key))
 	n.triggered = false
 	n.pulse = 0
 }
@@ -145,7 +145,7 @@ func (n *Note) SetChannel(channel uint8) {
 	if channel > maxChannel {
 		return
 	}
-	n.Channel = channel
+	n.Channel.Set(channel)
 }
 
 // ClockDivision returns the pulses per step and steps per quarter note,
