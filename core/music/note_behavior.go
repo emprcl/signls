@@ -92,7 +92,7 @@ type RandomNote struct {
 // Play is the implementation of the RandomNote behavior, which selects
 // a random key within an octave and transposes it according to the scale and root key.
 func (b *RandomNote) Play(n *Note, root Key, scale Scale) {
-	spread := (b.octaves/2)*12 + (b.octaves%2)*12
+	spread := b.octaves * 12
 	key := n.Key + Key(rand.Intn(spread))
 	interval := key.AllSemitonesFrom(root)
 	key = n.Key.Transpose(root, scale, interval)
