@@ -13,6 +13,7 @@ import (
 
 var (
 	gridStyle = lipgloss.NewStyle().
+			Background(lipgloss.Color("0")).
 			Foreground(lipgloss.Color("234"))
 	cursorStyle = lipgloss.NewStyle().
 			Background(lipgloss.Color("190")).
