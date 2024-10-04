@@ -13,8 +13,7 @@ import (
 
 var (
 	gridStyle = lipgloss.NewStyle().
-			Background(lipgloss.Color("0")).
-			Foreground(lipgloss.Color("234"))
+			Background(lipgloss.Color("234"))
 	cursorStyle = lipgloss.NewStyle().
 			Background(lipgloss.Color("190")).
 			Foreground(lipgloss.Color("0"))
@@ -68,7 +67,7 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 		if (x+y)%2 == 0 {
 			return "  "
 		}
-		return gridStyle.Render("░░")
+		return gridStyle.Render("  ")
 	}
 
 	// render node
