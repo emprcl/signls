@@ -32,15 +32,17 @@ func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
 			},
 		}
 	} else if isHomogeneousBehavior[*node.TollEmitter](nodes) {
-		return append([]Param{
+		return append(
+			DefaultEmitterParams(grid, nodes),
 			Threshold{nodes: nodes},
-		}, DefaultEmitterParams(grid, nodes)...)
+		)
 	} else if isHomogeneousNode[*node.EuclidEmitter](nodes) {
-		return append([]Param{
+		return append(
+			DefaultEmitterParams(grid, nodes),
 			Steps{nodes: nodes},
 			Triggers{nodes: nodes},
 			Offset{nodes: nodes},
-		}, DefaultEmitterParams(grid, nodes)...)
+		)
 	}
 
 	emitters := filterNodes[music.Audible](nodes)
