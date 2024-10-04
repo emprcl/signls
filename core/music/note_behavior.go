@@ -65,7 +65,7 @@ func (b FixedNote) Play(n *Note, root Key, scale Scale) {
 		n.Key = n.nextKey
 	}
 	n.Transpose(root, scale)
-	n.midi.NoteOn(n.Channel.Computed(), uint8(n.Key), n.Velocity)
+	n.midi.NoteOn(n.Channel.Computed(), uint8(n.Key), n.Velocity.Computed())
 }
 
 // Name returns the name of the FixedNote behavior.
@@ -96,7 +96,7 @@ func (b *RandomNote) Play(n *Note, root Key, scale Scale) {
 	key := n.Key + Key(rand.Intn(spread))
 	interval := key.AllSemitonesFrom(root)
 	key = n.Key.Transpose(root, scale, interval)
-	n.midi.NoteOn(n.Channel.Computed(), uint8(key), n.Velocity)
+	n.midi.NoteOn(n.Channel.Computed(), uint8(key), n.Velocity.Computed())
 }
 
 // Name returns the name of the RandomNote behavior.

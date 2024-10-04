@@ -25,18 +25,18 @@ const (
 // Note represents a musical note with various properties such as key, velocity, and length.
 // It includes behavior that defines how the note plays and interacts with other elements.
 type Note struct {
-	Behavior NoteBehavior // Interface for defining different behaviors for a note.
+	Behavior NoteBehavior
 
-	midi midi.Midi // Interface to interact with MIDI devices.
+	midi midi.Midi
 
 	rand *rand.Rand
 
-	Key         Key                     // The MIDI key (pitch) of the note.
-	Interval    int                     // Interval relative to a scale's root note.
-	Channel     common.Parameter[uint8] // The MIDI channel on which the note is played.
-	Velocity    uint8                   // The velocity (volume) of the note.
-	Length      uint8                   // The duration the note is held for.
-	Probability uint8                   // The probability of the note triggering.
+	Key         Key
+	Interval    int
+	Channel     common.Parameter[uint8]
+	Velocity    common.Parameter[uint8]
+	Length      common.Parameter[uint8]
+	Probability uint8
 
 	nextKey   Key    // Next key to be played, used for transposition.
 	pulse     uint64 // Internal pulse counter to manage note length.
@@ -50,10 +50,10 @@ func NewNote(midi midi.Midi) *Note {
 		Behavior:    FixedNote{},
 		midi:        midi,
 		rand:        rand.New(source),
-		Channel:     NewMidiParam(defaultChannel, 0, maxChannel),
 		Key:         defaultKey,
-		Velocity:    defaultVelocity,
-		Length:      defaultLength,
+		Channel:     NewMidiParam(defaultChannel, 0, maxChannel),
+		Velocity:    NewMidiParam(defaultVelocity, 0, maxVelocity),
+		Length:      NewMidiParam(defaultLength, minLength, maxLength),
 		Probability: maxProbability,
 	}
 }
@@ -82,7 +82,7 @@ func (n *Note) Tick() {
 	n.pulse++
 
 	// Stop the note if its duration is complete.
-	if n.Length < maxLength && n.pulse >= uint64(n.Length) {
+	if n.Length.Last() < maxLength && n.pulse >= uint64(n.Length.Last()) {
 		n.Stop()
 	}
 }
@@ -126,25 +126,16 @@ func (n *Note) SetKey(key Key, root Key) {
 
 // SetVelocity updates the velocity of the note, ensuring it is within valid limits.
 func (n *Note) SetVelocity(velocity uint8) {
-	if velocity > maxVelocity {
-		return
-	}
-	n.Velocity = velocity
+	n.Velocity.Set(velocity)
 }
 
 // SetLength updates the length of the note, ensuring it is within valid limits.
 func (n *Note) SetLength(length uint8) {
-	if length > maxLength || length < minLength {
-		return
-	}
-	n.Length = length
+	n.Length.Set(length)
 }
 
 // SetChannel updates the MIDI channel of the note, ensuring it is within valid limits.
 func (n *Note) SetChannel(channel uint8) {
-	if channel > maxChannel {
-		return
-	}
 	n.Channel.Set(channel)
 }
 
