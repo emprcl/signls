@@ -133,6 +133,9 @@ func (e *Emitter) Symbol() string {
 	if utf8.RuneCountInString(symbol) >= 2 {
 		return fmt.Sprintf("%.2s", symbol)
 	}
+	if _, ok := e.behavior.(*PassEmitter); ok {
+		return fmt.Sprintf("%s%s%s", symbol, e.note.Behavior.Symbol(), "⇌")
+	}
 	if e.note == nil {
 		return fmt.Sprintf("%s%s", symbol, e.direction.Symbol())
 	}

@@ -1,8 +1,6 @@
 package node
 
 import (
-	"fmt"
-
 	"cykl/core/common"
 	"cykl/core/music"
 	"cykl/midi"
@@ -35,7 +33,7 @@ func (e *PassEmitter) Copy() common.EmitterBehavior {
 }
 
 func (e *PassEmitter) Symbol() string {
-	return fmt.Sprintf("%s%s", "P", "⇌")
+	return "P"
 }
 
 func (e *PassEmitter) Name() string {
