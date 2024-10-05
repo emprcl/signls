@@ -26,12 +26,12 @@ type Emitter struct {
 // Copy creates a deep copy of the emitter, returning it as a Node interface.
 // It clones the associated note and keeps the same behavior and direction.
 func (e *Emitter) Copy(dx, dy int) common.Node {
-	newNote := *e.note
+	newNote := e.note.Copy()
 	return &Emitter{
 		behavior:  e.behavior.Copy(),
 		direction: e.direction,
 		armed:     e.armed,
-		note:      &newNote,
+		note:      newNote,
 		muted:     e.muted,
 	}
 }

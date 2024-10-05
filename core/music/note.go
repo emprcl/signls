@@ -33,9 +33,9 @@ type Note struct {
 
 	Key         Key
 	Interval    int
-	Channel     common.Parameter[uint8]
-	Velocity    common.Parameter[uint8]
-	Length      common.Parameter[uint8]
+	Channel     *MidiParam
+	Velocity    *MidiParam
+	Length      *MidiParam
 	Probability uint8
 
 	nextKey   Key    // Next key to be played, used for transposition.
@@ -55,6 +55,24 @@ func NewNote(midi midi.Midi) *Note {
 		Velocity:    NewMidiParam(defaultVelocity, 0, maxVelocity),
 		Length:      NewMidiParam(defaultLength, minLength, maxLength),
 		Probability: maxProbability,
+	}
+}
+
+// Copy creates a copy of the note.
+func (n Note) Copy() *Note {
+	newChannel := *n.Channel
+	newVelocity := *n.Velocity
+	newLength := *n.Length
+	source := rand.NewSource(time.Now().UnixNano())
+	return &Note{
+		Behavior:    n.Behavior,
+		midi:        n.midi,
+		rand:        rand.New(source),
+		Key:         n.Key,
+		Channel:     &newChannel,
+		Velocity:    &newVelocity,
+		Length:      &newLength,
+		Probability: n.Probability,
 	}
 }
 

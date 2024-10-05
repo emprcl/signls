@@ -43,11 +43,11 @@ func NewEuclidEmitter(midi midi.Midi, direction common.Direction) *EuclidEmitter
 }
 
 func (e *EuclidEmitter) Copy(dx, dy int) common.Node {
-	newNote := *e.note
+	newNote := e.note.Copy()
 	return &EuclidEmitter{
 		direction: e.direction,
 		armed:     e.armed,
-		note:      &newNote,
+		note:      newNote,
 		muted:     e.muted,
 		Steps:     e.Steps,
 		Triggers:  e.Triggers,
