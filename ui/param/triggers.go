@@ -7,6 +7,10 @@ import (
 	"cykl/core/node"
 )
 
+const (
+	minTriggers = 1
+)
+
 type Triggers struct {
 	nodes []common.Node
 }
@@ -36,7 +40,7 @@ func (t Triggers) Left() {}
 func (t Triggers) Right() {}
 
 func (t Triggers) Set(value int) {
-	if value < 0 {
+	if value < minTriggers {
 		return
 	}
 	for _, n := range t.nodes {

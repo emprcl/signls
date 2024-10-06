@@ -106,5 +106,8 @@ func (p *KeyParam) Name() string {
 }
 
 func (p *KeyParam) Symbol() string {
+	if p.amount != 0 {
+		return "\u033c"
+	}
 	return ""
 }

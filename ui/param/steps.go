@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	minSteps = 1
 	maxSteps = 128
 )
 
@@ -40,7 +41,7 @@ func (s Steps) Left() {}
 func (s Steps) Right() {}
 
 func (s Steps) Set(value int) {
-	if value < 0 || value >= maxSteps {
+	if value < minSteps || value >= maxSteps {
 		return
 	}
 	for _, n := range s.nodes {
