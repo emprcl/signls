@@ -134,12 +134,12 @@ func (e *Emitter) Symbol() string {
 		return fmt.Sprintf("%.2s", symbol)
 	}
 	if _, ok := e.behavior.(*PassEmitter); ok {
-		return fmt.Sprintf("%s%s%s", symbol, e.note.Behavior.Symbol(), "⇌")
+		return fmt.Sprintf("%s%s%s", symbol, e.note.Key.Symbol(), "⇌")
 	}
 	if e.note == nil {
 		return fmt.Sprintf("%s%s", symbol, e.direction.Symbol())
 	}
-	return fmt.Sprintf("%s%s%s", symbol, e.note.Behavior.Symbol(), e.direction.Symbol())
+	return fmt.Sprintf("%s%s%s", symbol, e.note.Key.Symbol(), e.direction.Symbol())
 }
 
 // Name returns the name of the emitter type.
