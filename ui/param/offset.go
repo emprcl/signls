@@ -45,3 +45,5 @@ func (o Offset) Set(value int) {
 		n.(*node.EuclidEmitter).Offset = value
 	}
 }
+
+func (o Offset) SetAlt(value int) {}

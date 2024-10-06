@@ -46,3 +46,5 @@ func (t Triggers) Set(value int) {
 		n.(*node.EuclidEmitter).Triggers = value
 	}
 }
+
+func (t Triggers) SetAlt(value int) {}

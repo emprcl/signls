@@ -44,3 +44,5 @@ func (t Threshold) Set(value int) {
 		n.(*node.Emitter).Behavior().(*node.TollEmitter).Threshold = value
 	}
 }
+
+func (t Threshold) SetAlt(value int) {}

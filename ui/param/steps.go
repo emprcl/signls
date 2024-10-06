@@ -47,3 +47,5 @@ func (s Steps) Set(value int) {
 		n.(*node.EuclidEmitter).Steps = value
 	}
 }
+
+func (s Steps) SetAlt(value int) {}

@@ -12,6 +12,7 @@ type Param interface {
 	Value() int
 	Display() string
 	Set(value int)
+	SetAlt(value int)
 	Increment()
 	Decrement()
 	Left()

@@ -39,17 +39,21 @@ func (c Channel) Decrement() {
 }
 
 func (c Channel) Left() {
-	rand := c.nodes[0].(music.Audible).Note().Channel
-	rand.SetRandomAmount(rand.RandomAmount() - 1)
+	c.SetAlt(c.nodes[0].(music.Audible).Note().Channel.RandomAmount() - 1)
 }
 
 func (c Channel) Right() {
-	rand := c.nodes[0].(music.Audible).Note().Channel
-	rand.SetRandomAmount(rand.RandomAmount() + 1)
+	c.SetAlt(c.nodes[0].(music.Audible).Note().Channel.RandomAmount() + 1)
 }
 
 func (c Channel) Set(value int) {
 	for _, n := range c.nodes {
 		n.(music.Audible).Note().SetChannel(uint8(value))
+	}
+}
+
+func (c Channel) SetAlt(value int) {
+	for _, n := range c.nodes {
+		n.(music.Audible).Note().Channel.SetRandomAmount(value)
 	}
 }

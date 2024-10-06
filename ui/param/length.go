@@ -64,17 +64,21 @@ func (l Length) Decrement() {
 }
 
 func (l Length) Left() {
-	rand := l.nodes[0].(music.Audible).Note().Length
-	rand.SetRandomAmount(rand.RandomAmount() - 1)
+	l.SetAlt(l.nodes[0].(music.Audible).Note().Length.RandomAmount() - 1)
 }
 
 func (l Length) Right() {
-	rand := l.nodes[0].(music.Audible).Note().Length
-	rand.SetRandomAmount(rand.RandomAmount() + 1)
+	l.SetAlt(l.nodes[0].(music.Audible).Note().Length.RandomAmount() + 1)
 }
 
 func (l Length) Set(value int) {
 	for _, n := range l.nodes {
 		n.(music.Audible).Note().SetLength(uint8(value))
+	}
+}
+
+func (l Length) SetAlt(value int) {
+	for _, n := range l.nodes {
+		n.(music.Audible).Note().Length.SetRandomAmount(value)
 	}
 }

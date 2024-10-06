@@ -43,6 +43,8 @@ func (s Scale) Set(value int) {
 	s.grid.SetScale(s.scales[value])
 }
 
+func (s Scale) SetAlt(value int) {}
+
 func (s Scale) scaleIndex() int {
 	for i := 0; i < len(s.scales); i++ {
 		if s.grid.Scale == s.scales[i] {

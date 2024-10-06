@@ -47,6 +47,8 @@ func (k Key) Set(value int) {
 	}
 }
 
+func (k Key) SetAlt(value int) {}
+
 func (k Key) Preview() {
 	go func() {
 		n := *k.nodes[0].(music.Audible).Note()

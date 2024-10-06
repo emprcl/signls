@@ -44,6 +44,8 @@ func (d Direction) Set(value int) {
 	}
 }
 
+func (d Direction) SetAlt(value int) {}
+
 func (d Direction) SetFromKeyString(key string) {
 	var dir common.Direction
 	switch key {

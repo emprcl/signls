@@ -43,3 +43,5 @@ func (r Root) Set(value int) {
 	}
 	r.grid.SetKey(music.Key(value))
 }
+
+func (r Root) SetAlt(value int) {}

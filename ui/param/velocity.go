@@ -39,17 +39,21 @@ func (v Velocity) Decrement() {
 }
 
 func (v Velocity) Left() {
-	rand := v.nodes[0].(music.Audible).Note().Velocity
-	rand.SetRandomAmount(rand.RandomAmount() - 1)
+	v.SetAlt(v.nodes[0].(music.Audible).Note().Velocity.RandomAmount() - 1)
 }
 
 func (v Velocity) Right() {
-	rand := v.nodes[0].(music.Audible).Note().Velocity
-	rand.SetRandomAmount(rand.RandomAmount() + 1)
+	v.SetAlt(v.nodes[0].(music.Audible).Note().Velocity.RandomAmount() + 1)
 }
 
 func (v Velocity) Set(value int) {
 	for _, n := range v.nodes {
 		n.(music.Audible).Note().SetVelocity(uint8(value))
+	}
+}
+
+func (v Velocity) SetAlt(value int) {
+	for _, n := range v.nodes {
+		n.(music.Audible).Note().Velocity.SetRandomAmount(value)
 	}
 }

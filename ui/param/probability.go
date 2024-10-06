@@ -47,3 +47,5 @@ func (p Probability) Set(value int) {
 		n.(music.Audible).Note().Probability = uint8(value)
 	}
 }
+
+func (p Probability) SetAlt(value int) {}

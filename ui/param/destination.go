@@ -48,6 +48,8 @@ func (d Destination) Right() {
 
 func (d Destination) Set(value int) {}
 
+func (d Destination) SetAlt(value int) {}
+
 func (d Destination) SetDestination(dx, dy int) {
 	for _, n := range d.nodes {
 		x, y := n.(*node.HoleEmitter).Destination()
