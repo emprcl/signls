@@ -44,7 +44,7 @@ func NewNote(midi midi.Midi) *Note {
 	return &Note{
 		midi:        midi,
 		rand:        rand.New(source),
-		Key:         &KeyParam{key: defaultKey},
+		Key:         NewKeyParam(defaultKey),
 		Channel:     NewMidiParam(defaultChannel, 0, maxChannel),
 		Velocity:    NewMidiParam(defaultVelocity, 0, maxVelocity),
 		Length:      NewMidiParam(defaultLength, minLength, maxLength),
@@ -91,7 +91,11 @@ func (n *Note) Play(root Key, scale Scale) {
 			n.Stop()
 		}
 		n.Key.Transpose(root, scale)
-		n.midi.NoteOn(n.Channel.Computed(), uint8(n.Key.Computed()), n.Velocity.Computed())
+		n.midi.NoteOn(
+			n.Channel.Computed(),
+			uint8(n.Key.Computed(root, scale)),
+			n.Velocity.Computed(),
+		)
 	}
 	n.triggered = true
 	n.pulse = 0
@@ -99,7 +103,7 @@ func (n *Note) Play(root Key, scale Scale) {
 
 // Stop sends a MIDI Note Off message and resets the triggered state.
 func (n *Note) Stop() {
-	n.midi.NoteOff(n.Channel.Last(), uint8(n.Key.Value()))
+	n.midi.NoteOff(n.Channel.Last(), uint8(n.Key.Last()))
 	n.triggered = false
 	n.pulse = 0
 }

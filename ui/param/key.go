@@ -1,6 +1,7 @@
 package param
 
 import (
+	"fmt"
 	"time"
 
 	"cykl/core/common"
@@ -18,6 +19,13 @@ func (k Key) Name() string {
 }
 
 func (k Key) Display() string {
+	if k.nodes[0].(music.Audible).Note().Key.RandomAmount() != 0 {
+		return fmt.Sprintf(
+			"%s%+d\u033c",
+			k.nodes[0].(music.Audible).Note().Key.Display(),
+			k.nodes[0].(music.Audible).Note().Key.RandomAmount(),
+		)
+	}
 	return k.nodes[0].(music.Audible).Note().Key.Display()
 }
 
@@ -34,20 +42,27 @@ func (k Key) Decrement() {
 }
 
 func (k Key) Left() {
-	//k.mode.Left()
+	k.SetAlt(k.nodes[0].(music.Audible).Note().Key.RandomAmount() - 1)
 }
 
 func (k Key) Right() {
-	//k.mode.Right()
+	k.SetAlt(k.nodes[0].(music.Audible).Note().Key.RandomAmount() + 1)
 }
 
 func (k Key) Set(value int) {
+	if value >= len(k.keys) {
+		return
+	}
 	for _, n := range k.nodes {
 		n.(music.Audible).Note().SetKey(k.keys[value], k.root)
 	}
 }
 
-func (k Key) SetAlt(value int) {}
+func (k Key) SetAlt(value int) {
+	for _, n := range k.nodes {
+		n.(music.Audible).Note().Key.SetRandomAmount(value)
+	}
+}
 
 func (k Key) Preview() {
 	go func() {
