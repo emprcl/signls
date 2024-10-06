@@ -14,15 +14,15 @@ type Key struct {
 }
 
 func (k Key) Name() string {
-	return k.nodes[0].(music.Audible).Note().KeyName()
+	return k.nodes[0].(music.Audible).Note().Key.Name()
 }
 
 func (k Key) Display() string {
-	return k.nodes[0].(music.Audible).Note().KeyName()
+	return k.nodes[0].(music.Audible).Note().Key.Display()
 }
 
 func (k Key) Value() int {
-	return int(k.nodes[0].(music.Audible).Note().KeyValue())
+	return int(k.nodes[0].(music.Audible).Note().Key.Value())
 }
 
 func (k Key) Increment() {
@@ -58,7 +58,7 @@ func (k Key) Preview() {
 
 func (k Key) keyIndex() int {
 	for i := 0; i < len(k.keys); i++ {
-		if k.nodes[0].(music.Audible).Note().KeyValue() == k.keys[i] {
+		if k.nodes[0].(music.Audible).Note().Key.Value() == k.keys[i] {
 			return i
 		}
 	}

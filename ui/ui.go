@@ -171,6 +171,9 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.param = 0
 			}
 			m.edit = !m.edit
+			if m.edit {
+				m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
+			}
 			return m, nil
 		case key.Matches(msg, m.keymap.TriggerNode):
 			if !m.grid.Playing {

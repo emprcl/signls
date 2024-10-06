@@ -14,7 +14,6 @@ const (
 	defaultVelocity uint8 = 100
 	defaultLength   uint8 = uint8(common.PulsesPerStep)
 
-	maxKey         Key   = 127
 	maxVelocity    uint8 = 127
 	maxLength      uint8 = 127 // Maximum length of the note (127 is treated as infinity).
 	minLength      uint8 = 1
@@ -29,7 +28,7 @@ type Note struct {
 
 	rand *rand.Rand
 
-	Key         KeyBehavior
+	Key         *KeyParam
 	Channel     *MidiParam
 	Velocity    *MidiParam
 	Length      *MidiParam
@@ -45,7 +44,7 @@ func NewNote(midi midi.Midi) *Note {
 	return &Note{
 		midi:        midi,
 		rand:        rand.New(source),
-		Key:         &FixedKey{key: defaultKey},
+		Key:         &KeyParam{key: defaultKey},
 		Channel:     NewMidiParam(defaultChannel, 0, maxChannel),
 		Velocity:    NewMidiParam(defaultVelocity, 0, maxVelocity),
 		Length:      NewMidiParam(defaultLength, minLength, maxLength),
@@ -55,6 +54,7 @@ func NewNote(midi midi.Midi) *Note {
 
 // Copy creates a copy of the note.
 func (n Note) Copy() *Note {
+	newKey := *n.Key
 	newChannel := *n.Channel
 	newVelocity := *n.Velocity
 	newLength := *n.Length
@@ -62,22 +62,12 @@ func (n Note) Copy() *Note {
 	return &Note{
 		midi:        n.midi,
 		rand:        rand.New(source),
-		Key:         n.Key,
+		Key:         &newKey,
 		Channel:     &newChannel,
 		Velocity:    &newVelocity,
 		Length:      &newLength,
 		Probability: n.Probability,
 	}
-}
-
-// KeyName returns the MIDI note name based on the current or next key.
-func (n Note) KeyName() string {
-	return midi.Note(uint8(n.Key.Value()))
-}
-
-// KeyValue returns the MIDI key value of the current or next key.
-func (n Note) KeyValue() Key {
-	return n.Key.Value()
 }
 
 // Tick advances the internal pulse counter and stops the note if it exceeds its length.
