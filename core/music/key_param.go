@@ -29,82 +29,82 @@ func NewKeyParam(key Key) *KeyParam {
 	}
 }
 
-func (b *KeyParam) Value() Key {
-	if b.nextKey > 0 {
-		return b.nextKey
+func (p *KeyParam) Value() Key {
+	if p.nextKey > 0 {
+		return p.nextKey
 	}
-	return b.key
+	return p.key
 }
 
-func (b *KeyParam) Last() Key {
-	return b.lastKey
+func (p *KeyParam) Last() Key {
+	return p.lastKey
 }
 
-func (b *KeyParam) Display() string {
-	return midi.Note(uint8(b.Value()))
+func (p *KeyParam) Display() string {
+	return midi.Note(uint8(p.Value()))
 }
 
-func (b *KeyParam) Computed(root Key, scale Scale) Key {
-	if b.nextKey > 0 {
-		b.key = b.nextKey
-		b.nextKey = 0
+func (p *KeyParam) Computed(root Key, scale Scale) Key {
+	if p.nextKey > 0 {
+		p.key = p.nextKey
+		p.nextKey = 0
 	}
-	if b.amount == 0 {
-		return b.key
+	if p.amount == 0 {
+		return p.key
 	}
-	key := Key(b.rand.Intn(int(math.Abs(float64(b.amount))) + 1))
-	if b.amount > 0 {
-		key = b.key + Key(key)
+	key := Key(p.rand.Intn(int(math.Abs(float64(p.amount))) + 1))
+	if p.amount > 0 {
+		key = p.key + Key(key)
 	} else {
-		key = b.key - Key(key)
+		key = p.key - Key(key)
 	}
 	interval := key.AllSemitonesFrom(root)
-	b.lastKey = b.key.Transpose(root, scale, interval)
-	return b.lastKey
+	p.lastKey = p.key.Transpose(root, scale, interval)
+	return p.lastKey
 }
 
-func (b *KeyParam) SetNext(key Key, root Key) {
+func (p *KeyParam) SetNext(key Key, root Key) {
 	if key < minKey || key > maxKey {
 		return
 	}
-	b.nextKey = key
-	if int(key)+b.amount < int(maxKey) {
-		b.amount++
+	p.nextKey = key
+	if int(key)+p.amount < int(maxKey) {
+		p.amount++
 	}
-	if int(key)+b.amount > int(minKey) {
-		b.amount--
+	if int(key)+p.amount > int(minKey) {
+		p.amount--
 	}
-	b.interval = b.nextKey.AllSemitonesFrom(root)
+	p.interval = p.nextKey.AllSemitonesFrom(root)
 }
 
-func (b *KeyParam) Set(key Key) {
-	b.key = key
-	b.nextKey = 0
+func (p *KeyParam) Set(key Key) {
+	p.key = key
+	p.nextKey = 0
 }
 
-func (b *KeyParam) Transpose(root Key, scale Scale) {
-	b.SetNext(b.key.Transpose(root, scale, b.interval), root)
+func (p *KeyParam) Transpose(root Key, scale Scale) {
+	p.SetNext(p.key.Transpose(root, scale, p.interval), root)
 }
 
-func (b *KeyParam) RandomAmount() int {
-	return b.amount
+func (p *KeyParam) RandomAmount() int {
+	return p.amount
 }
 
-func (b *KeyParam) SetRandomAmount(amount int) {
-	if int(b.key)+amount < int(minKey) || int(b.key)+amount > int(maxKey) {
+func (p *KeyParam) SetRandomAmount(amount int) {
+	if int(p.key)+amount < int(minKey) || int(p.key)+amount > int(maxKey) {
 		return
 	}
-	b.amount = amount
+	p.amount = amount
 }
 
-func (b *KeyParam) IsChanging() bool {
-	return b.nextKey > 0
+func (p *KeyParam) IsChanging() bool {
+	return p.nextKey > 0
 }
 
-func (b *KeyParam) Name() string {
+func (p *KeyParam) Name() string {
 	return "key"
 }
 
-func (b *KeyParam) Symbol() string {
+func (p *KeyParam) Symbol() string {
 	return ""
 }
