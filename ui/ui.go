@@ -148,11 +148,12 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.handleParamEdit(dir)
 			return m, nil
-		case key.Matches(msg, m.keymap.EditAlt):
+		case key.Matches(msg, m.keymap.EditAltUp, m.keymap.EditAltRight, m.keymap.EditAltDown, m.keymap.EditAltLeft):
+			dir := m.keymap.Direction(msg)
 			if !m.edit {
 				return m, nil
 			}
-			m.params[m.param].ChangeAltMode()
+			m.handleParamAltEdit(dir)
 			return m, nil
 		case key.Matches(msg, m.keymap.AddBang, m.keymap.AddRelay, m.keymap.AddCycle, m.keymap.AddDice, m.keymap.AddToll, m.keymap.AddEuclid, m.keymap.AddZone, m.keymap.AddPass, m.keymap.AddHole):
 			m.grid.AddNodeFromSymbol(m.keymap.EmitterSymbol(msg), m.cursorX, m.cursorY)
@@ -195,25 +196,25 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.edit {
 				return m, nil
 			}
-			param.Get("root", m.gridParams).Increment()
+			param.Get("root", m.gridParams).Up()
 			return m, nil
 		case key.Matches(msg, m.keymap.RootNoteDown):
 			if m.edit {
 				return m, nil
 			}
-			param.Get("root", m.gridParams).Decrement()
+			param.Get("root", m.gridParams).Down()
 			return m, nil
 		case key.Matches(msg, m.keymap.ScaleUp):
 			if m.edit {
 				return m, nil
 			}
-			param.Get("scale", m.gridParams).Increment()
+			param.Get("scale", m.gridParams).Up()
 			return m, nil
 		case key.Matches(msg, m.keymap.ScaleDown):
 			if m.edit {
 				return m, nil
 			}
-			param.Get("scale", m.gridParams).Decrement()
+			param.Get("scale", m.gridParams).Down()
 			return m, nil
 		case key.Matches(msg, m.keymap.TempoUp):
 			m.grid.SetTempo(m.grid.Tempo() + 1)
@@ -281,17 +282,11 @@ func (m mainModel) handleParamEdit(dir string) {
 		return
 	}
 
-	switch p := m.params[m.param].(type) {
-	case param.Direction:
-		p.SetFromKeyString(dir)
-		return
-	}
-
 	switch dir {
 	case "up":
-		m.params[m.param].Increment()
+		m.params[m.param].Up()
 	case "down":
-		m.params[m.param].Decrement()
+		m.params[m.param].Down()
 	case "left":
 		m.params[m.param].Left()
 	case "right":
@@ -304,6 +299,23 @@ func (m mainModel) handleParamEdit(dir string) {
 			return
 		}
 		p.Preview()
+	}
+}
+
+func (m mainModel) handleParamAltEdit(dir string) {
+	if len(m.params) < m.param+1 {
+		return
+	}
+
+	switch dir {
+	case "up":
+		m.params[m.param].AltUp()
+	case "down":
+		m.params[m.param].AltDown()
+	case "left":
+		m.params[m.param].AltLeft()
+	case "right":
+		m.params[m.param].AltRight()
 	}
 }
 

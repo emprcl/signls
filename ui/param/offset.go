@@ -26,17 +26,25 @@ func (o Offset) AltValue() int {
 	return 0
 }
 
-func (o Offset) Increment() {
+func (o Offset) Up() {
 	o.Set(o.Value() + 1)
 }
 
-func (o Offset) Decrement() {
+func (o Offset) Down() {
 	o.Set(o.Value() - 1)
 }
 
 func (o Offset) Left() {}
 
 func (o Offset) Right() {}
+
+func (o Offset) AltUp() {}
+
+func (o Offset) AltDown() {}
+
+func (o Offset) AltLeft() {}
+
+func (o Offset) AltRight() {}
 
 func (o Offset) Set(value int) {
 	if value < 0 {
@@ -51,5 +59,3 @@ func (o Offset) Set(value int) {
 }
 
 func (o Offset) SetAlt(value int) {}
-
-func (o Offset) ChangeAltMode() {}

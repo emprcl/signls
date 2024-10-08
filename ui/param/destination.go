@@ -34,11 +34,11 @@ func (d Destination) Position() (int, int) {
 	return d.nodes[0].(*node.HoleEmitter).Destination()
 }
 
-func (d Destination) Increment() {
+func (d Destination) Up() {
 	d.SetDestination(0, -1)
 }
 
-func (d Destination) Decrement() {
+func (d Destination) Down() {
 	d.SetDestination(0, 1)
 }
 
@@ -49,6 +49,14 @@ func (d Destination) Left() {
 func (d Destination) Right() {
 	d.SetDestination(1, 0)
 }
+
+func (d Destination) AltUp() {}
+
+func (d Destination) AltDown() {}
+
+func (d Destination) AltLeft() {}
+
+func (d Destination) AltRight() {}
 
 func (d Destination) Set(value int) {}
 
@@ -68,5 +76,3 @@ func (d Destination) SetDestination(dx, dy int) {
 		n.(*node.HoleEmitter).SetDestination(x+dx, y+dy)
 	}
 }
-
-func (d Destination) ChangeAltMode() {}

@@ -19,7 +19,10 @@ type KeyMap struct {
 	EditDown  string `json:"edit_down"`
 	EditLeft  string `json:"edit_left"`
 
-	EditAlt string `json:"edit_alt"`
+	EditAltUp    string `json:"edit_alt_up"`
+	EditAltRight string `json:"edit_alt_down"`
+	EditAltDown  string `json:"edit_alt_right"`
+	EditAltLeft  string `json:"edit_alt_left"`
 
 	AddBang   string `json:"add_bang"`
 	AddEuclid string `json:"add_euclid"`
@@ -78,7 +81,10 @@ func NewDefaultAzertyKeyMap() KeyMap {
 		EditDown:  "ctrl+down",
 		EditLeft:  "ctrl+left",
 
-		EditAlt: "shift+tab",
+		EditAltUp:    "ctrl+shift+up",
+		EditAltRight: ">",
+		EditAltDown:  "ctrl+shift+down",
+		EditAltLeft:  "<",
 
 		AddBang:   "&",
 		AddEuclid: "é",
@@ -139,7 +145,10 @@ func NewDefaultAzertyMacKeyMap() KeyMap {
 		EditDown:  "ctrl+down",
 		EditLeft:  "ctrl+left",
 
-		EditAlt: "shift+tab",
+		EditAltUp:    "ctrl+shift+up",
+		EditAltRight: ">",
+		EditAltDown:  "ctrl+shift+down",
+		EditAltLeft:  "<",
 
 		AddBang:   "&",
 		AddEuclid: "é",
@@ -199,7 +208,10 @@ func NewDefaultQwertyKeyMap() KeyMap {
 		EditDown:  "ctrl+down",
 		EditLeft:  "ctrl+left",
 
-		EditAlt: "shift+tab",
+		EditAltUp:    "ctrl+shift+up",
+		EditAltRight: "ctrl+shift+right",
+		EditAltDown:  "ctrl+shift+down",
+		EditAltLeft:  "ctrl+shift+left",
 
 		AddBang:   "1",
 		AddEuclid: "2",
@@ -260,7 +272,10 @@ func NewDefaultQwertyMacKeyMap() KeyMap {
 		EditDown:  "ctrl+down",
 		EditLeft:  "ctrl+left",
 
-		EditAlt: "shift+tab",
+		EditAltUp:    "ctrl+shift+up",
+		EditAltRight: "ctrl+shift+right",
+		EditAltDown:  "ctrl+shift+down",
+		EditAltLeft:  "ctrl+shift+left",
 
 		AddBang:   "1",
 		AddEuclid: "2",

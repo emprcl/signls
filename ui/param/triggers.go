@@ -31,17 +31,25 @@ func (t Triggers) AltValue() int {
 	return 0
 }
 
-func (t Triggers) Increment() {
+func (t Triggers) Up() {
 	t.Set(t.Value() + 1)
 }
 
-func (t Triggers) Decrement() {
+func (t Triggers) Down() {
 	t.Set(t.Value() - 1)
 }
 
 func (t Triggers) Left() {}
 
 func (t Triggers) Right() {}
+
+func (t Triggers) AltUp() {}
+
+func (t Triggers) AltDown() {}
+
+func (t Triggers) AltLeft() {}
+
+func (t Triggers) AltRight() {}
 
 func (t Triggers) Set(value int) {
 	if value < minTriggers {
@@ -56,5 +64,3 @@ func (t Triggers) Set(value int) {
 }
 
 func (t Triggers) SetAlt(value int) {}
-
-func (t Triggers) ChangeAltMode() {}

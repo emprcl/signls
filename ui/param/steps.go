@@ -32,17 +32,25 @@ func (s Steps) AltValue() int {
 	return 0
 }
 
-func (s Steps) Increment() {
+func (s Steps) Up() {
 	s.Set(s.Value() + 1)
 }
 
-func (s Steps) Decrement() {
+func (s Steps) Down() {
 	s.Set(s.Value() - 1)
 }
 
 func (s Steps) Left() {}
 
 func (s Steps) Right() {}
+
+func (s Steps) AltUp() {}
+
+func (s Steps) AltDown() {}
+
+func (s Steps) AltLeft() {}
+
+func (s Steps) AltRight() {}
 
 func (s Steps) Set(value int) {
 	if value < minSteps || value >= maxSteps {
@@ -54,5 +62,3 @@ func (s Steps) Set(value int) {
 }
 
 func (s Steps) SetAlt(value int) {}
-
-func (s Steps) ChangeAltMode() {}

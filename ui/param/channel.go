@@ -34,11 +34,11 @@ func (c Channel) AltValue() int {
 	return 0
 }
 
-func (c Channel) Increment() {
+func (c Channel) Up() {
 	c.Set(c.Value() + 1)
 }
 
-func (c Channel) Decrement() {
+func (c Channel) Down() {
 	c.Set(c.Value() - 1)
 }
 
@@ -49,6 +49,14 @@ func (c Channel) Left() {
 func (c Channel) Right() {
 	c.SetAlt(c.nodes[0].(music.Audible).Note().Channel.RandomAmount() + 1)
 }
+
+func (c Channel) AltUp() {}
+
+func (c Channel) AltDown() {}
+
+func (c Channel) AltLeft() {}
+
+func (c Channel) AltRight() {}
 
 func (c Channel) Set(value int) {
 	for _, n := range c.nodes {
@@ -61,5 +69,3 @@ func (c Channel) SetAlt(value int) {
 		n.(music.Audible).Note().Channel.SetRandomAmount(value)
 	}
 }
-
-func (c Channel) ChangeAltMode() {}

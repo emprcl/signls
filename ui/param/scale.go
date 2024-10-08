@@ -26,17 +26,25 @@ func (s Scale) AltValue() int {
 	return 0
 }
 
-func (s Scale) Increment() {
+func (s Scale) Up() {
 	s.Set(s.scaleIndex() + 1)
 }
 
-func (s Scale) Decrement() {
+func (s Scale) Down() {
 	s.Set(s.scaleIndex() - 1)
 }
 
 func (s Scale) Left() {}
 
 func (s Scale) Right() {}
+
+func (s Scale) AltUp() {}
+
+func (s Scale) AltDown() {}
+
+func (s Scale) AltLeft() {}
+
+func (s Scale) AltRight() {}
 
 func (s Scale) Set(value int) {
 	if value < 0 {
@@ -48,8 +56,6 @@ func (s Scale) Set(value int) {
 }
 
 func (s Scale) SetAlt(value int) {}
-
-func (s Scale) ChangeAltMode() {}
 
 func (s Scale) scaleIndex() int {
 	for i := 0; i < len(s.scales); i++ {

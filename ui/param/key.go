@@ -54,11 +54,11 @@ func (k *Key) AltValue() int {
 	}
 }
 
-func (k *Key) Increment() {
+func (k *Key) Up() {
 	k.Set(k.keyIndex() + 1)
 }
 
-func (k *Key) Decrement() {
+func (k *Key) Down() {
 	k.Set(k.keyIndex() + -1)
 }
 
@@ -68,6 +68,24 @@ func (k *Key) Left() {
 
 func (k *Key) Right() {
 	k.SetAlt(k.AltValue() + 1)
+}
+
+func (k *Key) AltUp() {}
+
+func (k *Key) AltDown() {}
+
+func (k *Key) AltLeft() {
+	k.mode = KeyMode((k.mode - 1) % 2)
+	for _, n := range k.nodes {
+		n.(music.Audible).Note().Key.SetSilent(k.mode == KeyModeSilent)
+	}
+}
+
+func (k *Key) AltRight() {
+	k.mode = KeyMode((k.mode + 1) % 2)
+	for _, n := range k.nodes {
+		n.(music.Audible).Note().Key.SetSilent(k.mode == KeyModeSilent)
+	}
 }
 
 func (k *Key) Set(value int) {
@@ -90,13 +108,6 @@ func (k *Key) SetAlt(value int) {
 		for _, n := range k.nodes {
 			n.(music.Audible).Note().Key.SetRandomAmount(value)
 		}
-	}
-}
-
-func (k *Key) ChangeAltMode() {
-	k.mode = KeyMode((k.mode + 1) % 2)
-	for _, n := range k.nodes {
-		n.(music.Audible).Note().Key.SetSilent(k.mode == KeyModeSilent)
 	}
 }
 

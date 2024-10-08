@@ -28,17 +28,25 @@ func (t Threshold) AltValue() int {
 	return 0
 }
 
-func (t Threshold) Increment() {
+func (t Threshold) Up() {
 	t.Set(t.Value() + 1)
 }
 
-func (t Threshold) Decrement() {
+func (t Threshold) Down() {
 	t.Set(t.Value() - 1)
 }
 
 func (t Threshold) Left() {}
 
 func (t Threshold) Right() {}
+
+func (t Threshold) AltUp() {}
+
+func (t Threshold) AltDown() {}
+
+func (t Threshold) AltLeft() {}
+
+func (t Threshold) AltRight() {}
 
 func (t Threshold) Set(value int) {
 	if value < 0 || value >= math.MaxInt32 {
@@ -50,5 +58,3 @@ func (t Threshold) Set(value int) {
 }
 
 func (t Threshold) SetAlt(value int) {}
-
-func (t Threshold) ChangeAltMode() {}

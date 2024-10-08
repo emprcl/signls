@@ -30,17 +30,21 @@ func (d Direction) AltValue() int {
 	return 0
 }
 
-func (d Direction) Increment() {
-	// direction selection working differently
-}
+func (d Direction) Up() {}
 
-func (d Direction) Decrement() {
-	// direction selection working differently
-}
+func (d Direction) Down() {}
 
 func (d Direction) Left() {}
 
 func (d Direction) Right() {}
+
+func (d Direction) AltUp() {}
+
+func (d Direction) AltDown() {}
+
+func (d Direction) AltLeft() {}
+
+func (d Direction) AltRight() {}
 
 func (d Direction) Set(value int) {
 	for _, node := range d.nodes {
@@ -68,5 +72,3 @@ func (d Direction) SetFromKeyString(key string) {
 		node.SetDirection(dir)
 	}
 }
-
-func (d Direction) ChangeAltMode() {}

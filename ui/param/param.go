@@ -14,11 +14,15 @@ type Param interface {
 	Display() string
 	Set(value int)
 	SetAlt(value int)
-	ChangeAltMode()
-	Increment()
-	Decrement()
+
+	Up()
+	Down()
 	Left()
 	Right()
+	AltUp()
+	AltDown()
+	AltLeft()
+	AltRight()
 }
 
 func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
