@@ -53,7 +53,8 @@ func (p *KeyParam) Computed(root Key, scale Scale) Key {
 		p.nextKey = 0
 	}
 	if p.amount == 0 {
-		return p.key
+		p.lastKey = p.key
+		return p.lastKey
 	}
 	key := Key(p.rand.Intn(int(math.Abs(float64(p.amount))) + 1))
 	if p.amount > 0 {
@@ -98,10 +99,6 @@ func (p *KeyParam) SetRandomAmount(amount int) {
 		return
 	}
 	p.amount = amount
-}
-
-func (p *KeyParam) IsChanging() bool {
-	return p.nextKey > 0
 }
 
 func (p *KeyParam) IsSilent() bool {

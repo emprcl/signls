@@ -85,9 +85,6 @@ func (n *Note) Tick() {
 
 // Play triggers the note with a specific root and scale, resetting internal state.
 func (n *Note) Play(root Key, scale Scale) {
-	n.triggered = true
-	n.pulse = 0
-
 	if n.Key.IsSilent() {
 		return
 	}
@@ -97,15 +94,17 @@ func (n *Note) Play(root Key, scale Scale) {
 		return
 	}
 
-	if n.Key.IsChanging() {
-		n.Stop()
-	}
 	n.Key.Transpose(root, scale)
+	n.Stop() // stop previous note
+
+	n.triggered = true
+	n.pulse = 0
 	n.midi.NoteOn(
 		n.Channel.Computed(),
 		uint8(n.Key.Computed(root, scale)),
 		n.Velocity.Computed(),
 	)
+	n.Length.Computed() // Just trigger length computation
 }
 
 // Stop sends a MIDI Note Off message and resets the triggered state.

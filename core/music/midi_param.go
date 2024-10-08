@@ -30,7 +30,8 @@ func (p *MidiParam) Value() uint8 {
 
 func (p *MidiParam) Computed() uint8 {
 	if p.amount == 0 {
-		return p.val
+		p.last = p.val
+		return p.last
 	}
 	value := uint8(p.rand.Intn(int(math.Abs(float64(p.amount))) + 1))
 	if p.amount > 0 {
