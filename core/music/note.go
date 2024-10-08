@@ -28,10 +28,10 @@ type Note struct {
 
 	rand *rand.Rand
 
-	Key         *KeyParam
-	Channel     *MidiParam
-	Velocity    *MidiParam
-	Length      *MidiParam
+	Key         *KeyValue
+	Channel     *common.ControlValue[uint8]
+	Velocity    *common.ControlValue[uint8]
+	Length      *common.ControlValue[uint8]
 	Probability uint8
 
 	pulse     uint64 // Internal pulse counter to manage note length.
@@ -44,10 +44,10 @@ func NewNote(midi midi.Midi) *Note {
 	return &Note{
 		midi:        midi,
 		rand:        rand.New(source),
-		Key:         NewKeyParam(defaultKey),
-		Channel:     NewMidiParam(defaultChannel, 0, maxChannel),
-		Velocity:    NewMidiParam(defaultVelocity, 0, maxVelocity),
-		Length:      NewMidiParam(defaultLength, minLength, maxLength),
+		Key:         NewKeyValue(defaultKey),
+		Channel:     common.NewControlValue[uint8](defaultChannel, 0, maxChannel),
+		Velocity:    common.NewControlValue[uint8](defaultVelocity, 0, maxVelocity),
+		Length:      common.NewControlValue[uint8](defaultLength, minLength, maxLength),
 		Probability: maxProbability,
 	}
 }

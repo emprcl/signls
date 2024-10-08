@@ -188,7 +188,7 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	case "p":
 		g.AddNode(node.NewPassEmitter(g.midi, common.NONE), x, y)
 	case "h":
-		g.AddNode(node.NewHoleEmitter(common.NONE, x, y), x, y)
+		g.AddNode(node.NewHoleEmitter(common.NONE, x, y, g.Width, g.Height), x, y)
 	}
 }
 

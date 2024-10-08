@@ -19,7 +19,11 @@ func (d Destination) Name() string {
 
 func (d Destination) Display() string {
 	x, y := d.nodes[0].(*node.HoleEmitter).Destination()
-	return fmt.Sprintf("%d,%d", x, y)
+	amountX, amountY := d.nodes[0].(*node.HoleEmitter).DestinationAmount()
+	if amountX == 0 && amountY == 0 {
+		return fmt.Sprintf("%d,%d", x, y)
+	}
+	return fmt.Sprintf("%d%+d,%d%+d", x, amountX, y, amountY)
 }
 
 func (d Destination) Value() int {
@@ -50,13 +54,21 @@ func (d Destination) Right() {
 	d.SetDestination(1, 0)
 }
 
-func (d Destination) AltUp() {}
+func (d Destination) AltUp() {
+	d.SetDestinationAmount(1, 0)
+}
 
-func (d Destination) AltDown() {}
+func (d Destination) AltDown() {
+	d.SetDestinationAmount(-1, 0)
+}
 
-func (d Destination) AltLeft() {}
+func (d Destination) AltLeft() {
+	d.SetDestinationAmount(0, -1)
+}
 
-func (d Destination) AltRight() {}
+func (d Destination) AltRight() {
+	d.SetDestinationAmount(0, 1)
+}
 
 func (d Destination) Set(value int) {}
 
@@ -74,5 +86,12 @@ func (d Destination) SetDestination(dx, dy int) {
 			continue
 		}
 		n.(*node.HoleEmitter).SetDestination(x+dx, y+dy)
+	}
+}
+
+func (d Destination) SetDestinationAmount(dAmountX, dAmountY int) {
+	for _, n := range d.nodes {
+		amountX, amountY := n.(*node.HoleEmitter).DestinationAmount()
+		n.(*node.HoleEmitter).SetDestinationAmount(amountX+dAmountX, amountY+dAmountY)
 	}
 }

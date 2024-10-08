@@ -1,4 +1,4 @@
-package music
+package common
 
 import (
 	"math"
@@ -6,17 +6,21 @@ import (
 	"time"
 )
 
-type MidiParam struct {
-	val      uint8
-	last     uint8
-	min, max uint8
+type Number interface {
+	int | uint8
+}
+
+type ControlValue[T Number] struct {
+	val      T
+	last     T
+	min, max T
 	amount   int
 	rand     *rand.Rand
 }
 
-func NewMidiParam(value uint8, min uint8, max uint8) *MidiParam {
+func NewControlValue[T Number](value T, min T, max T) *ControlValue[T] {
 	source := rand.NewSource(time.Now().UnixNano())
-	return &MidiParam{
+	return &ControlValue[T]{
 		val:  value,
 		min:  min,
 		max:  max,
@@ -24,16 +28,16 @@ func NewMidiParam(value uint8, min uint8, max uint8) *MidiParam {
 	}
 }
 
-func (p *MidiParam) Value() uint8 {
+func (p *ControlValue[T]) Value() T {
 	return p.val
 }
 
-func (p *MidiParam) Computed() uint8 {
+func (p *ControlValue[T]) Computed() T {
 	if p.amount == 0 {
 		p.last = p.val
 		return p.last
 	}
-	value := uint8(p.rand.Intn(int(math.Abs(float64(p.amount))) + 1))
+	value := T(p.rand.Intn(int(math.Abs(float64(p.amount))) + 1))
 	if p.amount > 0 {
 		value = p.val + value
 	} else {
@@ -43,11 +47,11 @@ func (p *MidiParam) Computed() uint8 {
 	return p.last
 }
 
-func (p *MidiParam) Last() uint8 {
+func (p *ControlValue[T]) Last() T {
 	return p.last
 }
 
-func (p *MidiParam) Set(value uint8) {
+func (p *ControlValue[T]) Set(value T) {
 	if value < p.min || value > p.max {
 		return
 	}
@@ -61,11 +65,11 @@ func (p *MidiParam) Set(value uint8) {
 	p.last = value
 }
 
-func (p *MidiParam) RandomAmount() int {
+func (p *ControlValue[T]) RandomAmount() int {
 	return p.amount
 }
 
-func (p *MidiParam) SetRandomAmount(amount int) {
+func (p *ControlValue[T]) SetRandomAmount(amount int) {
 	if int(p.val)+amount < int(p.min) || int(p.val)+amount > int(p.max) {
 		return
 	}

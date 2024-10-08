@@ -12,7 +12,7 @@ const (
 	minKey Key = 21
 )
 
-type KeyParam struct {
+type KeyValue struct {
 	rand *rand.Rand
 
 	key      Key
@@ -24,30 +24,30 @@ type KeyParam struct {
 	silent bool
 }
 
-func NewKeyParam(key Key) *KeyParam {
+func NewKeyValue(key Key) *KeyValue {
 	source := rand.NewSource(time.Now().UnixNano())
-	return &KeyParam{
+	return &KeyValue{
 		key:  key,
 		rand: rand.New(source),
 	}
 }
 
-func (p *KeyParam) Value() Key {
+func (p *KeyValue) Value() Key {
 	if p.nextKey > 0 {
 		return p.nextKey
 	}
 	return p.key
 }
 
-func (p *KeyParam) Last() Key {
+func (p *KeyValue) Last() Key {
 	return p.lastKey
 }
 
-func (p *KeyParam) Display() string {
+func (p *KeyValue) Display() string {
 	return midi.Note(uint8(p.Value()))
 }
 
-func (p *KeyParam) Computed(root Key, scale Scale) Key {
+func (p *KeyValue) Computed(root Key, scale Scale) Key {
 	if p.nextKey > 0 {
 		p.key = p.nextKey
 		p.nextKey = 0
@@ -67,7 +67,7 @@ func (p *KeyParam) Computed(root Key, scale Scale) Key {
 	return p.lastKey
 }
 
-func (p *KeyParam) SetNext(key Key, root Key) {
+func (p *KeyValue) SetNext(key Key, root Key) {
 	if key < minKey || key > maxKey {
 		return
 	}
@@ -81,39 +81,39 @@ func (p *KeyParam) SetNext(key Key, root Key) {
 	p.interval = p.nextKey.AllSemitonesFrom(root)
 }
 
-func (p *KeyParam) Set(key Key) {
+func (p *KeyValue) Set(key Key) {
 	p.key = key
 	p.nextKey = 0
 }
 
-func (p *KeyParam) Transpose(root Key, scale Scale) {
+func (p *KeyValue) Transpose(root Key, scale Scale) {
 	p.SetNext(p.key.Transpose(root, scale, p.interval), root)
 }
 
-func (p *KeyParam) RandomAmount() int {
+func (p *KeyValue) RandomAmount() int {
 	return p.amount
 }
 
-func (p *KeyParam) SetRandomAmount(amount int) {
+func (p *KeyValue) SetRandomAmount(amount int) {
 	if int(p.key)+amount < int(minKey) || int(p.key)+amount > int(maxKey) {
 		return
 	}
 	p.amount = amount
 }
 
-func (p *KeyParam) IsSilent() bool {
+func (p *KeyValue) IsSilent() bool {
 	return p.silent
 }
 
-func (p *KeyParam) SetSilent(silent bool) {
+func (p *KeyValue) SetSilent(silent bool) {
 	p.silent = silent
 }
 
-func (p *KeyParam) Name() string {
+func (p *KeyValue) Name() string {
 	return "key"
 }
 
-func (p *KeyParam) Symbol() string {
+func (p *KeyValue) Symbol() string {
 	if p.silent {
 		return "\u0353"
 	}
