@@ -85,20 +85,27 @@ func (n *Note) Tick() {
 
 // Play triggers the note with a specific root and scale, resetting internal state.
 func (n *Note) Play(root Key, scale Scale) {
-	if n.Probability == maxProbability ||
-		uint8(rand.Int31n((100))) < n.Probability {
-		if n.Key.IsChanging() {
-			n.Stop()
-		}
-		n.Key.Transpose(root, scale)
-		n.midi.NoteOn(
-			n.Channel.Computed(),
-			uint8(n.Key.Computed(root, scale)),
-			n.Velocity.Computed(),
-		)
-	}
 	n.triggered = true
 	n.pulse = 0
+
+	if n.Key.IsSilent() {
+		return
+	}
+
+	if n.Probability < maxProbability &&
+		uint8(rand.Int31n((100))) >= n.Probability {
+		return
+	}
+
+	if n.Key.IsChanging() {
+		n.Stop()
+	}
+	n.Key.Transpose(root, scale)
+	n.midi.NoteOn(
+		n.Channel.Computed(),
+		uint8(n.Key.Computed(root, scale)),
+		n.Velocity.Computed(),
+	)
 }
 
 // Stop sends a MIDI Note Off message and resets the triggered state.

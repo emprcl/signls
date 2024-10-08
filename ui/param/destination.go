@@ -26,6 +26,10 @@ func (d Destination) Value() int {
 	return 0
 }
 
+func (d Destination) AltValue() int {
+	return 0
+}
+
 func (d Destination) Position() (int, int) {
 	return d.nodes[0].(*node.HoleEmitter).Destination()
 }
@@ -64,3 +68,5 @@ func (d Destination) SetDestination(dx, dy int) {
 		n.(*node.HoleEmitter).SetDestination(x+dx, y+dy)
 	}
 }
+
+func (d Destination) ChangeAltMode() {}

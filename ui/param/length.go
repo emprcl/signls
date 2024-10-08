@@ -55,6 +55,10 @@ func (l Length) Value() int {
 	return int(l.nodes[0].(music.Audible).Note().Length.Value())
 }
 
+func (l Length) AltValue() int {
+	return 0
+}
+
 func (l Length) Increment() {
 	l.Set(l.Value() + 1)
 }
@@ -82,3 +86,5 @@ func (l Length) SetAlt(value int) {
 		n.(music.Audible).Note().Length.SetRandomAmount(value)
 	}
 }
+
+func (l Length) ChangeAltMode() {}

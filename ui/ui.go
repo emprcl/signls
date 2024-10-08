@@ -148,6 +148,12 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.handleParamEdit(dir)
 			return m, nil
+		case key.Matches(msg, m.keymap.EditAlt):
+			if !m.edit {
+				return m, nil
+			}
+			m.params[m.param].ChangeAltMode()
+			return m, nil
 		case key.Matches(msg, m.keymap.AddBang, m.keymap.AddRelay, m.keymap.AddCycle, m.keymap.AddDice, m.keymap.AddToll, m.keymap.AddEuclid, m.keymap.AddZone, m.keymap.AddPass, m.keymap.AddHole):
 			m.grid.AddNodeFromSymbol(m.keymap.EmitterSymbol(msg), m.cursorX, m.cursorY)
 			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
@@ -293,7 +299,7 @@ func (m mainModel) handleParamEdit(dir string) {
 	}
 
 	switch p := m.params[m.param].(type) {
-	case param.Key:
+	case *param.Key:
 		if m.grid.Playing {
 			return
 		}

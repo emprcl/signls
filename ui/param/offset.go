@@ -22,6 +22,10 @@ func (o Offset) Value() int {
 	return o.nodes[0].(*node.EuclidEmitter).Offset
 }
 
+func (o Offset) AltValue() int {
+	return 0
+}
+
 func (o Offset) Increment() {
 	o.Set(o.Value() + 1)
 }
@@ -47,3 +51,5 @@ func (o Offset) Set(value int) {
 }
 
 func (o Offset) SetAlt(value int) {}
+
+func (o Offset) ChangeAltMode() {}

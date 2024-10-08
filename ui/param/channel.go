@@ -30,6 +30,10 @@ func (c Channel) Value() int {
 	return int(c.nodes[0].(music.Audible).Note().Channel.Value())
 }
 
+func (c Channel) AltValue() int {
+	return 0
+}
+
 func (c Channel) Increment() {
 	c.Set(c.Value() + 1)
 }
@@ -57,3 +61,5 @@ func (c Channel) SetAlt(value int) {
 		n.(music.Audible).Note().Channel.SetRandomAmount(value)
 	}
 }
+
+func (c Channel) ChangeAltMode() {}

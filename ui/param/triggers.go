@@ -27,6 +27,10 @@ func (t Triggers) Value() int {
 	return t.nodes[0].(*node.EuclidEmitter).Triggers
 }
 
+func (t Triggers) AltValue() int {
+	return 0
+}
+
 func (t Triggers) Increment() {
 	t.Set(t.Value() + 1)
 }
@@ -52,3 +56,5 @@ func (t Triggers) Set(value int) {
 }
 
 func (t Triggers) SetAlt(value int) {}
+
+func (t Triggers) ChangeAltMode() {}

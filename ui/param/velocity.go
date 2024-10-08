@@ -30,6 +30,10 @@ func (v Velocity) Value() int {
 	return int(v.nodes[0].(music.Audible).Note().Velocity.Value())
 }
 
+func (v Velocity) AltValue() int {
+	return 0
+}
+
 func (v Velocity) Increment() {
 	v.Set(v.Value() + 1)
 }
@@ -57,3 +61,5 @@ func (v Velocity) SetAlt(value int) {
 		n.(music.Audible).Note().Velocity.SetRandomAmount(value)
 	}
 }
+
+func (v Velocity) ChangeAltMode() {}

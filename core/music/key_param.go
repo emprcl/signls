@@ -13,12 +13,15 @@ const (
 )
 
 type KeyParam struct {
+	rand *rand.Rand
+
 	key      Key
 	nextKey  Key
 	lastKey  Key
 	interval int
 	amount   int
-	rand     *rand.Rand
+
+	silent bool
 }
 
 func NewKeyParam(key Key) *KeyParam {
@@ -101,11 +104,22 @@ func (p *KeyParam) IsChanging() bool {
 	return p.nextKey > 0
 }
 
+func (p *KeyParam) IsSilent() bool {
+	return p.silent
+}
+
+func (p *KeyParam) SetSilent(silent bool) {
+	p.silent = silent
+}
+
 func (p *KeyParam) Name() string {
 	return "key"
 }
 
 func (p *KeyParam) Symbol() string {
+	if p.silent {
+		return "\u0353"
+	}
 	if p.amount != 0 {
 		return "\u033c"
 	}

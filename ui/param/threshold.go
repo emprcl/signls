@@ -24,6 +24,10 @@ func (t Threshold) Value() int {
 	return t.nodes[0].(*node.Emitter).Behavior().(*node.TollEmitter).Threshold
 }
 
+func (t Threshold) AltValue() int {
+	return 0
+}
+
 func (t Threshold) Increment() {
 	t.Set(t.Value() + 1)
 }
@@ -46,3 +50,5 @@ func (t Threshold) Set(value int) {
 }
 
 func (t Threshold) SetAlt(value int) {}
+
+func (t Threshold) ChangeAltMode() {}

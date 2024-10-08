@@ -26,6 +26,10 @@ func (d Direction) Value() int {
 	return int(d.nodes[0].Direction())
 }
 
+func (d Direction) AltValue() int {
+	return 0
+}
+
 func (d Direction) Increment() {
 	// direction selection working differently
 }
@@ -64,3 +68,5 @@ func (d Direction) SetFromKeyString(key string) {
 		node.SetDirection(dir)
 	}
 }
+
+func (d Direction) ChangeAltMode() {}

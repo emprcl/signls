@@ -25,6 +25,10 @@ func (r Root) Value() int {
 	return int(r.grid.Key)
 }
 
+func (r Root) AltValue() int {
+	return 0
+}
+
 func (r Root) Increment() {
 	r.Set(r.Value() + 1)
 }
@@ -45,3 +49,5 @@ func (r Root) Set(value int) {
 }
 
 func (r Root) SetAlt(value int) {}
+
+func (r Root) ChangeAltMode() {}

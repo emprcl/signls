@@ -27,6 +27,10 @@ func (p Probability) Value() int {
 	return int(p.nodes[0].(music.Audible).Note().Probability)
 }
 
+func (p Probability) AltValue() int {
+	return 0
+}
+
 func (p Probability) Increment() {
 	p.Set(p.Value() + 1)
 }
@@ -49,3 +53,5 @@ func (p Probability) Set(value int) {
 }
 
 func (p Probability) SetAlt(value int) {}
+
+func (p Probability) ChangeAltMode() {}

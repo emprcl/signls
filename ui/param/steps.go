@@ -28,6 +28,10 @@ func (s Steps) Value() int {
 	return s.nodes[0].(*node.EuclidEmitter).Steps
 }
 
+func (s Steps) AltValue() int {
+	return 0
+}
+
 func (s Steps) Increment() {
 	s.Set(s.Value() + 1)
 }
@@ -50,3 +54,5 @@ func (s Steps) Set(value int) {
 }
 
 func (s Steps) SetAlt(value int) {}
+
+func (s Steps) ChangeAltMode() {}

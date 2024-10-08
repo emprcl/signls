@@ -10,9 +10,11 @@ import (
 type Param interface {
 	Name() string
 	Value() int
+	AltValue() int
 	Display() string
 	Set(value int)
 	SetAlt(value int)
+	ChangeAltMode()
 	Increment()
 	Decrement()
 	Left()
@@ -52,7 +54,7 @@ func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
 
 func DefaultEmitterParams(grid *field.Grid, nodes []common.Node) []Param {
 	return []Param{
-		Key{
+		&Key{
 			nodes: nodes,
 			keys:  music.AllKeysInScale(grid.Key, grid.Scale),
 			root:  grid.Key,

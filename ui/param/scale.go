@@ -22,6 +22,10 @@ func (s Scale) Value() int {
 	return int(s.grid.Scale)
 }
 
+func (s Scale) AltValue() int {
+	return 0
+}
+
 func (s Scale) Increment() {
 	s.Set(s.scaleIndex() + 1)
 }
@@ -44,6 +48,8 @@ func (s Scale) Set(value int) {
 }
 
 func (s Scale) SetAlt(value int) {}
+
+func (s Scale) ChangeAltMode() {}
 
 func (s Scale) scaleIndex() int {
 	for i := 0; i < len(s.scales); i++ {
