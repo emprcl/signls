@@ -77,6 +77,14 @@ func (p *ControlValue[T]) SetRandomAmount(amount int) {
 	p.amount = amount
 }
 
+func (p *ControlValue[T]) Min() T {
+	return p.min
+}
+
+func (p *ControlValue[T]) Max() T {
+	return p.max
+}
+
 func (p *ControlValue[T]) SetMin(min T) {
 	if p.val < min {
 		p.val = min

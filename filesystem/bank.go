@@ -3,6 +3,7 @@
 package filesystem
 
 import (
+	"cykl/core/common"
 	"cykl/core/music"
 	"encoding/json"
 	"errors"
@@ -49,15 +50,51 @@ type Node struct {
 }
 
 type Note struct {
-	Behavior    string `json:"behavior"`
-	Channel     uint8
-	Key         uint8
-	Velocity    uint8
-	Length      uint8
-	Probability uint8
+	Key         Key
+	Channel     Param
+	Velocity    Param
+	Length      Param
+	Probability int
 }
 
-type Params struct {
+func NewNote(n music.Note) Note {
+	return Note{
+		Key:         NewKey(*n.Key),
+		Channel:     NewParam[uint8](*n.Channel),
+		Velocity:    NewParam[uint8](*n.Velocity),
+		Length:      NewParam[uint8](*n.Length),
+		Probability: int(n.Probability),
+	}
+}
+
+type Key struct {
+	Key    int
+	Amount int
+	Silent bool
+}
+
+func NewKey(key music.KeyValue) Key {
+	return Key{
+		Key:    int(key.BaseValue()),
+		Amount: key.RandomAmount(),
+		Silent: key.IsSilent(),
+	}
+}
+
+type Param struct {
+	Value  int
+	Min    int
+	Max    int
+	Amount int
+}
+
+func NewParam[T uint8 | int](p common.ControlValue[T]) Param {
+	return Param{
+		Value:  int(p.Value()),
+		Min:    int(p.Min()),
+		Max:    int(p.Max()),
+		Amount: int(p.RandomAmount()),
+	}
 }
 
 // New creates and loads a new bank from a given file.

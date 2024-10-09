@@ -32,6 +32,10 @@ func NewKeyValue(key Key) *KeyValue {
 	}
 }
 
+func (p *KeyValue) BaseValue() Key {
+	return p.key
+}
+
 func (p *KeyValue) Value() Key {
 	if p.nextKey > 0 {
 		return p.nextKey

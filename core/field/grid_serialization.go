@@ -16,7 +16,7 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 	nodes := []filesystem.Node{}
 
 	for y := range g.nodes {
-		for x, n := range g.nodes[y] {
+		for _, n := range g.nodes[y] {
 			if n == nil {
 				continue
 			}
@@ -24,7 +24,7 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 			node := filesystem.Node{}
 			node.Type = n.Name()
 			node.Direction = int(n.Direction())
-			node.Note = filesystem.Note{}
+			node.Note = filesystem.NewNote(*n.(music.Audible).Note())
 
 			switch node.Type {
 			case "bang":
