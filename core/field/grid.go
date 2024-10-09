@@ -54,6 +54,7 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 		if !grid.Playing {
 			return
 		}
+		grid.midi.SendClock()
 		grid.Update()
 	})
 
