@@ -264,10 +264,19 @@ func (m mainModel) View() string {
 		return help
 	}
 
+	mainView := m.renderGrid()
+
+	// Cleanup gibber
+	cleanup := lipgloss.NewStyle().
+		Width(m.viewport.Width).
+		Height(m.viewport.Height - lipgloss.Height(mainView) - lipgloss.Height(help)).
+		Render("")
+
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		m.renderGrid(),
 		help,
+		cleanup,
 	)
 }
 

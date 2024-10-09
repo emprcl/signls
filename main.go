@@ -9,6 +9,10 @@ import (
 	"cykl/midi"
 	"cykl/ui"
 
+	"image/color"
+
+	"github.com/BigJk/crt"
+	bubbleadapter "github.com/BigJk/crt/bubbletea"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -36,8 +40,17 @@ func main() {
 		defer f.Close()
 	}
 
-	p := tea.NewProgram(ui.New(config, grid))
-	if _, err := p.Run(); err != nil {
+	fonts, err := crt.LoadFaces("./fonts/IosevkaTerm-Extended.ttf", "./fonts/IosevkaTerm-Extended.ttf", "./fonts/IosevkaTerm-Extended.ttf", crt.GetFontDPI(), 16.0)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	win, _, err := bubbleadapter.Window(1000, 600, fonts, ui.New(config, grid), color.Black, tea.WithAltScreen())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := win.Run("Cykl"); err != nil {
 		log.Fatal(err)
 	}
 }
