@@ -20,8 +20,8 @@ func NewHoleEmitter(direction common.Direction, x, y, width, height int) *HoleEm
 	return &HoleEmitter{
 		originX:      x,
 		originY:      y,
-		destinationX: common.NewControlValue[int](x, 0, width),
-		destinationY: common.NewControlValue[int](y, 0, height),
+		destinationX: common.NewControlValue[int](x, 0, width-1),
+		destinationY: common.NewControlValue[int](y, 0, height-1),
 	}
 }
 

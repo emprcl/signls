@@ -130,10 +130,11 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.viewport.Update(m.cursorX, m.cursorY, m.grid.Width, m.grid.Height)
 			return m, nil
 		case key.Matches(msg, m.keymap.SelectionUp, m.keymap.SelectionRight, m.keymap.SelectionDown, m.keymap.SelectionLeft):
+			dir := m.keymap.Direction(msg)
 			if m.edit {
+				m.handleParamAltEdit(dir)
 				return m, nil
 			}
-			dir := m.keymap.Direction(msg)
 			m.selectionX, m.selectionY = moveCursor(
 				dir, 1, m.selectionX, m.selectionY,
 				m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
@@ -147,13 +148,6 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			m.handleParamEdit(dir)
-			return m, nil
-		case key.Matches(msg, m.keymap.EditAltUp, m.keymap.EditAltRight, m.keymap.EditAltDown, m.keymap.EditAltLeft):
-			dir := m.keymap.Direction(msg)
-			if !m.edit {
-				return m, nil
-			}
-			m.handleParamAltEdit(dir)
 			return m, nil
 		case key.Matches(msg, m.keymap.AddBang, m.keymap.AddRelay, m.keymap.AddCycle, m.keymap.AddDice, m.keymap.AddToll, m.keymap.AddEuclid, m.keymap.AddZone, m.keymap.AddPass, m.keymap.AddHole):
 			m.grid.AddNodeFromSymbol(m.keymap.EmitterSymbol(msg), m.cursorX, m.cursorY)

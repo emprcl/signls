@@ -25,11 +25,6 @@ type keyMap struct {
 	EditDown  key.Binding
 	EditLeft  key.Binding
 
-	EditAltUp    key.Binding
-	EditAltRight key.Binding
-	EditAltDown  key.Binding
-	EditAltLeft  key.Binding
-
 	AddBang   key.Binding
 	AddEuclid key.Binding
 	AddPass   key.Binding
@@ -85,13 +80,13 @@ func (k keyMap) FullHelp() [][]key.Binding {
 // Direction returns the direction for a given key msg.
 func (k keyMap) Direction(msg tea.KeyMsg) string {
 	switch {
-	case key.Matches(msg, k.Up, k.SelectionUp, k.EditUp, k.EditAltUp):
+	case key.Matches(msg, k.Up, k.SelectionUp, k.EditUp):
 		return "up"
-	case key.Matches(msg, k.Right, k.SelectionRight, k.EditRight, k.EditAltRight):
+	case key.Matches(msg, k.Right, k.SelectionRight, k.EditRight):
 		return "right"
-	case key.Matches(msg, k.Down, k.SelectionDown, k.EditDown, k.EditAltDown):
+	case key.Matches(msg, k.Down, k.SelectionDown, k.EditDown):
 		return "down"
-	case key.Matches(msg, k.Left, k.SelectionLeft, k.EditLeft, k.EditAltLeft):
+	case key.Matches(msg, k.Left, k.SelectionLeft, k.EditLeft):
 		return "left"
 	default:
 		return ""
@@ -149,19 +144,19 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		SelectionUp: key.NewBinding(
 			key.WithKeys(keys.SelectionUp),
-			key.WithHelp(keys.SelectionUp, "move selection up"),
+			key.WithHelp(keys.SelectionUp, "move selection up | alt parameter up"),
 		),
 		SelectionRight: key.NewBinding(
 			key.WithKeys(keys.SelectionRight),
-			key.WithHelp(keys.SelectionRight, "move selection right"),
+			key.WithHelp(keys.SelectionRight, "move selection right | alt parameter right"),
 		),
 		SelectionDown: key.NewBinding(
 			key.WithKeys(keys.SelectionDown),
-			key.WithHelp(keys.SelectionDown, "move selection down"),
+			key.WithHelp(keys.SelectionDown, "move selection down | alt parameter down"),
 		),
 		SelectionLeft: key.NewBinding(
 			key.WithKeys(keys.SelectionLeft),
-			key.WithHelp(keys.SelectionLeft, "move selection left"),
+			key.WithHelp(keys.SelectionLeft, "move selection left | | alt parameter left"),
 		),
 		EditUp: key.NewBinding(
 			key.WithKeys(keys.EditUp),
@@ -178,22 +173,6 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		EditLeft: key.NewBinding(
 			key.WithKeys(keys.EditLeft),
 			key.WithHelp(keys.EditLeft, "decrease parameter mode value"),
-		),
-		EditAltUp: key.NewBinding(
-			key.WithKeys(keys.EditAltUp),
-			key.WithHelp(keys.EditAltUp, "alt parameter up"),
-		),
-		EditAltRight: key.NewBinding(
-			key.WithKeys(keys.EditAltRight),
-			key.WithHelp(keys.EditAltRight, "alt parameter right"),
-		),
-		EditAltDown: key.NewBinding(
-			key.WithKeys(keys.EditAltDown),
-			key.WithHelp(keys.EditAltDown, "alt parameter down"),
-		),
-		EditAltLeft: key.NewBinding(
-			key.WithKeys(keys.EditAltLeft),
-			key.WithHelp(keys.EditAltLeft, "alt parameter left"),
 		),
 		AddBang: key.NewBinding(
 			key.WithKeys(keys.AddBang),
