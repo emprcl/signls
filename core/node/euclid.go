@@ -8,7 +8,10 @@ import (
 )
 
 const (
-	defaultSteps    = 16
+	defaultSteps = 16
+	minSteps     = 1
+	maxSteps     = 128
+
 	defaultTriggers = 4
 	defaultOffset   = 0
 )
@@ -17,9 +20,9 @@ type EuclidEmitter struct {
 	direction common.Direction
 	note      *music.Note
 
-	Steps    int
-	Triggers int
-	Offset   int
+	Steps    *common.ControlValue[int]
+	Triggers *common.ControlValue[int]
+	Offset   *common.ControlValue[int]
 
 	step int
 
@@ -33,9 +36,9 @@ type EuclidEmitter struct {
 
 func NewEuclidEmitter(midi midi.Midi, direction common.Direction) *EuclidEmitter {
 	return &EuclidEmitter{
-		Steps:     defaultSteps,
-		Triggers:  defaultTriggers,
-		Offset:    defaultOffset,
+		Steps:     common.NewControlValue[int](defaultSteps, minSteps, maxSteps),
+		Triggers:  common.NewControlValue[int](defaultTriggers, minSteps, maxSteps),
+		Offset:    common.NewControlValue[int](defaultOffset, defaultOffset, maxSteps),
 		direction: direction,
 		armed:     true,
 		note:      music.NewNote(midi),
@@ -43,15 +46,18 @@ func NewEuclidEmitter(midi midi.Midi, direction common.Direction) *EuclidEmitter
 }
 
 func (e *EuclidEmitter) Copy(dx, dy int) common.Node {
-	newNote := *e.note
+	newSteps := *e.Steps
+	newTriggers := *e.Triggers
+	newOffset := *e.Offset
+	newNote := e.note.Copy()
 	return &EuclidEmitter{
 		direction: e.direction,
 		armed:     e.armed,
-		note:      &newNote,
+		note:      newNote,
 		muted:     e.muted,
-		Steps:     e.Steps,
-		Triggers:  e.Triggers,
-		Offset:    e.Offset,
+		Steps:     &newSteps,
+		Triggers:  &newTriggers,
+		Offset:    &newOffset,
 	}
 }
 
@@ -115,12 +121,21 @@ func (e *EuclidEmitter) patternTrigger() {
 	if e.ticks%uint64(common.PulsesPerStep) != 0 {
 		return
 	}
-	pattern := generateEuclideanPattern(e.Steps, e.Triggers)
-	adjusetedStep := (e.step + e.Offset) % e.Steps
+
+	if e.ticks%uint64(common.PulsesPerStep*e.Steps.Value()) == 0 {
+		newSteps := e.Steps.Computed()
+		e.Triggers.SetMax(newSteps)
+		e.Offset.SetMax(newSteps)
+		e.Triggers.Computed()
+		e.Offset.Computed()
+	}
+
+	pattern := generateEuclideanPattern(e.Steps.Last(), e.Triggers.Last())
+	adjusetedStep := (e.step + e.Offset.Last()) % e.Steps.Last()
 	if pattern[adjusetedStep] {
 		e.armed = true
 	}
-	e.step = (e.step + 1) % e.Steps
+	e.step = (e.step + 1) % e.Steps.Last()
 }
 
 func generateEuclideanPattern(steps, triggers int) []bool {
@@ -152,7 +167,7 @@ func (e *EuclidEmitter) SetDirection(dir common.Direction) {
 }
 
 func (e *EuclidEmitter) Symbol() string {
-	return fmt.Sprintf("%s%s%s", "E", e.note.Behavior.Symbol(), e.direction.Symbol())
+	return fmt.Sprintf("%s%s%s", "E", e.note.Key.Symbol(), e.direction.Symbol())
 }
 
 func (e *EuclidEmitter) Name() string {

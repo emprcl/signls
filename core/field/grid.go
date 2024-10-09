@@ -54,6 +54,7 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 		if !grid.Playing {
 			return
 		}
+		grid.midi.SendClock()
 		grid.Update()
 	})
 
@@ -188,7 +189,7 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	case "p":
 		g.AddNode(node.NewPassEmitter(g.midi, common.NONE), x, y)
 	case "h":
-		g.AddNode(node.NewHoleEmitter(common.NONE, x, y), x, y)
+		g.AddNode(node.NewHoleEmitter(common.NONE, x, y, g.Width, g.Height), x, y)
 	}
 }
 
@@ -284,7 +285,7 @@ func (g *Grid) Transpose() {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
 			if n, ok := g.nodes[y][x].(music.Audible); ok {
-				n.Note().Transpose(g.Key, g.Scale)
+				n.Note().Key.Transpose(g.Key, g.Scale)
 			}
 		}
 	}

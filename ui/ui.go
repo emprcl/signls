@@ -142,10 +142,11 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.viewport.Update(m.cursorX, m.cursorY, m.grid.Width, m.grid.Height)
 			return m, nil
 		case key.Matches(msg, m.keymap.SelectionUp, m.keymap.SelectionRight, m.keymap.SelectionDown, m.keymap.SelectionLeft):
+			dir := m.keymap.Direction(msg)
 			if m.edit {
+				m.handleParamAltEdit(dir)
 				return m, nil
 			}
-			dir := m.keymap.Direction(msg)
 			m.selectionX, m.selectionY = moveCursor(
 				dir, 1, m.selectionX, m.selectionY,
 				m.cursorX, m.grid.Width-1, m.cursorY, m.grid.Height-1,
@@ -183,6 +184,9 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.param = 0
 			}
 			m.edit = !m.edit
+			if m.edit {
+				m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
+			}
 			return m, nil
 		case key.Matches(msg, m.keymap.TriggerNode):
 			if !m.grid.Playing {
@@ -198,25 +202,25 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.edit {
 				return m, nil
 			}
-			param.Get("root", m.gridParams).Increment()
+			param.Get("root", m.gridParams).Up()
 			return m, save(m)
 		case key.Matches(msg, m.keymap.RootNoteDown):
 			if m.edit {
 				return m, nil
 			}
-			param.Get("root", m.gridParams).Decrement()
+			param.Get("root", m.gridParams).Down()
 			return m, save(m)
 		case key.Matches(msg, m.keymap.ScaleUp):
 			if m.edit {
 				return m, nil
 			}
-			param.Get("scale", m.gridParams).Increment()
+			param.Get("scale", m.gridParams).Up()
 			return m, save(m)
 		case key.Matches(msg, m.keymap.ScaleDown):
 			if m.edit {
 				return m, nil
 			}
-			param.Get("scale", m.gridParams).Decrement()
+			param.Get("scale", m.gridParams).Down()
 			return m, save(m)
 		case key.Matches(msg, m.keymap.TempoUp):
 			m.grid.SetTempo(m.grid.Tempo() + 1)
@@ -284,17 +288,11 @@ func (m mainModel) handleParamEdit(dir string) {
 		return
 	}
 
-	switch p := m.params[m.param].(type) {
-	case param.Direction:
-		p.SetFromKeyString(dir)
-		return
-	}
-
 	switch dir {
 	case "up":
-		m.params[m.param].Increment()
+		m.params[m.param].Up()
 	case "down":
-		m.params[m.param].Decrement()
+		m.params[m.param].Down()
 	case "left":
 		m.params[m.param].Left()
 	case "right":
@@ -302,11 +300,28 @@ func (m mainModel) handleParamEdit(dir string) {
 	}
 
 	switch p := m.params[m.param].(type) {
-	case param.Key:
+	case *param.Key:
 		if m.grid.Playing {
 			return
 		}
 		p.Preview()
+	}
+}
+
+func (m mainModel) handleParamAltEdit(dir string) {
+	if len(m.params) < m.param+1 {
+		return
+	}
+
+	switch dir {
+	case "up":
+		m.params[m.param].AltUp()
+	case "down":
+		m.params[m.param].AltDown()
+	case "left":
+		m.params[m.param].AltLeft()
+	case "right":
+		m.params[m.param].AltRight()
 	}
 }
 

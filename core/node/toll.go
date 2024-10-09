@@ -4,10 +4,11 @@ import (
 	"cykl/core/common"
 	"cykl/core/music"
 	"cykl/midi"
+	"math"
 )
 
 type TollEmitter struct {
-	Threshold int
+	Threshold *common.ControlValue[int]
 	count     int
 }
 
@@ -15,16 +16,19 @@ func NewTollEmitter(midi midi.Midi, direction common.Direction) *Emitter {
 	return &Emitter{
 		direction: direction,
 		note:      music.NewNote(midi),
-		behavior:  &TollEmitter{},
+		behavior: &TollEmitter{
+			Threshold: common.NewControlValue[int](1, 1, math.MaxInt32),
+		},
 	}
 }
 
 func (e *TollEmitter) EmitDirections(dir common.Direction, inDir common.Direction, pulse uint64) common.Direction {
 	e.count++
-	if e.count < e.Threshold {
+	if e.count < e.Threshold.Last() {
 		return common.NONE
 	}
 	e.count = 0
+	e.Threshold.Computed()
 	return dir
 }
 

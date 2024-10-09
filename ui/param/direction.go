@@ -26,23 +26,33 @@ func (d Direction) Value() int {
 	return int(d.nodes[0].Direction())
 }
 
-func (d Direction) Increment() {
-	// direction selection working differently
+func (d Direction) AltValue() int {
+	return 0
 }
 
-func (d Direction) Decrement() {
-	// direction selection working differently
-}
+func (d Direction) Up() {}
+
+func (d Direction) Down() {}
 
 func (d Direction) Left() {}
 
 func (d Direction) Right() {}
+
+func (d Direction) AltUp() {}
+
+func (d Direction) AltDown() {}
+
+func (d Direction) AltLeft() {}
+
+func (d Direction) AltRight() {}
 
 func (d Direction) Set(value int) {
 	for _, node := range d.nodes {
 		node.SetDirection(common.Direction(value))
 	}
 }
+
+func (d Direction) SetAlt(value int) {}
 
 func (d Direction) SetFromKeyString(key string) {
 	var dir common.Direction

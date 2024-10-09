@@ -10,12 +10,19 @@ import (
 type Param interface {
 	Name() string
 	Value() int
+	AltValue() int
 	Display() string
 	Set(value int)
-	Increment()
-	Decrement()
+	SetAlt(value int)
+
+	Up()
+	Down()
 	Left()
 	Right()
+	AltUp()
+	AltDown()
+	AltLeft()
+	AltRight()
 }
 
 func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
@@ -32,15 +39,17 @@ func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
 			},
 		}
 	} else if isHomogeneousBehavior[*node.TollEmitter](nodes) {
-		return append([]Param{
+		return append(
+			DefaultEmitterParams(grid, nodes),
 			Threshold{nodes: nodes},
-		}, DefaultEmitterParams(grid, nodes)...)
+		)
 	} else if isHomogeneousNode[*node.EuclidEmitter](nodes) {
-		return append([]Param{
+		return append(
+			DefaultEmitterParams(grid, nodes),
 			Steps{nodes: nodes},
 			Triggers{nodes: nodes},
 			Offset{nodes: nodes},
-		}, DefaultEmitterParams(grid, nodes)...)
+		)
 	}
 
 	emitters := filterNodes[music.Audible](nodes)
@@ -49,11 +58,10 @@ func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
 
 func DefaultEmitterParams(grid *field.Grid, nodes []common.Node) []Param {
 	return []Param{
-		Key{
+		&Key{
 			nodes: nodes,
 			keys:  music.AllKeysInScale(grid.Key, grid.Scale),
 			root:  grid.Key,
-			mode:  KeyMode{nodes: nodes, modes: music.AllNoteBehaviors()},
 		},
 		Velocity{nodes: nodes},
 		Length{nodes: nodes},

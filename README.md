@@ -2,10 +2,8 @@
 :loop: a generative midi sequencer in the terminal
 
 TODO:
- - add random note octave spread
- - add random based on perlin noise
  - add lfo on every param
- - add randomness on every note param
+   - set 2 global lfos with shapes and coeff
  - add keyboard mode for note input
  - add new notes behaviors:
    - note relative to the previous one (set true intervals? or relative to scale?)
@@ -13,6 +11,7 @@ TODO:
  - add midi cc (note behavior?)
  - add commands (tempo, scale, root, others?)
  - add theme
+ - try making a standalone gui app with https://github.com/BigJk/crt
  - add file system
 
 Names:

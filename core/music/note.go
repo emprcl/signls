@@ -14,7 +14,6 @@ const (
 	defaultVelocity uint8 = 100
 	defaultLength   uint8 = uint8(common.PulsesPerStep)
 
-	maxKey         Key   = 127
 	maxVelocity    uint8 = 127
 	maxLength      uint8 = 127 // Maximum length of the note (127 is treated as infinity).
 	minLength      uint8 = 1
@@ -25,20 +24,16 @@ const (
 // Note represents a musical note with various properties such as key, velocity, and length.
 // It includes behavior that defines how the note plays and interacts with other elements.
 type Note struct {
-	Behavior NoteBehavior // Interface for defining different behaviors for a note.
-
-	midi midi.Midi // Interface to interact with MIDI devices.
+	midi midi.Midi
 
 	rand *rand.Rand
 
-	Key         Key   // The MIDI key (pitch) of the note.
-	Interval    int   // Interval relative to a scale's root note.
-	Channel     uint8 // The MIDI channel on which the note is played.
-	Velocity    uint8 // The velocity (volume) of the note.
-	Length      uint8 // The duration the note is held for.
-	Probability uint8 // The probability of the note triggering.
+	Key         *KeyValue
+	Channel     *common.ControlValue[uint8]
+	Velocity    *common.ControlValue[uint8]
+	Length      *common.ControlValue[uint8]
+	Probability uint8
 
-	nextKey   Key    // Next key to be played, used for transposition.
 	pulse     uint64 // Internal pulse counter to manage note length.
 	triggered bool   // Indicates whether the note is currently playing.
 }
@@ -47,31 +42,32 @@ type Note struct {
 func NewNote(midi midi.Midi) *Note {
 	source := rand.NewSource(time.Now().UnixNano())
 	return &Note{
-		Behavior:    FixedNote{},
 		midi:        midi,
 		rand:        rand.New(source),
-		Channel:     defaultChannel,
-		Key:         defaultKey,
-		Velocity:    defaultVelocity,
-		Length:      defaultLength,
+		Key:         NewKeyValue(defaultKey),
+		Channel:     common.NewControlValue[uint8](defaultChannel, 0, maxChannel),
+		Velocity:    common.NewControlValue[uint8](defaultVelocity, 0, maxVelocity),
+		Length:      common.NewControlValue[uint8](defaultLength, minLength, maxLength),
 		Probability: maxProbability,
 	}
 }
 
-// KeyName returns the MIDI note name based on the current or next key.
-func (n Note) KeyName() string {
-	if n.nextKey > 0 {
-		return midi.Note(uint8(n.nextKey))
+// Copy creates a copy of the note.
+func (n Note) Copy() *Note {
+	newKey := *n.Key
+	newChannel := *n.Channel
+	newVelocity := *n.Velocity
+	newLength := *n.Length
+	source := rand.NewSource(time.Now().UnixNano())
+	return &Note{
+		midi:        n.midi,
+		rand:        rand.New(source),
+		Key:         &newKey,
+		Channel:     &newChannel,
+		Velocity:    &newVelocity,
+		Length:      &newLength,
+		Probability: n.Probability,
 	}
-	return midi.Note(uint8(n.Key))
-}
-
-// KeyValue returns the MIDI key value of the current or next key.
-func (n Note) KeyValue() Key {
-	if n.nextKey > 0 {
-		return n.nextKey
-	}
-	return n.Key
 }
 
 // Tick advances the internal pulse counter and stops the note if it exceeds its length.
@@ -82,70 +78,63 @@ func (n *Note) Tick() {
 	n.pulse++
 
 	// Stop the note if its duration is complete.
-	if n.Length < maxLength && n.pulse >= uint64(n.Length) {
+	if n.Length.Last() < maxLength && n.pulse >= uint64(n.Length.Last()) {
 		n.Stop()
 	}
 }
 
-// Transpose changes the note's key according to a scale and root note.
-func (n *Note) Transpose(root Key, scale Scale) {
-	n.SetKey(n.Key.Transpose(root, scale, n.Interval), root)
-}
-
-// Play triggers the note with a specific key and scale, resetting internal state.
-func (n *Note) Play(key Key, scale Scale) {
-	if n.Probability == maxProbability ||
-		uint8(rand.Int31n((100))) < n.Probability {
-		n.Behavior.Play(n, key, scale)
+// Play triggers the note with a specific root and scale, resetting internal state.
+func (n *Note) Play(root Key, scale Scale) {
+	if n.Key.IsSilent() {
+		return
 	}
+
+	if n.Probability < maxProbability &&
+		uint8(rand.Int31n((100))) >= n.Probability {
+		return
+	}
+
+	n.Key.Transpose(root, scale)
+	n.Stop()
+	n.midi.NoteOn(
+		n.Channel.Computed(),
+		uint8(n.Key.Computed(root, scale)),
+		n.Velocity.Computed(),
+	)
+	n.Length.Computed() // Just trigger length computation
+
 	n.triggered = true
 	n.pulse = 0
-	n.nextKey = 0
 }
 
 // Stop sends a MIDI Note Off message and resets the triggered state.
 func (n *Note) Stop() {
-	n.midi.NoteOff(n.Channel, uint8(n.Key))
+	n.midi.NoteOff(n.Channel.Last(), uint8(n.Key.Last()))
 	n.triggered = false
 	n.pulse = 0
 }
 
 // SetKey updates the note's key and calculates the interval relative to the root.
 func (n *Note) SetKey(key Key, root Key) {
-	if key > maxKey {
-		n.nextKey = Key(0)
-	} else {
-		n.nextKey = key
-	}
-	n.Interval = n.nextKey.AllSemitonesFrom(root)
+	n.Key.SetNext(key, root)
 	if !n.triggered {
-		n.Key = n.nextKey
-		n.nextKey = 0
+		n.Key.Set(n.Key.Value())
 	}
 }
 
 // SetVelocity updates the velocity of the note, ensuring it is within valid limits.
 func (n *Note) SetVelocity(velocity uint8) {
-	if velocity > maxVelocity {
-		return
-	}
-	n.Velocity = velocity
+	n.Velocity.Set(velocity)
 }
 
 // SetLength updates the length of the note, ensuring it is within valid limits.
 func (n *Note) SetLength(length uint8) {
-	if length > maxLength || length < minLength {
-		return
-	}
-	n.Length = length
+	n.Length.Set(length)
 }
 
 // SetChannel updates the MIDI channel of the note, ensuring it is within valid limits.
 func (n *Note) SetChannel(channel uint8) {
-	if channel > maxChannel {
-		return
-	}
-	n.Channel = channel
+	n.Channel.Set(channel)
 }
 
 // ClockDivision returns the pulses per step and steps per quarter note,

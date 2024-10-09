@@ -72,3 +72,12 @@ type Tickable interface {
 type Copyable interface {
 	Copy(dx, dy int) Node
 }
+
+type Parameter[T any] interface {
+	Value() T
+	Computed() T
+	Last() T
+	Set(value T)
+	RandomAmount() int
+	SetRandomAmount(amount int)
+}

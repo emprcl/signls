@@ -26,12 +26,12 @@ type Emitter struct {
 // Copy creates a deep copy of the emitter, returning it as a Node interface.
 // It clones the associated note and keeps the same behavior and direction.
 func (e *Emitter) Copy(dx, dy int) common.Node {
-	newNote := *e.note
+	newNote := e.note.Copy()
 	return &Emitter{
 		behavior:  e.behavior.Copy(),
 		direction: e.direction,
 		armed:     e.armed,
-		note:      &newNote,
+		note:      newNote,
 		muted:     e.muted,
 	}
 }
@@ -84,7 +84,7 @@ func (e *Emitter) Trig(key music.Key, scale music.Scale, inDir common.Direction,
 	if !e.muted {
 		e.note.Play(key, scale)
 	}
-	if e.triggered {
+	if !e.updated(pulse) && e.triggered {
 		e.retrig = true
 	} else {
 		e.pulse = pulse
@@ -133,10 +133,13 @@ func (e *Emitter) Symbol() string {
 	if utf8.RuneCountInString(symbol) >= 2 {
 		return fmt.Sprintf("%.2s", symbol)
 	}
+	if _, ok := e.behavior.(*PassEmitter); ok {
+		return fmt.Sprintf("%s%s%s", symbol, e.note.Key.Symbol(), "⇌")
+	}
 	if e.note == nil {
 		return fmt.Sprintf("%s%s", symbol, e.direction.Symbol())
 	}
-	return fmt.Sprintf("%s%s%s", symbol, e.note.Behavior.Symbol(), e.direction.Symbol())
+	return fmt.Sprintf("%s%s%s", symbol, e.note.Key.Symbol(), e.direction.Symbol())
 }
 
 // Name returns the name of the emitter type.

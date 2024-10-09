@@ -144,19 +144,19 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		SelectionUp: key.NewBinding(
 			key.WithKeys(keys.SelectionUp),
-			key.WithHelp(keys.SelectionUp, "move selection up"),
+			key.WithHelp(keys.SelectionUp, "move selection up | alt parameter up"),
 		),
 		SelectionRight: key.NewBinding(
 			key.WithKeys(keys.SelectionRight),
-			key.WithHelp(keys.SelectionRight, "move selection right"),
+			key.WithHelp(keys.SelectionRight, "move selection right | alt parameter right"),
 		),
 		SelectionDown: key.NewBinding(
 			key.WithKeys(keys.SelectionDown),
-			key.WithHelp(keys.SelectionDown, "move selection down"),
+			key.WithHelp(keys.SelectionDown, "move selection down | alt parameter down"),
 		),
 		SelectionLeft: key.NewBinding(
 			key.WithKeys(keys.SelectionLeft),
-			key.WithHelp(keys.SelectionLeft, "move selection left"),
+			key.WithHelp(keys.SelectionLeft, "move selection left | | alt parameter left"),
 		),
 		EditUp: key.NewBinding(
 			key.WithKeys(keys.EditUp),
@@ -164,7 +164,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		EditRight: key.NewBinding(
 			key.WithKeys(keys.EditRight),
-			key.WithHelp(keys.EditRight, "select parameter mode"),
+			key.WithHelp(keys.EditRight, "increase parameter mode value"),
 		),
 		EditDown: key.NewBinding(
 			key.WithKeys(keys.EditDown),
@@ -172,7 +172,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		EditLeft: key.NewBinding(
 			key.WithKeys(keys.EditLeft),
-			key.WithHelp(keys.EditLeft, "select parameter mode"),
+			key.WithHelp(keys.EditLeft, "decrease parameter mode value"),
 		),
 		AddBang: key.NewBinding(
 			key.WithKeys(keys.AddBang),
@@ -280,7 +280,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		Help: key.NewBinding(
 			key.WithKeys(keys.Help),
-			key.WithHelp(keys.Help, "show help"),
+			key.WithHelp(keys.Help, "help"),
 		),
 		Quit: key.NewBinding(
 			key.WithKeys(keys.Quit),

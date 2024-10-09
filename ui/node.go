@@ -13,7 +13,7 @@ import (
 
 var (
 	gridStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("234"))
+			Background(lipgloss.Color("234"))
 	cursorStyle = lipgloss.NewStyle().
 			Background(lipgloss.Color("190")).
 			Foreground(lipgloss.Color("0"))
@@ -59,7 +59,9 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 	teleportDestinationSymbol := node.HoleDestinationSymbol
 	if n == nil && isCursor {
 		return cursorStyle.Render("  ")
-	} else if n == nil && isTeleportDestination {
+	} else if n == nil && isTeleportDestination && !m.blink {
+		return cursorStyle.Render(teleportDestinationSymbol)
+	} else if n == nil && isTeleportDestination && m.blink {
 		return teleportDestinationStyle.Render(teleportDestinationSymbol)
 	} else if n == nil && m.inSelectionRange(x, y) {
 		return selectionStyle.Render("..")
@@ -67,7 +69,7 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 		if (x+y)%2 == 0 {
 			return "  "
 		}
-		return gridStyle.Render("░░")
+		return gridStyle.Render("  ")
 	}
 
 	// render node
