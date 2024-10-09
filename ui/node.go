@@ -59,7 +59,9 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 	teleportDestinationSymbol := node.HoleDestinationSymbol
 	if n == nil && isCursor {
 		return cursorStyle.Render("  ")
-	} else if n == nil && isTeleportDestination {
+	} else if n == nil && isTeleportDestination && !m.blink {
+		return cursorStyle.Render(teleportDestinationSymbol)
+	} else if n == nil && isTeleportDestination && m.blink {
 		return teleportDestinationStyle.Render(teleportDestinationSymbol)
 	} else if n == nil && m.inSelectionRange(x, y) {
 		return selectionStyle.Render("..")

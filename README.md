@@ -2,8 +2,6 @@
 :loop: a generative midi sequencer in the terminal
 
 TODO:
- - add randomness on every note param
-   - keep a global list of random modulator with a coeff value. The coeff values should be validated by the param package.
  - add lfo on every param
    - set 2 global lfos with shapes and coeff
  - add keyboard mode for note input

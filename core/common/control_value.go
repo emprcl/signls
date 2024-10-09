@@ -22,6 +22,7 @@ func NewControlValue[T Number](value T, min T, max T) *ControlValue[T] {
 	source := rand.NewSource(time.Now().UnixNano())
 	return &ControlValue[T]{
 		val:  value,
+		last: value,
 		min:  min,
 		max:  max,
 		rand: rand.New(source),
