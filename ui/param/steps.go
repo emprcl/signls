@@ -7,11 +7,6 @@ import (
 	"cykl/core/node"
 )
 
-const (
-	minSteps = 1
-	maxSteps = 128
-)
-
 type Steps struct {
 	nodes []common.Node
 }
@@ -21,15 +16,22 @@ func (s Steps) Name() string {
 }
 
 func (s Steps) Display() string {
+	if s.nodes[0].(*node.EuclidEmitter).Steps.RandomAmount() != 0 {
+		return fmt.Sprintf(
+			"%d%+d\u033c",
+			s.nodes[0].(*node.EuclidEmitter).Steps.Value(),
+			s.nodes[0].(*node.EuclidEmitter).Steps.RandomAmount(),
+		)
+	}
 	return fmt.Sprintf("%d", s.Value())
 }
 
 func (s Steps) Value() int {
-	return s.nodes[0].(*node.EuclidEmitter).Steps
+	return s.nodes[0].(*node.EuclidEmitter).Steps.Value()
 }
 
 func (s Steps) AltValue() int {
-	return 0
+	return s.nodes[0].(*node.EuclidEmitter).Steps.RandomAmount()
 }
 
 func (s Steps) Up() {
@@ -40,9 +42,13 @@ func (s Steps) Down() {
 	s.Set(s.Value() - 1)
 }
 
-func (s Steps) Left() {}
+func (s Steps) Left() {
+	s.SetAlt(s.nodes[0].(*node.EuclidEmitter).Steps.RandomAmount() - 1)
+}
 
-func (s Steps) Right() {}
+func (s Steps) Right() {
+	s.SetAlt(s.nodes[0].(*node.EuclidEmitter).Steps.RandomAmount() + 1)
+}
 
 func (s Steps) AltUp() {}
 
@@ -53,12 +59,20 @@ func (s Steps) AltLeft() {}
 func (s Steps) AltRight() {}
 
 func (s Steps) Set(value int) {
-	if value < minSteps || value >= maxSteps {
-		return
-	}
 	for _, n := range s.nodes {
-		n.(*node.EuclidEmitter).Steps = value
+		n.(*node.EuclidEmitter).Steps.Set(value)
+		if n.(*node.EuclidEmitter).Offset.Value() > value {
+			n.(*node.EuclidEmitter).Offset.Set(value)
+		}
+
+		if n.(*node.EuclidEmitter).Triggers.Value() > value {
+			n.(*node.EuclidEmitter).Triggers.Set(value)
+		}
 	}
 }
 
-func (s Steps) SetAlt(value int) {}
+func (s Steps) SetAlt(value int) {
+	for _, n := range s.nodes {
+		n.(*node.EuclidEmitter).Steps.SetRandomAmount(value)
+	}
+}

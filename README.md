@@ -13,6 +13,8 @@ TODO:
  - add midi cc (note behavior?)
  - add commands (tempo, scale, root, others?)
  - add theme
+ - send midi clock
+ - try making a standalone gui app with https://github.com/BigJk/crt
  - add file system
 
 Names:

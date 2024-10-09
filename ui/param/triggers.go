@@ -20,15 +20,22 @@ func (t Triggers) Name() string {
 }
 
 func (t Triggers) Display() string {
+	if t.nodes[0].(*node.EuclidEmitter).Triggers.RandomAmount() != 0 {
+		return fmt.Sprintf(
+			"%d%+d\u033c",
+			t.nodes[0].(*node.EuclidEmitter).Triggers.Value(),
+			t.nodes[0].(*node.EuclidEmitter).Triggers.RandomAmount(),
+		)
+	}
 	return fmt.Sprintf("%d", t.Value())
 }
 
 func (t Triggers) Value() int {
-	return t.nodes[0].(*node.EuclidEmitter).Triggers
+	return t.nodes[0].(*node.EuclidEmitter).Triggers.Value()
 }
 
 func (t Triggers) AltValue() int {
-	return 0
+	return t.nodes[0].(*node.EuclidEmitter).Triggers.RandomAmount()
 }
 
 func (t Triggers) Up() {
@@ -39,9 +46,13 @@ func (t Triggers) Down() {
 	t.Set(t.Value() - 1)
 }
 
-func (t Triggers) Left() {}
+func (t Triggers) Left() {
+	t.SetAlt(t.nodes[0].(*node.EuclidEmitter).Triggers.RandomAmount() - 1)
+}
 
-func (t Triggers) Right() {}
+func (t Triggers) Right() {
+	t.SetAlt(t.nodes[0].(*node.EuclidEmitter).Triggers.RandomAmount() + 1)
+}
 
 func (t Triggers) AltUp() {}
 
@@ -56,11 +67,15 @@ func (t Triggers) Set(value int) {
 		return
 	}
 	for _, n := range t.nodes {
-		if value > n.(*node.EuclidEmitter).Steps {
+		if value > n.(*node.EuclidEmitter).Steps.Value() {
 			continue
 		}
-		n.(*node.EuclidEmitter).Triggers = value
+		n.(*node.EuclidEmitter).Triggers.Set(value)
 	}
 }
 
-func (t Triggers) SetAlt(value int) {}
+func (t Triggers) SetAlt(value int) {
+	for _, n := range t.nodes {
+		n.(*node.EuclidEmitter).Triggers.SetRandomAmount(value)
+	}
+}
