@@ -23,6 +23,10 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 				continue
 			}
 
+			if _, ok := n.(*node.Signal); ok {
+				continue
+			}
+
 			note := filesystem.Note{}
 			muted := false
 			if a, ok := n.(music.Audible); ok {
@@ -82,4 +86,22 @@ func (g *Grid) Load(grid filesystem.Grid) {
 	g.clock.SetTempo(grid.Tempo)
 	g.Key = music.Key(grid.Key)
 	g.Scale = music.Scale(grid.Scale)
+	g.Height = grid.Height
+	g.Resize(grid.Width, grid.Height)
+
+	for _, n := range grid.Nodes {
+		var newNode common.Node
+		switch n.Type {
+		case "bang":
+			newNode = node.NewBangEmitter(g.midi, common.Direction(n.Direction), true)
+		case "euclid":
+			newNode = node.NewEuclidEmitter(g.midi, common.Direction(n.Direction))
+			newNode.(*node.EuclidEmitter)()
+			newNode.(*node.EuclidEmitter).Steps = filesystem.NewParamFromFile[int](n.Params["steps"])
+			newNode.(*node.EuclidEmitter).Triggers = filesystem.NewParamFromFile[int](n.Params["triggers"])
+			newNode.(*node.EuclidEmitter).Offset = filesystem.NewParamFromFile[int](n.Params["offset"])
+		}
+
+		g.nodes[n.Y][n.X] = newNode
+	}
 }

@@ -102,6 +102,16 @@ func NewParam[T uint8 | int](p common.ControlValue[T]) Param {
 	}
 }
 
+func NewParamFromFile[T uint8 | int](param Param) *common.ControlValue[T] {
+	value := common.NewControlValue[T](
+		T(param.Value),
+		T(param.Min),
+		T(param.Max),
+	)
+	value.SetRandomAmount(int(param.Amount))
+	return value
+}
+
 // New creates and loads a new bank from a given file.
 func New(filename string) *Bank {
 	grids := make([]Grid, maxGrids)
