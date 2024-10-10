@@ -96,11 +96,14 @@ func (g *Grid) Load(grid filesystem.Grid) {
 			newNode = node.NewBangEmitter(g.midi, common.Direction(n.Direction), true)
 		case "euclid":
 			newNode = node.NewEuclidEmitter(g.midi, common.Direction(n.Direction))
-			newNode.(*node.EuclidEmitter)()
 			newNode.(*node.EuclidEmitter).Steps = filesystem.NewParamFromFile[int](n.Params["steps"])
 			newNode.(*node.EuclidEmitter).Triggers = filesystem.NewParamFromFile[int](n.Params["triggers"])
 			newNode.(*node.EuclidEmitter).Offset = filesystem.NewParamFromFile[int](n.Params["offset"])
 		}
+
+		//newNode.(*node.EuclidEmitter).Note().Key.Set(music.Key(n.Note.Key.Key))
+		//newNode.(*node.EuclidEmitter).Note().Channel.Set(n.Note.Channel)
+		//newNode.(*node.EuclidEmitter).Note().Key.Set(music.Key(n.Note.Key.Key))
 
 		g.nodes[n.Y][n.X] = newNode
 	}
