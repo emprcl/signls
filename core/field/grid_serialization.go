@@ -1,7 +1,9 @@
 package field
 
 import (
+	"cykl/core/common"
 	"cykl/core/music"
+	"cykl/core/node"
 	"cykl/filesystem"
 	"cykl/midi"
 )
@@ -16,22 +18,47 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 	nodes := []filesystem.Node{}
 
 	for y := range g.nodes {
-		for _, n := range g.nodes[y] {
+		for x, n := range g.nodes[y] {
 			if n == nil {
 				continue
 			}
 
-			node := filesystem.Node{}
-			node.Type = n.Name()
-			node.Direction = int(n.Direction())
-			node.Note = filesystem.NewNote(*n.(music.Audible).Note())
-
-			switch node.Type {
-			case "bang":
-
+			note := filesystem.Note{}
+			muted := false
+			if a, ok := n.(music.Audible); ok {
+				note = filesystem.NewNote(*a.Note())
+				muted = a.Muted()
 			}
 
-			nodes = append(nodes)
+			fnode := filesystem.Node{
+				X:         x,
+				Y:         y,
+				Type:      n.Name(),
+				Direction: int(n.Direction()),
+				Note:      note,
+				Muted:     muted,
+				Params:    map[string]filesystem.Param{},
+			}
+
+			switch fnode.Type {
+			case "euclid":
+				fnode.Params = map[string]filesystem.Param{
+					"steps":    filesystem.NewParam(*n.(*node.EuclidEmitter).Steps),
+					"triggers": filesystem.NewParam(*n.(*node.EuclidEmitter).Triggers),
+					"offset":   filesystem.NewParam(*n.(*node.EuclidEmitter).Offset),
+				}
+			case "toll":
+				fnode.Params = map[string]filesystem.Param{
+					"threshold": filesystem.NewParam(*n.(common.Behavioral).Behavior().(*node.TollEmitter).Threshold),
+				}
+			case "hole":
+				fnode.Params = map[string]filesystem.Param{
+					"destinationX": filesystem.NewParam(*n.(*node.HoleEmitter).DestinationX),
+					"destinationY": filesystem.NewParam(*n.(*node.HoleEmitter).DestinationY),
+				}
+			}
+
+			nodes = append(nodes, fnode)
 		}
 	}
 

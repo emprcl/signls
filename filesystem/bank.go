@@ -44,25 +44,30 @@ type Grid struct {
 
 // Node represents a grid node that is json serializable.
 type Node struct {
+	X         int    `json:"x"`
+	Y         int    `json:"y"`
 	Note      Note   `json:"note"`
 	Type      string `json:"type"`
 	Direction int    `json:"direction"`
+	Muted     bool   `json:"muted"`
+
+	Params map[string]Param `json:"params"`
 }
 
 type Note struct {
-	Key         Key
-	Channel     Param
-	Velocity    Param
-	Length      Param
-	Probability int
+	Key         Key   `json:"key"`
+	Channel     Param `json:"channel"`
+	Velocity    Param `json:"velocity"`
+	Length      Param `json:"length"`
+	Probability int   `json:"probability"`
 }
 
 func NewNote(n music.Note) Note {
 	return Note{
 		Key:         NewKey(*n.Key),
-		Channel:     NewParam[uint8](*n.Channel),
-		Velocity:    NewParam[uint8](*n.Velocity),
-		Length:      NewParam[uint8](*n.Length),
+		Channel:     NewParam(*n.Channel),
+		Velocity:    NewParam(*n.Velocity),
+		Length:      NewParam(*n.Length),
 		Probability: int(n.Probability),
 	}
 }
