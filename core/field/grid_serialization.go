@@ -101,9 +101,14 @@ func (g *Grid) Load(grid filesystem.Grid) {
 			newNode.(*node.EuclidEmitter).Offset = filesystem.NewParamFromFile[int](n.Params["offset"])
 		}
 
-		//newNode.(*node.EuclidEmitter).Note().Key.Set(music.Key(n.Note.Key.Key))
-		//newNode.(*node.EuclidEmitter).Note().Channel.Set(n.Note.Channel)
-		//newNode.(*node.EuclidEmitter).Note().Key.Set(music.Key(n.Note.Key.Key))
+		if a, ok := newNode.(music.Audible); ok {
+			// TODO: fix weird bugs
+			a.Note().Key.Set(music.Key(n.Note.Key.Key))
+			a.Note().Channel.Set(uint8(n.Note.Channel.Value))
+			a.Note().Velocity.Set(uint8(n.Note.Velocity.Value))
+			a.Note().Length.Set(uint8(n.Note.Length.Value))
+			a.Note().Probability = uint8(n.Note.Probability)
+		}
 
 		g.nodes[n.Y][n.X] = newNode
 	}
