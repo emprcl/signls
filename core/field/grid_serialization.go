@@ -6,6 +6,7 @@ import (
 	"cykl/core/node"
 	"cykl/filesystem"
 	"cykl/midi"
+	"log"
 )
 
 func NewFromBank(grid filesystem.Grid, midi midi.Midi) *Grid {
@@ -115,6 +116,9 @@ func (g *Grid) Load(grid filesystem.Grid) {
 			newNode = node.NewHoleEmitter(common.Direction(n.Direction), n.X, n.Y, g.Width, g.Height)
 			newNode.(*node.HoleEmitter).DestinationX = filesystem.NewParamFromFile[int](n.Params["destinationX"])
 			newNode.(*node.HoleEmitter).DestinationY = filesystem.NewParamFromFile[int](n.Params["destinationY"])
+		default:
+			log.Printf("cannot load node of type %s", n.Type)
+			continue
 		}
 
 		if a, ok := newNode.(music.Audible); ok {
