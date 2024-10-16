@@ -57,11 +57,16 @@ func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
 }
 
 func DefaultEmitterParams(grid *field.Grid, nodes []common.Node) []Param {
+	keyMode := KeyModeRandom
+	if nodes[0].(music.Audible).Note().Key.IsSilent() {
+		keyMode = KeyModeSilent
+	}
 	return []Param{
 		&Key{
 			nodes: nodes,
 			keys:  music.AllKeysInScale(grid.Key, grid.Scale),
 			root:  grid.Key,
+			mode:  keyMode,
 		},
 		Velocity{nodes: nodes},
 		Length{nodes: nodes},

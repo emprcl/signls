@@ -114,7 +114,7 @@ func (g *Grid) Load(grid filesystem.Grid) {
 		case "hole":
 			newNode = node.NewHoleEmitter(common.Direction(n.Direction), n.X, n.Y, g.Width, g.Height)
 			newNode.(*node.HoleEmitter).DestinationX = filesystem.NewParamFromFile[int](n.Params["destinationX"])
-			newNode.(*node.HoleEmitter).DestinationX = filesystem.NewParamFromFile[int](n.Params["destinationY"])
+			newNode.(*node.HoleEmitter).DestinationY = filesystem.NewParamFromFile[int](n.Params["destinationY"])
 		}
 
 		if a, ok := newNode.(music.Audible); ok {
