@@ -87,7 +87,7 @@ func (e *EuclidEmitter) Trig(key music.Key, scale music.Scale, inDir common.Dire
 		return
 	}
 	if !e.muted {
-		e.note.Play(key, scale)
+		e.note.TransposeAndPlay(key, scale)
 	}
 	if e.triggered {
 		e.retrig = true

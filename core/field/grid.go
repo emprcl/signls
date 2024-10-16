@@ -285,7 +285,7 @@ func (g *Grid) Transpose() {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
 			if n, ok := g.nodes[y][x].(music.Audible); ok {
-				n.Note().Key.Transpose(g.Key, g.Scale)
+				n.Note().Transpose(g.Key, g.Scale)
 			}
 		}
 	}

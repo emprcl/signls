@@ -283,8 +283,10 @@ func (m mainModel) handleParamEdit(dir string) {
 		m.params[m.param].Down()
 	case "left":
 		m.params[m.param].Left()
+		return // no preview for alt param
 	case "right":
 		m.params[m.param].Right()
+		return // no preview for alt param
 	}
 
 	switch p := m.params[m.param].(type) {

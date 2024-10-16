@@ -59,7 +59,7 @@ func (k *Key) Up() {
 }
 
 func (k *Key) Down() {
-	k.Set(k.keyIndex() + -1)
+	k.Set(k.keyIndex() - 1)
 }
 
 func (k *Key) Left() {
@@ -92,7 +92,7 @@ func (k *Key) Set(value int) {
 	if k.mode == KeyModeSilent {
 		return
 	}
-	if value >= len(k.keys) {
+	if value < 0 || value >= len(k.keys) {
 		return
 	}
 	for _, n := range k.nodes {
@@ -114,7 +114,7 @@ func (k *Key) SetAlt(value int) {
 func (k *Key) Preview() {
 	go func() {
 		n := *k.nodes[0].(music.Audible).Note()
-		n.Play(music.Key(60), music.CHROMATIC)
+		n.Play()
 		time.Sleep(300 * time.Millisecond)
 		n.Stop()
 	}()
