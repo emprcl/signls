@@ -86,7 +86,6 @@ func (g *Grid) Load(grid filesystem.Grid) {
 	g.clock.SetTempo(grid.Tempo)
 	g.Key = music.Key(grid.Key)
 	g.Scale = music.Scale(grid.Scale)
-	g.Height = grid.Height
 	g.Resize(grid.Width, grid.Height)
 
 	for _, n := range grid.Nodes {
@@ -99,14 +98,42 @@ func (g *Grid) Load(grid filesystem.Grid) {
 			newNode.(*node.EuclidEmitter).Steps = filesystem.NewParamFromFile[int](n.Params["steps"])
 			newNode.(*node.EuclidEmitter).Triggers = filesystem.NewParamFromFile[int](n.Params["triggers"])
 			newNode.(*node.EuclidEmitter).Offset = filesystem.NewParamFromFile[int](n.Params["offset"])
+		case "pass":
+			newNode = node.NewPassEmitter(g.midi, common.Direction(n.Direction))
+		case "relay":
+			newNode = node.NewRelayEmitter(g.midi, common.Direction(n.Direction))
+		case "cycle":
+			newNode = node.NewCycleEmitter(g.midi, common.Direction(n.Direction))
+		case "dice":
+			newNode = node.NewDiceEmitter(g.midi, common.Direction(n.Direction))
+		case "toll":
+			newNode = node.NewTollEmitter(g.midi, common.Direction(n.Direction))
+			newNode.(common.Behavioral).Behavior().(*node.TollEmitter).Threshold = filesystem.NewParamFromFile[int](n.Params["threshold"])
+		case "zone":
+			newNode = node.NewZoneEmitter(g.midi, common.Direction(n.Direction))
+		case "hole":
+			newNode = node.NewHoleEmitter(common.Direction(n.Direction), n.X, n.Y, g.Width, g.Height)
+			newNode.(*node.HoleEmitter).DestinationX = filesystem.NewParamFromFile[int](n.Params["destinationX"])
+			newNode.(*node.HoleEmitter).DestinationX = filesystem.NewParamFromFile[int](n.Params["destinationY"])
 		}
 
 		if a, ok := newNode.(music.Audible); ok {
-			// TODO: fix weird bugs
+			a.SetMute(n.Muted)
 			a.Note().Key.Set(music.Key(n.Note.Key.Key))
+			a.Note().Key.SetRandomAmount(n.Note.Key.Amount)
+			a.Note().Key.SetSilent(n.Note.Key.Silent)
 			a.Note().Channel.Set(uint8(n.Note.Channel.Value))
+			a.Note().Channel.SetRandomAmount(n.Note.Channel.Amount)
+			a.Note().Channel.SetMin(uint8(n.Note.Channel.Min))
+			a.Note().Channel.SetMax(uint8(n.Note.Channel.Max))
 			a.Note().Velocity.Set(uint8(n.Note.Velocity.Value))
+			a.Note().Velocity.SetRandomAmount(n.Note.Velocity.Amount)
+			a.Note().Velocity.SetMin(uint8(n.Note.Velocity.Min))
+			a.Note().Velocity.SetMax(uint8(n.Note.Velocity.Max))
 			a.Note().Length.Set(uint8(n.Note.Length.Value))
+			a.Note().Length.SetRandomAmount(n.Note.Length.Amount)
+			a.Note().Length.SetMin(uint8(n.Note.Length.Min))
+			a.Note().Length.SetMax(uint8(n.Note.Length.Max))
 			a.Note().Probability = uint8(n.Note.Probability)
 		}
 

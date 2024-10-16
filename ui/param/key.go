@@ -59,7 +59,7 @@ func (k *Key) Up() {
 }
 
 func (k *Key) Down() {
-	k.Set(k.keyIndex() + -1)
+	k.Set(k.keyIndex() - 1)
 }
 
 func (k *Key) Left() {
@@ -95,6 +95,7 @@ func (k *Key) Set(value int) {
 	if value >= len(k.keys) {
 		return
 	}
+	// TODO: fix not updated keys
 	for _, n := range k.nodes {
 		n.(music.Audible).Note().SetKey(k.keys[value], k.root)
 	}
