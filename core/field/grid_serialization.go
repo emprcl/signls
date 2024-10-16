@@ -123,7 +123,7 @@ func (g *Grid) Load(grid filesystem.Grid) {
 
 		if a, ok := newNode.(music.Audible); ok {
 			a.SetMute(n.Muted)
-			a.Note().Key.Set(music.Key(n.Note.Key.Key))
+			a.Note().SetKey(music.Key(n.Note.Key.Key), g.Key)
 			a.Note().Key.SetRandomAmount(n.Note.Key.Amount)
 			a.Note().Key.SetSilent(n.Note.Key.Silent)
 			a.Note().Channel.Set(uint8(n.Note.Channel.Value))
