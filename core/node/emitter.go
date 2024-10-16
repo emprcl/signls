@@ -82,7 +82,7 @@ func (e *Emitter) Trig(key music.Key, scale music.Scale, inDir common.Direction,
 		return
 	}
 	if !e.muted {
-		e.note.Play(key, scale)
+		e.note.TransposeAndPlay(key, scale)
 	}
 	if !e.updated(pulse) && e.triggered {
 		e.retrig = true

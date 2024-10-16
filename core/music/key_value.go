@@ -90,10 +90,6 @@ func (p *KeyValue) Set(key Key) {
 	p.nextKey = 0
 }
 
-func (p *KeyValue) Transpose(root Key, scale Scale) {
-	p.SetNext(p.key.Transpose(root, scale, p.interval), root)
-}
-
 func (p *KeyValue) RandomAmount() int {
 	return p.amount
 }

@@ -92,7 +92,7 @@ func (k *Key) Set(value int) {
 	if k.mode == KeyModeSilent {
 		return
 	}
-	if value >= len(k.keys) {
+	if value < 0 || value >= len(k.keys) {
 		return
 	}
 	// TODO: fix not updated keys
@@ -115,7 +115,7 @@ func (k *Key) SetAlt(value int) {
 func (k *Key) Preview() {
 	go func() {
 		n := *k.nodes[0].(music.Audible).Note()
-		n.Play(music.Key(60), music.CHROMATIC)
+		n.Play()
 		time.Sleep(300 * time.Millisecond)
 		n.Stop()
 	}()

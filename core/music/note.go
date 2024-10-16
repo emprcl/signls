@@ -83,8 +83,8 @@ func (n *Note) Tick() {
 	}
 }
 
-// Play triggers the note with a specific root and scale, resetting internal state.
-func (n *Note) Play(root Key, scale Scale) {
+// TransposeAndPlay triggers the note with a specific root and scale, resetting internal state.
+func (n *Note) TransposeAndPlay(root Key, scale Scale) {
 	if n.Key.IsSilent() {
 		return
 	}
@@ -94,7 +94,7 @@ func (n *Note) Play(root Key, scale Scale) {
 		return
 	}
 
-	n.Key.Transpose(root, scale)
+	n.Transpose(root, scale)
 	n.Stop()
 	n.midi.NoteOn(
 		n.Channel.Computed(),
@@ -107,11 +107,33 @@ func (n *Note) Play(root Key, scale Scale) {
 	n.pulse = 0
 }
 
+// Play just triggers the note. Used for note preview.
+func (n *Note) Play() {
+	if n.Key.IsSilent() {
+		return
+	}
+
+	n.Stop()
+	n.midi.NoteOn(
+		n.Channel.Value(),
+		uint8(n.Key.Value()),
+		n.Velocity.Value(),
+	)
+
+	n.triggered = true
+	n.pulse = 0
+}
+
 // Stop sends a MIDI Note Off message and resets the triggered state.
 func (n *Note) Stop() {
 	n.midi.NoteOff(n.Channel.Last(), uint8(n.Key.Last()))
 	n.triggered = false
 	n.pulse = 0
+}
+
+// Transpose transposes current key for a given root and scale.
+func (n *Note) Transpose(root Key, scale Scale) {
+	n.Key.SetNext(n.Key.key.Transpose(root, scale, n.Key.interval), root)
 }
 
 // SetKey updates the note's key and calculates the interval relative to the root.
