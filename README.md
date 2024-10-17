@@ -2,6 +2,7 @@
 :loop: a generative midi sequencer in the terminal
 
 TODO:
+ - add bank selection ui
  - add lfo on every param
    - set 2 global lfos with shapes and coeff
  - add keyboard mode for note input
@@ -12,7 +13,6 @@ TODO:
  - add commands (tempo, scale, root, others?)
  - add theme
  - try making a standalone gui app with https://github.com/BigJk/crt
- - add file system
 
 Names:
   - Nyll
