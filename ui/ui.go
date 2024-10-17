@@ -48,6 +48,7 @@ type mainModel struct {
 	selectionY int
 	param      int
 	edit       bool
+	bankMode   bool
 	blink      bool
 	mute       bool
 }

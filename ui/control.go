@@ -9,6 +9,11 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+const (
+	maxGrids     = 32
+	gridsPerLine = 16
+)
+
 var (
 	controlStyle = lipgloss.NewStyle().
 			MarginTop(1).
@@ -17,6 +22,14 @@ var (
 			MarginRight(2)
 	activeCellStyle = cellStyle.
 			Foreground(lipgloss.Color("190"))
+	bankStyle = lipgloss.NewStyle().
+			MarginRight(1).
+			Background(lipgloss.Color("79")).
+			Foreground(lipgloss.Color("0"))
+	bankStyleOdd = lipgloss.NewStyle().
+			MarginRight(1).
+			Background(lipgloss.Color("85")).
+			Foreground(lipgloss.Color("0"))
 )
 
 func (m mainModel) renderControl() string {
@@ -26,6 +39,9 @@ func (m mainModel) renderControl() string {
 	} else {
 		pane = m.gridInfo()
 	}
+
+	return controlStyle.Render(m.bankSelection())
+
 	return controlStyle.Render(
 		lipgloss.JoinHorizontal(
 			lipgloss.Left,
@@ -35,6 +51,30 @@ func (m mainModel) renderControl() string {
 				cellStyle.Render(m.modeName()),
 			),
 			pane,
+		),
+	)
+}
+
+func (m mainModel) bankSelection() string {
+	banks := make([]string, maxGrids)
+	for i, _ := range m.bank.Grids[:maxGrids] {
+		label := fmt.Sprintf("%2d", i+1)
+		if (i < gridsPerLine && i%2 == 0) || (i >= gridsPerLine && i%2 == 1) {
+			banks[i] = bankStyle.Render(label)
+		} else {
+			banks[i] = bankStyleOdd.Render(label)
+		}
+
+	}
+	return lipgloss.JoinVertical(
+		lipgloss.Left,
+		lipgloss.JoinHorizontal(
+			lipgloss.Left,
+			banks[:gridsPerLine]...,
+		),
+		lipgloss.JoinHorizontal(
+			lipgloss.Left,
+			banks[gridsPerLine:maxGrids]...,
 		),
 	)
 }
