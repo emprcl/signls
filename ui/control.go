@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"cykl/core/common"
+	"cykl/filesystem"
 	"cykl/ui/param"
 
 	"github.com/charmbracelet/lipgloss"
@@ -64,13 +65,10 @@ func (m mainModel) renderControl() string {
 func (m mainModel) bankSelection() string {
 	banks := make([]string, maxGrids)
 	for i, g := range m.bank.Grids[:maxGrids] {
-		label := fmt.Sprintf("%2d", i+1)
-		if !g.IsEmpty() {
-			label = fmt.Sprintf("%2d\u0320", i+1)
-		}
+		label := bankGridLabel(i, g)
 		if i == m.selectedGrid {
 			banks[i] = cursorStyle.MarginRight(1).Render(label)
-		} else if i == m.activeGrid {
+		} else if i == m.bank.Active {
 			banks[i] = activeBankStyle.Render(label)
 		} else if (i < gridsPerLine && i%2 == 0) || (i >= gridsPerLine && i%2 == 1) {
 			banks[i] = bankStyle.Render(label)
@@ -95,7 +93,7 @@ func (m mainModel) bankSelection() string {
 		lipgloss.Left,
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			activeBankStyle.MarginRight(9).Render(fmt.Sprintf("%2d", m.activeGrid+1)),
+			activeBankStyle.MarginRight(9).Render(bankGridLabel(m.bank.Active, m.bank.ActiveGrid())),
 			cellStyle.Render(m.modeName()),
 		),
 		pane,
@@ -210,4 +208,12 @@ func (m mainModel) selectedNodeName() string {
 			Render(nodes[0].Symbol()),
 		nodes[0].Name(),
 	)
+}
+
+func bankGridLabel(nb int, g filesystem.Grid) string {
+	label := fmt.Sprintf("%2d", nb+1)
+	if !g.IsEmpty() {
+		label = fmt.Sprintf("%2d\u0320", nb+1)
+	}
+	return label
 }

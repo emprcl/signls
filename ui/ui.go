@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"log"
 	"time"
 
 	"cykl/core/common"
@@ -46,7 +47,6 @@ type mainModel struct {
 	cursorY      int
 	selectionX   int
 	selectionY   int
-	activeGrid   int
 	selectedGrid int
 	param        int
 	edit         bool
@@ -99,20 +99,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 
 	case tea.WindowSizeMsg:
-		m.help.Width = msg.Width
-		m.viewport.Width = msg.Width / 2
-		m.viewport.Height = msg.Height - controlsHeight - 1
-		if m.viewport.Width > m.grid.Width || m.viewport.Height > m.grid.Height {
-			m.grid.Resize(m.viewport.Width, m.viewport.Height)
-		}
-		m.viewport.Update(m.cursorX, m.cursorY, m.grid.Width, m.grid.Height)
-		if m.cursorX > m.grid.Width-1 {
-			m.cursorX = m.grid.Width - 1
-		}
-		if m.cursorY > m.grid.Height-1 {
-			m.cursorY = m.grid.Height - 1
-		}
-		return m, nil
+		return m.windowResize(msg.Width, msg.Height), nil
 
 	case tickMsg:
 		return m, tick()
@@ -185,9 +172,8 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, save(m)
 		case key.Matches(msg, m.keymap.EditNode):
 			if m.bankMode {
-				m.activeGrid = m.selectedGrid
 				m.bankMode = false
-				return m, nil
+				return m.loadGridFromBank(), tea.WindowSize()
 			}
 			if len(m.selectedEmitters()) == 0 {
 				return m, nil
@@ -397,6 +383,35 @@ func (m *mainModel) moveBankGrid(dir string) {
 		}
 		m.selectedGrid++
 	}
+}
+
+func (m mainModel) loadGridFromBank() mainModel {
+	m.bank.Active = m.selectedGrid
+	newGrid := field.NewFromBank(m.bank.ActiveGrid(), m.grid.Midi())
+	if m.grid.Playing {
+		m.grid.Playing = false
+		newGrid.Playing = true
+	}
+	log.Println(newGrid.Key, newGrid.Scale, m.grid.Key, m.grid.Scale)
+	m.grid = newGrid
+	return m.windowResize(m.viewport.Width, m.viewport.Height)
+}
+
+func (m mainModel) windowResize(width, height int) mainModel {
+	m.help.Width = width
+	m.viewport.Width = width / 2
+	m.viewport.Height = height - controlsHeight - 1
+	if m.viewport.Width > m.grid.Width || m.viewport.Height > m.grid.Height {
+		m.grid.Resize(m.viewport.Width, m.viewport.Height)
+	}
+	m.viewport.Update(m.cursorX, m.cursorY, m.grid.Width, m.grid.Height)
+	if m.cursorX > m.grid.Width-1 {
+		m.cursorX = m.grid.Width - 1
+	}
+	if m.cursorY > m.grid.Height-1 {
+		m.cursorY = m.grid.Height - 1
+	}
+	return m
 }
 
 func moveCursor(dir string, speed, x, y, minX, maxX, minY, maxY int) (int, int) {

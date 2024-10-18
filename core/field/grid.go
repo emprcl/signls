@@ -61,6 +61,11 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 	return grid
 }
 
+// Midi returns the grid midi interface.
+func (g *Grid) Midi() midi.Midi {
+	return g.midi
+}
+
 // TogglePlay toggles the playing state of the grid.
 func (g *Grid) TogglePlay() {
 	g.Playing = !g.Playing
