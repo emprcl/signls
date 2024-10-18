@@ -10,6 +10,8 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -142,6 +144,11 @@ func (b *Bank) ActiveGrid() Grid {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	return b.Grids[b.Active]
+}
+
+// Filename returns the bank filename.
+func (b *Bank) Filename() string {
+	return strings.TrimSuffix(b.filename, filepath.Ext(b.filename))
 }
 
 // Save saves a grid to the active slot and writes.

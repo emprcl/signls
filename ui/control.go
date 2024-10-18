@@ -122,7 +122,11 @@ func (m mainModel) gridInfo() string {
 		),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			"",
+			fmt.Sprintf(
+				"%s%s",
+				activeBankStyle.Render(bankGridLabel(m.bank.Active, m.bank.ActiveGrid())),
+				m.bank.Filename(),
+			),
 			m.grid.MidiDevice(),
 		),
 	)
