@@ -42,7 +42,7 @@ func (m mainModel) inSelectionRange(x, y int) bool {
 func (m mainModel) renderNode(n common.Node, x, y int) string {
 	// render cursor
 	isCursor := false
-	if x == m.cursorX && y == m.cursorY {
+	if x == m.cursorX && y == m.cursorY && !m.bankMode {
 		isCursor = true
 	}
 
@@ -59,11 +59,11 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 	teleportDestinationSymbol := node.HoleDestinationSymbol
 	if n == nil && isCursor {
 		return cursorStyle.Render("  ")
-	} else if n == nil && isTeleportDestination && !m.blink {
+	} else if n == nil && isTeleportDestination && !m.blink && !m.bankMode {
 		return cursorStyle.Render(teleportDestinationSymbol)
-	} else if n == nil && isTeleportDestination && m.blink {
+	} else if n == nil && isTeleportDestination && (m.blink || m.bankMode) {
 		return teleportDestinationStyle.Render(teleportDestinationSymbol)
-	} else if n == nil && m.inSelectionRange(x, y) {
+	} else if n == nil && m.inSelectionRange(x, y) && !m.bankMode {
 		return selectionStyle.Render("..")
 	} else if n == nil {
 		if (x+y)%2 == 0 {

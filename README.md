@@ -15,6 +15,9 @@ TODO:
  - try making a standalone gui app with https://github.com/BigJk/crt
 
 Names:
+  - uvvu
+  - nlsq
+  - nlsek
   - Nyll
   - KYVL
   - HYDR

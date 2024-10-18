@@ -35,22 +35,24 @@ type blinkMsg time.Time
 type saveMsg bool
 
 type mainModel struct {
-	bank       *filesystem.Bank
-	grid       *field.Grid
-	viewport   viewport
-	keymap     keyMap
-	help       help.Model
-	params     []param.Param
-	gridParams []param.Param
-	cursorX    int
-	cursorY    int
-	selectionX int
-	selectionY int
-	param      int
-	edit       bool
-	bankMode   bool
-	blink      bool
-	mute       bool
+	bank         *filesystem.Bank
+	grid         *field.Grid
+	viewport     viewport
+	keymap       keyMap
+	help         help.Model
+	params       []param.Param
+	gridParams   []param.Param
+	cursorX      int
+	cursorY      int
+	selectionX   int
+	selectionY   int
+	activeGrid   int
+	selectedGrid int
+	param        int
+	edit         bool
+	bankMode     bool
+	blink        bool
+	mute         bool
 }
 
 // New creates a new mainModel that hols the ui state. It takes a new grid.
@@ -126,6 +128,10 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, m.keymap.Up, m.keymap.Right, m.keymap.Down, m.keymap.Left):
 			dir := m.keymap.Direction(msg)
+			if m.bankMode {
+				m.moveBankGrid(dir)
+				return m, nil
+			}
 			if m.edit {
 				m.moveParam(dir)
 				return m, nil
@@ -178,6 +184,11 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.grid.RemoveNodes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			return m, save(m)
 		case key.Matches(msg, m.keymap.EditNode):
+			if m.bankMode {
+				m.activeGrid = m.selectedGrid
+				m.bankMode = false
+				return m, nil
+			}
 			if len(m.selectedEmitters()) == 0 {
 				return m, nil
 			}
@@ -198,6 +209,9 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.selectedNode().(*node.Emitter).Arm()
 			m.selectedNode().(*node.Emitter).Trig(m.grid.Key, m.grid.Scale, common.NONE, m.grid.Pulse())
+			return m, nil
+		case key.Matches(msg, m.keymap.Bank):
+			m.bankMode = !m.bankMode
 			return m, nil
 		case key.Matches(msg, m.keymap.RootNoteUp):
 			if m.edit {
@@ -244,6 +258,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, save(m)
 		case key.Matches(msg, m.keymap.Cancel):
 			m.edit = false
+			m.bankMode = false
 			m.param = 0
 			m.selectionX = m.cursorX
 			m.selectionY = m.cursorY
@@ -356,6 +371,31 @@ func (m *mainModel) moveParam(dir string) {
 			return
 		}
 		m.param--
+	}
+}
+
+func (m *mainModel) moveBankGrid(dir string) {
+	switch dir {
+	case "up":
+		if m.selectedGrid-gridsPerLine < 0 {
+			return
+		}
+		m.selectedGrid = m.selectedGrid - gridsPerLine
+	case "down":
+		if m.selectedGrid+gridsPerLine >= maxGrids {
+			return
+		}
+		m.selectedGrid = m.selectedGrid + gridsPerLine
+	case "left":
+		if m.selectedGrid == 0 {
+			return
+		}
+		m.selectedGrid--
+	case "right":
+		if m.selectedGrid == maxGrids-1 {
+			return
+		}
+		m.selectedGrid++
 	}
 }
 

@@ -30,17 +30,23 @@ var (
 			MarginRight(1).
 			Background(lipgloss.Color("85")).
 			Foreground(lipgloss.Color("0"))
+	activeBankStyle = lipgloss.NewStyle().
+			MarginRight(1).
+			Background(lipgloss.Color("15")).
+			Foreground(lipgloss.Color("0"))
 )
 
 func (m mainModel) renderControl() string {
+	if m.bankMode {
+		return controlStyle.Render(m.bankSelection())
+	}
+
 	var pane string
 	if m.edit {
 		pane = m.nodeEdit()
 	} else {
 		pane = m.gridInfo()
 	}
-
-	return controlStyle.Render(m.bankSelection())
 
 	return controlStyle.Render(
 		lipgloss.JoinHorizontal(
@@ -59,14 +65,18 @@ func (m mainModel) bankSelection() string {
 	banks := make([]string, maxGrids)
 	for i, _ := range m.bank.Grids[:maxGrids] {
 		label := fmt.Sprintf("%2d", i+1)
-		if (i < gridsPerLine && i%2 == 0) || (i >= gridsPerLine && i%2 == 1) {
+		if i == m.selectedGrid {
+			banks[i] = cursorStyle.MarginRight(1).Render(label)
+		} else if i == m.activeGrid {
+			banks[i] = activeBankStyle.Render(label)
+		} else if (i < gridsPerLine && i%2 == 0) || (i >= gridsPerLine && i%2 == 1) {
 			banks[i] = bankStyle.Render(label)
 		} else {
 			banks[i] = bankStyleOdd.Render(label)
 		}
 
 	}
-	return lipgloss.JoinVertical(
+	pane := lipgloss.JoinVertical(
 		lipgloss.Left,
 		lipgloss.JoinHorizontal(
 			lipgloss.Left,
@@ -76,6 +86,16 @@ func (m mainModel) bankSelection() string {
 			lipgloss.Left,
 			banks[gridsPerLine:maxGrids]...,
 		),
+	)
+
+	return lipgloss.JoinHorizontal(
+		lipgloss.Left,
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			activeBankStyle.MarginRight(9).Render(fmt.Sprintf("%2d", m.activeGrid+1)),
+			cellStyle.Render(m.modeName()),
+		),
+		pane,
 	)
 }
 
@@ -144,6 +164,9 @@ func (m mainModel) transportSymbol() string {
 }
 
 func (m mainModel) modeName() string {
+	if m.bankMode {
+		return "bank"
+	}
 	if m.edit {
 		return "edit"
 	}
