@@ -158,7 +158,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		SelectionLeft: key.NewBinding(
 			key.WithKeys(keys.SelectionLeft),
-			key.WithHelp(keys.SelectionLeft, "move selection left | | alt parameter left"),
+			key.WithHelp(keys.SelectionLeft, "move selection left | alt parameter left"),
 		),
 		EditUp: key.NewBinding(
 			key.WithKeys(keys.EditUp),
@@ -234,7 +234,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		RemoveNode: key.NewBinding(
 			key.WithKeys(keys.RemoveNode),
-			key.WithHelp(keys.RemoveNode, "remove selected nodes"),
+			key.WithHelp(keys.RemoveNode, "remove selected nodes | grid"),
 		),
 		TriggerNode: key.NewBinding(
 			key.WithKeys(keys.TriggerNode),

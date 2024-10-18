@@ -44,6 +44,18 @@ type Grid struct {
 	Scale uint16 `json:"scale"`
 }
 
+// NewGrid creates a new grid with default values.
+func NewGrid() Grid {
+	return Grid{
+		Nodes:  []Node{},
+		Height: defaultSize,
+		Width:  defaultSize,
+		Tempo:  defaultTempo,
+		Key:    uint8(defaultRootKey),
+		Scale:  uint16(defaultScale),
+	}
+}
+
 // IsEmpty returns true if the grid is empty (no nodes).
 func (g Grid) IsEmpty() bool {
 	return len(g.Nodes) == 0
@@ -122,14 +134,8 @@ func NewParamFromFile[T uint8 | int](param Param) *common.ControlValue[T] {
 // New creates and loads a new bank from a given file.
 func New(filename string) *Bank {
 	grids := make([]Grid, maxGrids)
-	nodes := []Node{}
 	for k := range grids {
-		grids[k].Nodes = nodes
-		grids[k].Height = defaultSize
-		grids[k].Width = defaultSize
-		grids[k].Tempo = defaultTempo
-		grids[k].Key = uint8(defaultRootKey)
-		grids[k].Scale = uint16(defaultScale)
+		grids[k] = NewGrid()
 	}
 	bank := &Bank{
 		filename: filename,
@@ -144,6 +150,11 @@ func (b *Bank) ActiveGrid() Grid {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	return b.Grids[b.Active]
+}
+
+// ClearGrid clears a given grid.
+func (b *Bank) ClearGrid(nb int) {
+	b.Grids[nb] = NewGrid()
 }
 
 // Filename returns the bank filename.

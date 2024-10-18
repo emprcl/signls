@@ -166,6 +166,10 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.mute = !m.mute
 			return m, save(m)
 		case key.Matches(msg, m.keymap.RemoveNode):
+			if m.bankMode {
+				m.bank.ClearGrid(m.selectedGrid)
+				return m.loadGridFromBank(), tea.WindowSize()
+			}
 			m.edit = false
 			m.grid.RemoveNodes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			return m, save(m)
