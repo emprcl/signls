@@ -89,6 +89,11 @@ func (g *Grid) Load(grid filesystem.Grid) {
 	g.Scale = music.Scale(grid.Scale)
 	g.Resize(grid.Width, grid.Height)
 
+	g.nodes = make([][]common.Node, g.Height)
+	for i := range g.nodes {
+		g.nodes[i] = make([]common.Node, g.Width)
+	}
+
 	for _, n := range grid.Nodes {
 		var newNode common.Node
 		switch n.Type {

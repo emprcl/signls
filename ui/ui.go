@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"log"
 	"time"
 
 	"cykl/core/common"
@@ -197,6 +196,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.selectedNode().(*node.Emitter).Trig(m.grid.Key, m.grid.Scale, common.NONE, m.grid.Pulse())
 			return m, nil
 		case key.Matches(msg, m.keymap.Bank):
+			m.selectedGrid = m.bank.Active
 			m.bankMode = !m.bankMode
 			return m, nil
 		case key.Matches(msg, m.keymap.RootNoteUp):
@@ -387,13 +387,9 @@ func (m *mainModel) moveBankGrid(dir string) {
 
 func (m mainModel) loadGridFromBank() mainModel {
 	m.bank.Active = m.selectedGrid
-	newGrid := field.NewFromBank(m.bank.ActiveGrid(), m.grid.Midi())
-	if m.grid.Playing {
-		m.grid.Playing = false
-		newGrid.Playing = true
-	}
-	log.Println(newGrid.Key, newGrid.Scale, m.grid.Key, m.grid.Scale)
-	m.grid = newGrid
+	isPlaying := m.grid.Playing
+	m.grid.Load(m.bank.ActiveGrid())
+	m.grid.Playing = isPlaying
 	return m.windowResize(m.viewport.Width, m.viewport.Height)
 }
 
