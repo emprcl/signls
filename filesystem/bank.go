@@ -42,6 +42,11 @@ type Grid struct {
 	Scale uint16 `json:"scale"`
 }
 
+// IsEmpty returns true if the grid is empty (no nodes).
+func (g Grid) IsEmpty() bool {
+	return len(g.Nodes) == 0
+}
+
 // Node represents a grid node that is json serializable.
 type Node struct {
 	X         int    `json:"x"`

@@ -63,8 +63,11 @@ func (m mainModel) renderControl() string {
 
 func (m mainModel) bankSelection() string {
 	banks := make([]string, maxGrids)
-	for i, _ := range m.bank.Grids[:maxGrids] {
+	for i, g := range m.bank.Grids[:maxGrids] {
 		label := fmt.Sprintf("%2d", i+1)
+		if !g.IsEmpty() {
+			label = fmt.Sprintf("%2d\u0320", i+1)
+		}
 		if i == m.selectedGrid {
 			banks[i] = cursorStyle.MarginRight(1).Render(label)
 		} else if i == m.activeGrid {
