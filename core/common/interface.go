@@ -1,12 +1,13 @@
 package common
 
 // Node represents a general interface for any element that can exist on the grid.
-// It defines common behavior for all types of nodes, such as emitters or signals.
 type Node interface {
 	// Activated returns whether the node is currently active.
 	Activated() bool
 
-	// Direction returns the current direction the node is facing.
+	// Direction returns the current node direction.
+	// Can be either the moving direction (signals) or
+	// the emitting directions (emitters).
 	Direction() Direction
 
 	// SetDirection sets the direction for the node.
@@ -15,11 +16,10 @@ type Node interface {
 	// Symbol returns a string that visually represents the node.
 	Symbol() string
 
-	// Name returns the name of the node, typically used for identifying its type.
+	// Name returns the name of the node..
 	Name() string
 
-	// Color returns a string representing the color code for the node,
-	// which could be used for rendering in a terminal or GUI.
+	// Color returns a string representing the color code for the node.
 	Color() string
 }
 
@@ -32,7 +32,7 @@ type EmitterBehavior interface {
 	Copy() EmitterBehavior
 
 	// EmitDirections determines which directions the emitter will emit signals
-	// based on its current direction, the incoming direction, and the pulse count.
+	// based on its current direction, the incoming signal direction, and the pulse count.
 	EmitDirections(dir Direction, inDir Direction, pulse uint64) Direction
 
 	// ShouldPropagate indicates if triggers should be propagated to direct
@@ -53,12 +53,12 @@ type EmitterBehavior interface {
 }
 
 // Movable represents an interface for nodes that can move within the grid.
-// This could be implemented by any node that changes position over time.
 type Movable interface {
-	// MustMove checks if the node should move for the current pulse.
+	// MustMove checks if the node must move during the current pulse.
 	MustMove(pulse uint64) bool
 }
 
+// Behavioral represents an interface for nodes that have a specific behavior.
 type Behavioral interface {
 	Behavior() EmitterBehavior
 	SetBehavior(behavior EmitterBehavior)

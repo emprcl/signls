@@ -21,7 +21,7 @@ var (
 	// allDirections is a slice containing all the basic directional constants.
 	allDirections = []Direction{UP, RIGHT, DOWN, LEFT}
 
-	// symbols maps Direction combinations to their corresponding string symbols.
+	// symbols maps direction combinations to their corresponding string symbols.
 	symbols = map[Direction]string{
 		NONE:                     "•",
 		UP:                       "╹",
@@ -43,7 +43,6 @@ var (
 )
 
 // Decompose splits a Direction into its constituent basic directions.
-// Returns a slice of Directions that make up the current Direction.
 func (d Direction) Decompose() []Direction {
 	directions := []Direction{}
 	for _, dir := range allDirections {
@@ -55,14 +54,13 @@ func (d Direction) Decompose() []Direction {
 	return directions
 }
 
-// Count returns the number of active directions in the current Direction.
-// Utilizes the bits.OnesCount function to count the number of set bits.
+// Count returns the number of active directions in the current direction.
 func (d Direction) Count() int {
 	return bits.OnesCount(uint(d))
 }
 
-// NextPosition calculates the new position (x, y) after moving in the specified Direction.
-// The new coordinates are determined based on the direction of movement.
+// NextPosition calculates the new position (x, y) after moving in the specified direction
+// from a given position.
 func (d Direction) NextPosition(x, y int) (int, int) {
 	switch d {
 	case NONE:
@@ -80,26 +78,22 @@ func (d Direction) NextPosition(x, y int) (int, int) {
 	}
 }
 
-// Add combines the current Direction with another Direction using bitwise OR.
-// This allows multiple directions to be represented in a single Direction.
+// Add combines the current direction with another direction.
 func (d Direction) Add(dir Direction) Direction {
 	return d | dir
 }
 
-// Remove subtracts a specific Direction from the current Direction using bitwise AND NOT.
-// This effectively removes the specified direction from the current set of directions.
+// Remove subtracts a specific direction from the current direction.
 func (d Direction) Remove(dir Direction) Direction {
 	return d &^ dir
 }
 
-// Contains checks if the current Direction includes a specific basic Direction.
-// Returns true if the specified direction is part of the current Direction.
+// Contains checks if the current direction includes a specific basic direction.
 func (d Direction) Contains(dir Direction) bool {
 	return d&dir != 0
 }
 
-// Symbol returns the string symbol associated with the current Direction.
-// If a symbol is not defined for the current combination of directions, it returns a space.
+// Symbol returns the string symbol associated with the current direction.
 func (d Direction) Symbol() string {
 	if s, ok := symbols[d]; ok {
 		return s

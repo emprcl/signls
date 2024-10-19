@@ -2,7 +2,6 @@ package common
 
 import "time"
 
-// Constants defining the timing and buffer parameters
 const (
 	PulsesPerStep       int = 4
 	StepsPerQuarterNote int = 4
@@ -18,10 +17,10 @@ const (
 //
 // Read more: http://midi.teragonaudio.com/tech/midispec/clock.htm
 type Clock struct {
-	ticker       *time.Ticker // Ticker to generate regular clock pulses
-	update       chan float64 // Channel for updating the tempo
-	tempo        float64      // Current tempo in BPM
-	shouldUpdate bool         // Flag to indicate if the ticker should be updated
+	ticker       *time.Ticker
+	update       chan float64
+	tempo        float64
+	shouldUpdate bool // Flag to indicate if the ticker should be updated after the next tick.
 }
 
 // setTempo updates the tempo of the clock. It ensures the new tempo is within the defined range.
@@ -50,13 +49,13 @@ func NewClock(tempo float64, tick func()) *Clock {
 	go func(c *Clock) {
 		for {
 			select {
-			case <-c.ticker.C: // On each tick, execute the callback
+			case <-c.ticker.C:
 				tick()
 				if c.shouldUpdate {
-					c.ticker.Reset(newClockInterval(c.tempo)) // Reset the ticker with the new interval
+					c.ticker.Reset(newClockInterval(c.tempo))
 					c.shouldUpdate = false
 				}
-			case newTempo := <-c.update: // On receiving a new tempo value
+			case newTempo := <-c.update:
 				c.shouldUpdate = true
 				c.tempo = newTempo
 			}
@@ -66,8 +65,6 @@ func NewClock(tempo float64, tick func()) *Clock {
 }
 
 // newClockInterval calculates the duration of each tick based on the current tempo.
-// The duration is computed to ensure that the ticker emits ticks at the correct rate
-// for the specified tempo.
 func newClockInterval(tempo float64) time.Duration {
 	// midi clock: http://midi.teragonaudio.com/tech/midispec/clock.htm
 	return time.Duration(1000000*60/(tempo*float64(PulsesPerStep*StepsPerQuarterNote))) * time.Microsecond
