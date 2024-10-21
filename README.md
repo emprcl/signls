@@ -12,6 +12,7 @@ TODO:
  - try making a standalone gui app with https://github.com/BigJk/crt
 
 Names:
+  - qryll
   - uvvu
   - nlsq
   - nlsek
