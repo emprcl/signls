@@ -1,10 +1,10 @@
-# :purple_square: Signls
+# Signls
 
 Signls is a non-linear, generative midi sequencer designed for music composition and live performance. It runs in the terminal (TUI).
 
-**_Signls has only been tested on linux (it should work on macOS as well) and you may experience some crashes here and there._**
+**_Signls is still in development, but it is expected to be relatively stable. Comprehensive documentation is coming soon._**
 
-**_Feel free to [open an issue](https://github.com/emprcl/signls/issues/new)._**
+_Feel free to [open an issue](https://github.com/emprcl/signls/issues/new)._
 
 ![signls screenshot](/docs/screenshot.png)
 
