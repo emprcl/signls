@@ -28,6 +28,7 @@ Although you should be able to build it for either **linux**, **macOS** or **Win
 
 ```sh
 # Linux
+sudo apt-get install libasound2-dev
 make GOLANG_OS=linux build
 
 # macOS
