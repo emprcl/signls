@@ -11,13 +11,15 @@ import (
 // Configuration represents a configuration loaded from a json file.
 type Configuration struct {
 	KeyMap   KeyMap `json:"keymap"`
+	version  string
 	filename string
 }
 
 // NewConfiguration returns a new default configuration.
-func NewConfiguration(filename, keyboard string) Configuration {
+func NewConfiguration(filename, version, keyboard string) Configuration {
 	config := Configuration{
 		KeyMap:   NewDefaultQwertyKeyMap(),
+		version:  version,
 		filename: filename,
 	}
 	config.Load(filename)
@@ -35,6 +37,14 @@ func NewConfiguration(filename, keyboard string) Configuration {
 	config.Save()
 
 	return config
+}
+
+// Version returns the version number.
+func (c Configuration) Version() string {
+	if c.version == "" {
+		return "dev"
+	}
+	return c.version
 }
 
 // Save serializes the Configuration and writes it to a file.

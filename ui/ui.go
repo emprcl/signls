@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"time"
 
 	"signls/core/common"
@@ -42,6 +43,7 @@ type mainModel struct {
 	help         help.Model
 	params       []param.Param
 	gridParams   []param.Param
+	version      string
 	cursorX      int
 	cursorY      int
 	selectionX   int
@@ -67,6 +69,8 @@ func New(config filesystem.Configuration, grid *field.Grid, bank *filesystem.Ban
 		cursorY:    1,
 		selectionX: 1,
 		selectionY: 1,
+
+		version: config.Version(),
 	}
 	return model
 }
@@ -279,7 +283,16 @@ func (m mainModel) View() string {
 		Render(m.help.View(m.keymap))
 
 	if m.help.ShowAll {
-		return help
+		return lipgloss.JoinVertical(
+			lipgloss.Left,
+			lipgloss.NewStyle().
+				MarginTop(1).
+				MarginLeft(2).
+				Render(fmt.Sprintf("signls %s", m.version)),
+			lipgloss.NewStyle().
+				Height(m.viewport.Height+controlsHeight-1).
+				Render(help),
+		)
 	}
 
 	return lipgloss.JoinVertical(
