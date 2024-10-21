@@ -64,15 +64,20 @@ type Behavioral interface {
 	SetBehavior(behavior EmitterBehavior)
 }
 
+// Tickable represents an interface for nodes that have an internal
+// time-related state.
 type Tickable interface {
 	Tick()
 	Reset()
 }
 
+// Copyable represents an interface for nodes that can be copied.
 type Copyable interface {
 	Copy(dx, dy int) Node
 }
 
+// Parameter represents an interface for values that needs to be
+// updated from the ui.
 type Parameter[T any] interface {
 	Value() T
 	Computed() T

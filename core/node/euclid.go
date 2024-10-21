@@ -189,7 +189,6 @@ func (e *EuclidEmitter) Reset() {
 	e.Note().Stop()
 }
 
-// updated checks if the emitter was updated on the given pulse.
 func (e *EuclidEmitter) updated(pulse uint64) bool {
 	return e.pulse == pulse
 }

@@ -10,20 +10,19 @@ import (
 
 // Constants defining default values for note properties and their limits.
 const (
-	defaultKey      Key   = 60 // Default MIDI key value (Middle C).
+	defaultKey      Key   = 60 // Middle C
 	defaultChannel  uint8 = 0
 	defaultVelocity uint8 = 100
 	defaultLength   uint8 = uint8(common.PulsesPerStep)
 
 	maxVelocity    uint8 = 127
-	maxLength      uint8 = 127 // Maximum length of the note (127 is treated as infinity).
+	maxLength      uint8 = 127 // 127 is treated as infinity
 	minLength      uint8 = 1
 	maxChannel     uint8 = 15
 	maxProbability uint8 = 100
 )
 
-// Note represents a musical note with various properties such as key, velocity, and length.
-// It includes behavior that defines how the note plays and interacts with other elements.
+// Note represents a midi note.
 type Note struct {
 	midi midi.Midi
 
@@ -36,7 +35,7 @@ type Note struct {
 	Probability uint8
 
 	pulse     uint64 // Internal pulse counter to manage note length.
-	triggered bool   // Indicates whether the note is currently playing.
+	triggered bool
 }
 
 // NewNote initializes a new Note with default settings and the provided MIDI interface.
@@ -137,7 +136,7 @@ func (n *Note) Transpose(root Key, scale Scale) {
 	n.Key.SetNext(n.Key.key.Transpose(root, scale, n.Key.interval), root)
 }
 
-// SetKey updates the note's key and calculates the interval relative to the root.
+// SetKey sets the next key to play.
 func (n *Note) SetKey(key Key, root Key) {
 	n.Key.SetNext(key, root)
 	if !n.triggered {
@@ -145,17 +144,17 @@ func (n *Note) SetKey(key Key, root Key) {
 	}
 }
 
-// SetVelocity updates the velocity of the note, ensuring it is within valid limits.
+// SetVelocity updates the velocity of the note.
 func (n *Note) SetVelocity(velocity uint8) {
 	n.Velocity.Set(velocity)
 }
 
-// SetLength updates the length of the note, ensuring it is within valid limits.
+// SetLength updates the length of the note.
 func (n *Note) SetLength(length uint8) {
 	n.Length.Set(length)
 }
 
-// SetChannel updates the MIDI channel of the note, ensuring it is within valid limits.
+// SetChannel updates the MIDI channel of the note.
 func (n *Note) SetChannel(channel uint8) {
 	n.Channel.Set(channel)
 }

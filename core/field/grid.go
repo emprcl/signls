@@ -9,47 +9,45 @@ import (
 	"signls/midi"
 )
 
-// Constants for default settings
 const (
-	defaultTempo               = 120.            // Default tempo (BPM)
-	defaultRootKey music.Key   = 60              // Default root key (MIDI note number for Middle C)
-	defaultScale   music.Scale = music.CHROMATIC // Default scale (chromatic scale)
+	defaultTempo               = 120.
+	defaultRootKey music.Key   = 60
+	defaultScale   music.Scale = music.CHROMATIC
 )
 
 // Grid represents the main structure for the grid-based sequencer.
 type Grid struct {
-	mu sync.Mutex // Mutex to handle concurrent access to the grid
+	mu sync.Mutex
 
-	midi   midi.Midi       // MIDI interface to send notes and control signals
-	clock  *common.Clock   // Clock to manage timing and tempo
-	nodes  [][]common.Node // 2D slice to store nodes (emitters, signals, etc.)
-	Height int             // Height of the grid
-	Width  int             // Width of the grid
+	midi   midi.Midi
+	clock  *common.Clock
+	nodes  [][]common.Node
+	Height int
+	Width  int
 
-	Key   music.Key   // Current root key of the grid
-	Scale music.Scale // Current scale of the grid
+	Key   music.Key
+	Scale music.Scale
 
-	Playing bool   // Flag to indicate whether the grid is currently playing
+	Playing bool
 	pulse   uint64 // Global pulse counter for timing events
 
-	clipboard [][]common.Node // Clipboard to store nodes for copy-paste operations
+	clipboard [][]common.Node
 }
 
 // NewGrid initializes and returns a new Grid with the given dimensions and MIDI interface.
 func NewGrid(width, height int, midi midi.Midi) *Grid {
 	grid := &Grid{
 		midi:   midi,
-		nodes:  make([][]common.Node, height), // Initialize the grid with the specified height
+		nodes:  make([][]common.Node, height),
 		Height: height,
 		Width:  width,
 		Key:    defaultRootKey,
 		Scale:  defaultScale,
 	}
 	for i := range grid.nodes {
-		grid.nodes[i] = make([]common.Node, width) // Initialize each row with the specified width
+		grid.nodes[i] = make([]common.Node, width)
 	}
 
-	// Create a new clock to manage timing, using the default tempo.
 	grid.clock = common.NewClock(defaultTempo, func() {
 		if !grid.Playing {
 			return
@@ -105,7 +103,7 @@ func (g *Grid) CycleMidiDevice() {
 	g.midi.CycleMidiDevices()
 }
 
-// Pulse returns the current pulse count divided by the number of pulses per step.
+// Pulse returns the current pulse step.
 func (g *Grid) Pulse() uint64 {
 	return g.pulse / uint64(common.PulsesPerStep)
 }
@@ -120,7 +118,7 @@ func (g *Grid) QuarterNote() bool {
 
 // CopyOrCut copies or cuts a selection of nodes from the grid to the clipboard.
 func (g *Grid) CopyOrCut(startX, startY, endX, endY int, cut bool) {
-	nodes := make([][]common.Node, endY-startY+1) // Initialize the clipboard with the selection size
+	nodes := make([][]common.Node, endY-startY+1)
 	for i := range nodes {
 		nodes[i] = make([]common.Node, endX-startX+1)
 	}
@@ -204,7 +202,7 @@ func (g *Grid) AddNode(e common.Node, x, y int) {
 	g.nodes[y][x] = e
 }
 
-// RemoveNodes removes nodes from a specified rectangular region of the grid.
+// RemoveNodes removes nodes from a specified region of the grid.
 func (g *Grid) RemoveNodes(startX, startY, endX, endY int) {
 	for y := startY; y <= endY; y++ {
 		for x := startX; x <= endX; x++ {
@@ -310,7 +308,7 @@ func (g *Grid) Reset() {
 	}
 }
 
-// Emit generates a signal at the specified coordinates and direction.
+// Emit makes specified emitter generates signals.
 func (g *Grid) Emit(emitter music.Audible, x, y int) {
 	for _, direction := range emitter.Emit(g.pulse) {
 		newX, newY := direction.NextPosition(x, y)
@@ -366,6 +364,7 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 	g.nodes[y][x] = nil
 }
 
+// PropagateZone propagates a trigger to neighboring nodes.
 func (g *Grid) PropagateZone(e *node.Emitter, direction common.Direction, x, y int) {
 	if e == nil {
 		return
@@ -391,6 +390,7 @@ func (g *Grid) PropagateZone(e *node.Emitter, direction common.Direction, x, y i
 	}
 }
 
+// Teleport moves a node through a Hole emitter.
 func (g *Grid) Teleport(t *node.HoleEmitter, m common.Node, x, y int) {
 	teleportX, teleportY := t.Teleport()
 	if g.outOfBounds(teleportX, teleportY) {

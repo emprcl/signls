@@ -2,6 +2,7 @@ package music
 
 import "signls/core/common"
 
+// Audible represents an interface for nodes that trigger notes.
 type Audible interface {
 	Arm()
 	Note() *Note
