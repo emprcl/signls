@@ -49,9 +49,9 @@ jobs:
         if: ${{ github.ref_type == 'tag' }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: signls_${{ github.sha }}
+          name: signls_${{ github.sha }}_${{ runner.os}}
           path: signls_${{ github.ref_name }}_${{ runner.os}}.tar.gz
           if-no-files-found: error
         if: ${{ github.ref_type == 'tag' }}
