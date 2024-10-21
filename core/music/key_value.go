@@ -63,9 +63,9 @@ func (p *KeyValue) Computed(root Key, scale Scale) Key {
 	}
 	key := Key(p.rand.Intn(int(math.Abs(float64(p.amount))) + 1))
 	if p.amount > 0 {
-		key = p.key + Key(key)
+		key = p.key + key
 	} else {
-		key = p.key - Key(key)
+		key = p.key - key
 	}
 	interval := key.AllSemitonesFrom(root)
 	p.lastKey = p.key.Transpose(root, scale, interval)

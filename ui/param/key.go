@@ -75,14 +75,14 @@ func (k *Key) AltUp() {}
 func (k *Key) AltDown() {}
 
 func (k *Key) AltLeft() {
-	k.mode = KeyMode((k.mode - 1) % 2)
+	k.mode = (k.mode - 1) % 2
 	for _, n := range k.nodes {
 		n.(music.Audible).Note().Key.SetSilent(k.mode == KeyModeSilent)
 	}
 }
 
 func (k *Key) AltRight() {
-	k.mode = KeyMode((k.mode + 1) % 2)
+	k.mode = (k.mode + 1) % 2
 	for _, n := range k.nodes {
 		n.(music.Audible).Note().Key.SetSilent(k.mode == KeyModeSilent)
 	}

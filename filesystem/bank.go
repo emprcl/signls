@@ -118,7 +118,7 @@ func NewParam[T uint8 | int](p common.ControlValue[T]) Param {
 		Value:  int(p.Value()),
 		Min:    int(p.Min()),
 		Max:    int(p.Max()),
-		Amount: int(p.RandomAmount()),
+		Amount: p.RandomAmount(),
 	}
 }
 
@@ -128,7 +128,7 @@ func NewParamFromFile[T uint8 | int](param Param) *common.ControlValue[T] {
 		T(param.Min),
 		T(param.Max),
 	)
-	value.SetRandomAmount(int(param.Amount))
+	value.SetRandomAmount(param.Amount)
 	return value
 }
 
