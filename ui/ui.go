@@ -407,6 +407,10 @@ func (m mainModel) loadGridFromBank() mainModel {
 	isPlaying := m.grid.Playing
 	m.grid.Load(m.bank.ActiveGrid())
 	m.grid.Playing = isPlaying
+	m.cursorX = 1
+	m.cursorY = 1
+	m.selectionX = 1
+	m.selectionY = 1
 	return m.windowResize(m.viewport.Width, m.viewport.Height)
 }
 
