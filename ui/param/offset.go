@@ -1,9 +1,10 @@
 package param
 
 import (
-	"cykl/core/common"
-	"cykl/core/node"
 	"fmt"
+
+	"signls/core/common"
+	"signls/core/node"
 )
 
 type Offset struct {

@@ -1,10 +1,11 @@
 package node
 
 import (
-	"cykl/core/common"
-	"cykl/core/music"
 	"fmt"
 	"unicode/utf8"
+
+	"signls/core/common"
+	"signls/core/music"
 )
 
 // Emitter represents a node that emits signals when triggered. It contains

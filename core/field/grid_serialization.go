@@ -1,12 +1,13 @@
 package field
 
 import (
-	"cykl/core/common"
-	"cykl/core/music"
-	"cykl/core/node"
-	"cykl/filesystem"
-	"cykl/midi"
 	"log"
+
+	"signls/core/common"
+	"signls/core/music"
+	"signls/core/node"
+	"signls/filesystem"
+	"signls/midi"
 )
 
 func NewFromBank(grid filesystem.Grid, midi midi.Midi) *Grid {

@@ -4,9 +4,9 @@ import (
 	"math/rand"
 	"time"
 
-	"cykl/core/common"
-	"cykl/core/music"
-	"cykl/midi"
+	"signls/core/common"
+	"signls/core/music"
+	"signls/midi"
 )
 
 type DiceEmitter struct {

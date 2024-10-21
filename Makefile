@@ -1,5 +1,5 @@
 BIN                    := bin
-BIN_NAME               := cykl
+BIN_NAME               := signls
 GOLANG_BIN             := go
 CGO_ENABLED            := 1
 GOLANG_OS              := linux

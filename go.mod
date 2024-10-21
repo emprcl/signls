@@ -1,4 +1,4 @@
-module cykl
+module signls
 
 go 1.23
 

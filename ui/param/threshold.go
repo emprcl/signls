@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"math"
 
-	"cykl/core/common"
-	"cykl/core/node"
+	"signls/core/common"
+	"signls/core/node"
 )
 
 type Threshold struct {

@@ -4,10 +4,10 @@ import (
 	"flag"
 	"log"
 
-	"cykl/core/field"
-	"cykl/filesystem"
-	"cykl/midi"
-	"cykl/ui"
+	"signls/core/field"
+	"signls/filesystem"
+	"signls/midi"
+	"signls/ui"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

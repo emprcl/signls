@@ -3,11 +3,11 @@ package ui
 import (
 	"time"
 
-	"cykl/core/common"
-	"cykl/core/field"
-	"cykl/core/node"
-	"cykl/filesystem"
-	"cykl/ui/param"
+	"signls/core/common"
+	"signls/core/field"
+	"signls/core/node"
+	"signls/filesystem"
+	"signls/ui/param"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"

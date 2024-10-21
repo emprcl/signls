@@ -3,8 +3,8 @@ package param
 import (
 	"fmt"
 
-	"cykl/core/common"
-	"cykl/core/music"
+	"signls/core/common"
+	"signls/core/music"
 )
 
 type Channel struct {

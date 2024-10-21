@@ -5,7 +5,7 @@ import (
 	"math"
 	"slices"
 
-	"cykl/midi"
+	"signls/midi"
 )
 
 // Interval constants represent various musical intervals as bitwise values.

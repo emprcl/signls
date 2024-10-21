@@ -3,8 +3,8 @@ package param
 import (
 	"fmt"
 
-	"cykl/core/common"
-	"cykl/core/node"
+	"signls/core/common"
+	"signls/core/node"
 )
 
 type Destination struct {

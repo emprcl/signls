@@ -1,6 +1,6 @@
 package music
 
-import "cykl/core/common"
+import "signls/core/common"
 
 type Audible interface {
 	Arm()

@@ -3,10 +3,10 @@ package ui
 import (
 	"log"
 
-	"cykl/core/common"
-	"cykl/core/music"
-	"cykl/core/node"
-	"cykl/ui/param"
+	"signls/core/common"
+	"signls/core/music"
+	"signls/core/node"
+	"signls/ui/param"
 
 	"github.com/charmbracelet/lipgloss"
 )

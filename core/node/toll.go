@@ -1,10 +1,11 @@
 package node
 
 import (
-	"cykl/core/common"
-	"cykl/core/music"
-	"cykl/midi"
 	"math"
+
+	"signls/core/common"
+	"signls/core/music"
+	"signls/midi"
 )
 
 type TollEmitter struct {

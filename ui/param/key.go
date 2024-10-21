@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"cykl/core/common"
-	"cykl/core/music"
+	"signls/core/common"
+	"signls/core/music"
 )
 
 type KeyMode uint8

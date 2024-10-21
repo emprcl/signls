@@ -1,10 +1,10 @@
 package param
 
 import (
-	"cykl/core/common"
-	"cykl/core/field"
-	"cykl/core/music"
-	"cykl/core/node"
+	"signls/core/common"
+	"signls/core/field"
+	"signls/core/music"
+	"signls/core/node"
 )
 
 type Param interface {

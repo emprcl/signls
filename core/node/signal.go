@@ -1,7 +1,7 @@
 package node
 
 import (
-	"cykl/core/common"
+	"signls/core/common"
 )
 
 // Signal represents a directional pulse in a grid-based system.

@@ -1,7 +1,7 @@
 package param
 
 import (
-	"cykl/core/common"
+	"signls/core/common"
 )
 
 type Direction struct {

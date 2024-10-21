@@ -1,10 +1,11 @@
 package music
 
 import (
-	"cykl/core/common"
-	"cykl/midi"
 	"math/rand"
 	"time"
+
+	"signls/core/common"
+	"signls/midi"
 )
 
 // Constants defining default values for note properties and their limits.

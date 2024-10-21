@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"cykl/filesystem"
+	"signls/filesystem"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"

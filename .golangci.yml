@@ -10,4 +10,4 @@ linters:
 
 linters-settings:
   gofumpt:
-    module-path: cykl
+    module-path: signls

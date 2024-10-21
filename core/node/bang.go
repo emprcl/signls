@@ -1,9 +1,9 @@
 package node
 
 import (
-	"cykl/core/common"
-	"cykl/core/music"
-	"cykl/midi"
+	"signls/core/common"
+	"signls/core/music"
+	"signls/midi"
 )
 
 // BangEmitter defines a simple emitter behavior where it triggers and emits
@@ -45,7 +45,6 @@ func (e *BangEmitter) ShouldPropagate() bool {
 // Symbol returns the visual representation of the emitter on the grid.
 func (e *BangEmitter) Symbol() string {
 	return "B"
-
 }
 
 // Name returns the name of this emitter behavior, which is "bang".

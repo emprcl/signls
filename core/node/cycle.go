@@ -1,9 +1,9 @@
 package node
 
 import (
-	"cykl/core/common"
-	"cykl/core/music"
-	"cykl/midi"
+	"signls/core/common"
+	"signls/core/music"
+	"signls/midi"
 )
 
 // CycleEmitter defines an emitter behavior that cycles through multiple directions

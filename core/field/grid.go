@@ -3,10 +3,10 @@ package field
 import (
 	"sync"
 
-	"cykl/core/common"
-	"cykl/core/music"
-	"cykl/core/node"
-	"cykl/midi"
+	"signls/core/common"
+	"signls/core/music"
+	"signls/core/node"
+	"signls/midi"
 )
 
 // Constants for default settings

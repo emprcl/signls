@@ -3,8 +3,6 @@
 package filesystem
 
 import (
-	"cykl/core/common"
-	"cykl/core/music"
 	"encoding/json"
 	"errors"
 	"io"
@@ -13,6 +11,9 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+
+	"signls/core/common"
+	"signls/core/music"
 )
 
 const (

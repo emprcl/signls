@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"cykl/core/common"
-	"cykl/core/node"
-	"cykl/midi"
+	"signls/core/common"
+	"signls/core/node"
+	"signls/midi"
 )
 
 var benchmarks = []struct {

@@ -1,4 +1,4 @@
-# cykl
+# signls
 :loop: a generative midi sequencer in the terminal
 
 TODO:

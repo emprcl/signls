@@ -1,9 +1,9 @@
 package node
 
 import (
-	"cykl/core/common"
-	"cykl/core/music"
-	"cykl/midi"
+	"signls/core/common"
+	"signls/core/music"
+	"signls/midi"
 )
 
 // RelayEmitter is a type of emitter that generates signals in a spread pattern.

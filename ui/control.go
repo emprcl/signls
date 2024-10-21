@@ -3,9 +3,9 @@ package ui
 import (
 	"fmt"
 
-	"cykl/core/common"
-	"cykl/filesystem"
-	"cykl/ui/param"
+	"signls/core/common"
+	"signls/filesystem"
+	"signls/ui/param"
 
 	"github.com/charmbracelet/lipgloss"
 )

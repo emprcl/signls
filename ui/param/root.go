@@ -1,8 +1,8 @@
 package param
 
 import (
-	"cykl/core/field"
-	"cykl/core/music"
+	"signls/core/field"
+	"signls/core/music"
 )
 
 const (

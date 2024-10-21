@@ -1,10 +1,11 @@
 package music
 
 import (
-	"cykl/midi"
 	"math"
 	"math/rand"
 	"time"
+
+	"signls/midi"
 )
 
 const (
