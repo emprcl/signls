@@ -88,9 +88,8 @@ For qwerty keyboards, here's the default mapping:
  - `tab` **show bank**
  - `1` ... `9` **add nodes**
  - `↑` `↓` `←` `→` **move cursor**
- - `shift`+`↑` `↓` `←` `→` **multiple selection (or modify alternative parameter mode in edit mode)**
- - `ctrl`+`↑` `↓` **modify parameter value**
- - `ctrl`+`←` `→` **modify alternative parameter value**
+ - `shift`+`↑` `↓` `←` `→` **multiple selection (or modify alt parameter mode in edit mode)**
+ - `ctrl`+`↑` `↓` `←` `→` **modify selected node direction (modify parameter or alt parameter value)**
  - `backspace` **remove selected nodes (or grid in bank)**
  - `enter` **edit selected nodes**
  - `m` **toggle selected nodes mute**
