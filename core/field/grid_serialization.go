@@ -107,8 +107,8 @@ func (g *Grid) Load(grid filesystem.Grid) {
 			newNode.(*node.EuclidEmitter).Offset = filesystem.NewParamFromFile[int](n.Params["offset"])
 		case "pass":
 			newNode = node.NewPassEmitter(g.midi, common.Direction(n.Direction))
-		case "relay":
-			newNode = node.NewRelayEmitter(g.midi, common.Direction(n.Direction))
+		case "spread":
+			newNode = node.NewSpreadEmitter(g.midi, common.Direction(n.Direction))
 		case "cycle":
 			newNode = node.NewCycleEmitter(g.midi, common.Direction(n.Direction))
 		case "dice":

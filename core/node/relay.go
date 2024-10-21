@@ -6,42 +6,42 @@ import (
 	"signls/midi"
 )
 
-type RelayEmitter struct{}
+type SpreadEmitter struct{}
 
-func NewRelayEmitter(midi midi.Midi, direction common.Direction) *Emitter {
+func NewSpreadEmitter(midi midi.Midi, direction common.Direction) *Emitter {
 	return &Emitter{
 		direction: direction,
 		note:      music.NewNote(midi),
-		behavior:  &RelayEmitter{},
+		behavior:  &SpreadEmitter{},
 	}
 }
 
-func (e *RelayEmitter) EmitDirections(dir common.Direction, inDir common.Direction, pulse uint64) common.Direction {
+func (e *SpreadEmitter) EmitDirections(dir common.Direction, inDir common.Direction, pulse uint64) common.Direction {
 	return dir
 }
 
-func (e *RelayEmitter) ShouldPropagate() bool {
+func (e *SpreadEmitter) ShouldPropagate() bool {
 	return false
 }
 
-func (e *RelayEmitter) ArmedOnStart() bool {
+func (e *SpreadEmitter) ArmedOnStart() bool {
 	return false
 }
 
-func (e *RelayEmitter) Copy() common.EmitterBehavior {
-	return &RelayEmitter{}
+func (e *SpreadEmitter) Copy() common.EmitterBehavior {
+	return &SpreadEmitter{}
 }
 
-func (e *RelayEmitter) Symbol() string {
-	return "R"
+func (e *SpreadEmitter) Symbol() string {
+	return "S"
 }
 
-func (e *RelayEmitter) Name() string {
-	return "relay"
+func (e *SpreadEmitter) Name() string {
+	return "spread"
 }
 
-func (e *RelayEmitter) Color() string {
+func (e *SpreadEmitter) Color() string {
 	return "56"
 }
 
-func (e *RelayEmitter) Reset() {}
+func (e *SpreadEmitter) Reset() {}
