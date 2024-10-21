@@ -1,5 +1,7 @@
 # Signls
 
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/emprcl/signls) ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/emprcl/signls/build.yml)
+
 Signls is a non-linear, generative midi sequencer designed for music composition and live performance. It runs in the terminal (TUI).
 
 **_Signls is still in development, but it is expected to be relatively stable. Comprehensive documentation is coming soon._**
