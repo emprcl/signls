@@ -11,7 +11,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-12]
+        os: [ubuntu-20.04, macos-13]
     runs-on: ${{ matrix.os }}
     env:
       CGO_ENABLED: 1
@@ -63,7 +63,11 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4.1.7
         with:
-          name: signls_${{ github.sha }}
+          name: signls_${{ github.sha }}_macOS
+
+      - uses: actions/download-artifact@v4.1.7
+        with:
+          name: signls_${{ github.sha }}_Linux
 
       - name: Create release
         uses: softprops/action-gh-release@v1
