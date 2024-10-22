@@ -43,7 +43,7 @@ type midi struct {
 	// devices holds all the midi devices outputs that are returned by gomidi.
 	devices gomidi.OutPorts
 
-	// active holes the active device
+	// active holds the active device
 	active int
 
 	// Because we want to allow the usage of multiple midi devices at the same
