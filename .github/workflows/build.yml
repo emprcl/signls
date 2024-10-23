@@ -42,10 +42,9 @@ jobs:
         run: go build -o bin/signls && chmod +x bin/signls
         if: ${{ !startsWith(matrix.os, 'windows') }}
 
-      # Disable windows for now has I have no way of testing it.
-      # - name: Build windows
-      #   run: go build -ldflags "-linkmode 'external' -extldflags '-static'" -o bin/signls.exe
-      #   if: startsWith(matrix.os, 'windows')
+      - name: Build windows
+        run: go build -ldflags "-linkmode 'external' -extldflags '-static'" -o bin/signls.exe
+        if: startsWith(matrix.os, 'windows')
 
       - name: Tar.gz files
         run: tar -zcvf signls_${{ github.ref_name }}_${{ runner.os}}.tar.gz LICENSE -C bin signls
@@ -71,6 +70,10 @@ jobs:
       - uses: actions/download-artifact@v4.1.7
         with:
           name: signls_${{ github.sha }}_Linux
+
+      - uses: actions/download-artifact@v4.1.7
+        with:
+          name: signls_${{ github.sha }}_Windows
 
       - name: Create release
         uses: softprops/action-gh-release@v1
