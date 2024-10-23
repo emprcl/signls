@@ -55,19 +55,19 @@ func (d Destination) Right() {
 }
 
 func (d Destination) AltUp() {
-	d.SetDestinationAmount(1, 0)
+	d.SetDestinationAmount(0, 1)
 }
 
 func (d Destination) AltDown() {
-	d.SetDestinationAmount(-1, 0)
-}
-
-func (d Destination) AltLeft() {
 	d.SetDestinationAmount(0, -1)
 }
 
+func (d Destination) AltLeft() {
+	d.SetDestinationAmount(-1, 0)
+}
+
 func (d Destination) AltRight() {
-	d.SetDestinationAmount(0, 1)
+	d.SetDestinationAmount(1, 0)
 }
 
 func (d Destination) Set(value int) {}
