@@ -2,7 +2,7 @@
 
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/emprcl/signls) ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/emprcl/signls/build.yml)
 
-Signls is a non-linear, generative midi sequencer designed for music composition and live performance. It's cross-platform (Linux, macOS et Windows) and it runs in the terminal (TUI).
+Signls (_pronounced signals_) is a non-linear, generative midi sequencer designed for music composition and live performance. It's cross-platform (Linux, macOS et Windows) and it runs in the terminal (TUI).
 
 It takes inspiration from [Orca](https://100r.co/site/orca.html) and [Nodal](https://nodalmusic.com/).
 
@@ -97,6 +97,7 @@ For qwerty keyboards, here's the default mapping:
  - `m` **toggle selected nodes mute**
  - `M` **mute/unmute all selected nodes**
  - `/` **trigger selected node**
+ - `-` `=` **modify tempo**
  - `'` `;` **modify root note**
  - `"` `:` **modify scale**
  - `ctrl`+`c` `x` `v`  **copy, cut, paste selection**
