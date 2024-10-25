@@ -24,6 +24,8 @@ const (
 	blinkFrequency = 500 * time.Millisecond
 
 	controlsHeight = 4
+
+	helpHeader = "signls %s - docs: https://empr.cl/signls/"
 )
 
 // tickMsg is a message that triggers ui rrefresh
@@ -288,7 +290,7 @@ func (m mainModel) View() string {
 			lipgloss.NewStyle().
 				MarginTop(1).
 				MarginLeft(2).
-				Render(fmt.Sprintf("signls %s", m.version)),
+				Render(fmt.Sprintf(helpHeader, m.version)),
 			lipgloss.NewStyle().
 				Height(m.viewport.Height+controlsHeight-1).
 				Render(help),
