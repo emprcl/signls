@@ -71,7 +71,6 @@ jobs:
           path: signls_${{ github.ref_name }}_${{ runner.os}}.zip
           if-no-files-found: error
         if: ${{ startsWith(matrix.os, 'windows') }}
- }}
 
   release:
     needs: build
