@@ -70,7 +70,7 @@ jobs:
           name: signls_${{ github.sha }}_${{ runner.os}}
           path: signls_${{ github.ref_name }}_${{ runner.os}}.zip
           if-no-files-found: error
-        if: ${{ github.ref_type == 'tag'&& startsWith(matrix.os, 'windows') }}
+        if: ${{ github.ref_type == 'tag' && startsWith(matrix.os, 'windows') }}
 
   release:
     needs: build
@@ -92,4 +92,6 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
-          files: signls_*.tar.gz
+          files: |
+            signls_*.tar.gz
+            signls_*.zip
