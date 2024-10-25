@@ -53,7 +53,7 @@ jobs:
       - name: Zip files
         shell: pwsh
         run: |
-          Compress-Archive bin\signls.exe LICENSE signls_${{ github.ref_name }}_${{ runner.os}}.zip
+          Compress-Archive bin\signls.exe signls_${{ github.ref_name }}_${{ runner.os}}.zip
         if: ${{ startsWith(matrix.os, 'windows') }}
 
       - name: Upload artifact
