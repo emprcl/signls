@@ -33,6 +33,7 @@ func BenchmarkGrid(b *testing.B) {
 			grid.AddNode(node.NewSpreadEmitter(midi, common.LEFT), 12, 2)
 			grid.AddNode(node.NewBangEmitter(midi, common.RIGHT, true), 7, 3)
 			grid.AddNode(node.NewSpreadEmitter(midi, common.LEFT), 9, 3)
+			grid.TogglePlay()
 			for i := 0; i < b.N; i++ {
 				grid.Update()
 			}
