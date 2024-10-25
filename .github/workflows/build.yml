@@ -46,17 +46,17 @@ jobs:
         run: go build -ldflags "-linkmode 'external' -extldflags '-static'" -o bin/signls.exe
         if: startsWith(matrix.os, 'windows')
 
-      - name: Tar.gz files
+      - name: Tar.gz linux|mac files
         run: tar -zcvf signls_${{ github.ref_name }}_${{ runner.os}}.tar.gz LICENSE -C bin signls
         if: ${{ github.ref_type == 'tag'&& !startsWith(matrix.os, 'windows') }}
 
-      - name: Zip files
+      - name: Zip windows files
         shell: pwsh
         run: |
           Compress-Archive bin\signls.exe signls_${{ github.ref_name }}_${{ runner.os}}.zip
-        if: ${{ startsWith(matrix.os, 'windows') }}
+        if: ${{ github.ref_type == 'tag'&& startsWith(matrix.os, 'windows') }}
 
-      - name: Upload artifact
+      - name: Upload linux|mac artifact
         uses: actions/upload-artifact@v4
         with:
           name: signls_${{ github.sha }}_${{ runner.os}}
@@ -64,13 +64,13 @@ jobs:
           if-no-files-found: error
         if: ${{ github.ref_type == 'tag' && !startsWith(matrix.os, 'windows') }}
 
-      - name: Upload artifact
+      - name: Upload windows artifact
         uses: actions/upload-artifact@v4
         with:
           name: signls_${{ github.sha }}_${{ runner.os}}
           path: signls_${{ github.ref_name }}_${{ runner.os}}.zip
           if-no-files-found: error
-        if: ${{ startsWith(matrix.os, 'windows') }}
+        if: ${{ github.ref_type == 'tag'&& startsWith(matrix.os, 'windows') }}
 
   release:
     needs: build
