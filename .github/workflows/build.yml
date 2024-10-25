@@ -54,7 +54,7 @@ jobs:
         shell: pwsh
         run: |
           Compress-Archive bin\signls.exe LICENSE signls_${{ github.ref_name }}_${{ runner.os}}.zip
-        if: ${{ github.ref_type == 'tag'&& startsWith(matrix.os, 'windows') }}
+        if: ${{ startsWith(matrix.os, 'windows') }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -70,7 +70,7 @@ jobs:
           name: signls_${{ github.sha }}_${{ runner.os}}
           path: signls_${{ github.ref_name }}_${{ runner.os}}.zip
           if-no-files-found: error
-        if: ${{ github.ref_type == 'tag' && startsWith(matrix.os, 'windows') }}
+        if: ${{ startsWith(matrix.os, 'windows') }}
  }}
 
   release:
