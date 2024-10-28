@@ -124,6 +124,13 @@ func (n *Note) Play() {
 	n.pulse = 0
 }
 
+// Silence silences the note channel
+func (n *Note) Silence() {
+	n.midi.Silence(n.Channel.Value())
+	n.triggered = false
+	n.pulse = 0
+}
+
 // Stop sends a MIDI Note Off message and resets the triggered state.
 func (n *Note) Stop() {
 	n.midi.NoteOff(n.Channel.Last(), uint8(n.Key.Last()))

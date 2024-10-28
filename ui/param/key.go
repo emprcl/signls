@@ -117,7 +117,7 @@ func (k *Key) Preview() {
 		n := *k.nodes[0].(music.Audible).Note()
 		n.Play()
 		time.Sleep(300 * time.Millisecond)
-		n.Stop()
+		n.Silence()
 	}()
 }
 
