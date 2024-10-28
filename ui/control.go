@@ -202,7 +202,7 @@ func (m mainModel) selectedNodeName() string {
 	if len(nodes) == 0 {
 		return "empty"
 	} else if len(nodes) > 1 {
-		return fmt.Sprintf("%d emit.", len(nodes))
+		return fmt.Sprintf("%d nodes", len(nodes))
 	}
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
