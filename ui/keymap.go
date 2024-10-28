@@ -218,15 +218,15 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		Copy: key.NewBinding(
 			key.WithKeys(keys.Copy),
-			key.WithHelp(keys.Copy, "copy node"),
+			key.WithHelp(keys.Copy, "copy node | bank"),
 		),
 		Cut: key.NewBinding(
 			key.WithKeys(keys.Cut),
-			key.WithHelp(keys.Cut, "cut node"),
+			key.WithHelp(keys.Cut, "cut node | bank"),
 		),
 		Paste: key.NewBinding(
 			key.WithKeys(keys.Paste),
-			key.WithHelp(keys.Paste, "paste node"),
+			key.WithHelp(keys.Paste, "paste node | bank"),
 		),
 		EditNode: key.NewBinding(
 			key.WithKeys(keys.EditNode),

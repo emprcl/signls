@@ -38,24 +38,25 @@ type blinkMsg time.Time
 type saveMsg bool
 
 type mainModel struct {
-	bank         *filesystem.Bank
-	grid         *field.Grid
-	viewport     viewport
-	keymap       keyMap
-	help         help.Model
-	params       []param.Param
-	gridParams   []param.Param
-	version      string
-	cursorX      int
-	cursorY      int
-	selectionX   int
-	selectionY   int
-	selectedGrid int
-	param        int
-	edit         bool
-	bankMode     bool
-	blink        bool
-	mute         bool
+	bank          *filesystem.Bank
+	grid          *field.Grid
+	viewport      viewport
+	keymap        keyMap
+	help          help.Model
+	params        []param.Param
+	gridParams    []param.Param
+	bankClipboard filesystem.Grid
+	version       string
+	cursorX       int
+	cursorY       int
+	selectionX    int
+	selectionY    int
+	selectedGrid  int
+	param         int
+	edit          bool
+	bankMode      bool
+	blink         bool
+	mute          bool
 }
 
 // New creates a new mainModel that hols the ui state. It takes a new grid.
@@ -156,7 +157,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			dir := m.keymap.Direction(msg)
 			if !m.edit {
 				param.NewDirection(m.selectedEmitters()).SetFromKeyString(dir)
-				return m, nil
+				return m, save(m)
 			}
 			m.handleParamEdit(dir)
 			return m, save(m)
@@ -243,12 +244,27 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.grid.CycleMidiDevice()
 			return m, nil
 		case key.Matches(msg, m.keymap.Copy):
+			if m.bankMode {
+				m.bankClipboard = m.bank.Grids[m.selectedGrid]
+				return m, nil
+			}
 			m.grid.CopyOrCut(m.cursorX, m.cursorY, m.selectionX, m.selectionY, false)
 			return m, nil
 		case key.Matches(msg, m.keymap.Cut):
+			if m.bankMode {
+				m.bankClipboard = m.bank.Grids[m.selectedGrid]
+				m.bank.ClearGrid(m.selectedGrid)
+				if m.bank.Active == m.selectedGrid {
+					return m.loadGridFromBank(), tea.WindowSize()
+				}
+				return m, tea.WindowSize()
+			}
 			m.grid.CopyOrCut(m.cursorX, m.cursorY, m.selectionX, m.selectionY, true)
 			return m, nil
 		case key.Matches(msg, m.keymap.Paste):
+			if m.bankMode {
+				m.bank.Grids[m.selectedGrid] = m.bankClipboard
+			}
 			m.grid.Paste(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			return m, save(m)
