@@ -37,20 +37,30 @@ const (
 	AEOLIAN    = Scale(UNISON | MAJOR_2ND | MINOR_3RD | FOURTH | FIFTH | MINOR_6TH | MINOR_7TH)
 	LOCRIAN    = Scale(UNISON | MINOR_2ND | MINOR_3RD | FOURTH | TRITONE | MINOR_6TH | MINOR_7TH)
 
-	// TODO: add more scales, pentatonic, etc.
+	PENTATONIC_MAJOR = Scale(UNISON | MAJOR_2ND | MAJOR_3RD | FIFTH | MAJOR_6TH)
+	PENTATONIC_MINOR = Scale(UNISON | MINOR_3RD | FOURTH | FIFTH | MINOR_7TH)
+	HIRAJOSHI        = Scale(UNISON | MAJOR_2ND | MINOR_3RD | FIFTH | MINOR_6TH)
+	IWATO            = Scale(UNISON | MINOR_2ND | FOURTH | TRITONE | MINOR_7TH)
+
+	TETRATONIC = Scale(UNISON | MAJOR_3RD | FIFTH | MAJOR_7TH)
 )
 
 // allScales maps each scale constant to its corresponding name.
 // This allows easy lookup of scale names based on their bitwise representation.
 var allScales = map[Scale]string{
-	CHROMATIC:  "chromatic",
-	IONIAN:     "ionian",
-	DORIAN:     "dorian",
-	PHRYGIAN:   "phrygian",
-	LYDIAN:     "lydian",
-	MIXOLYDIAN: "mixolydian",
-	AEOLIAN:    "aeolian",
-	LOCRIAN:    "locrian",
+	CHROMATIC:        "chromatic",
+	IONIAN:           "ionian",
+	DORIAN:           "dorian",
+	PHRYGIAN:         "phrygian",
+	LYDIAN:           "lydian",
+	MIXOLYDIAN:       "mixolydian",
+	AEOLIAN:          "aeolian",
+	LOCRIAN:          "locrian",
+	PENTATONIC_MAJOR: "penta maj",
+	PENTATONIC_MINOR: "penta min",
+	HIRAJOSHI:        "hirajoshi",
+	IWATO:            "iwato",
+	TETRATONIC:       "tetratonic",
 }
 
 // Key represents a musical note by its MIDI key number.
