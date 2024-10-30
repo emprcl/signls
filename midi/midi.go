@@ -3,13 +3,12 @@
 package midi
 
 import (
-	"errors"
 	"log"
 	"sync"
 
 	gomidi "gitlab.com/gomidi/midi/v2"
 	"gitlab.com/gomidi/midi/v2/drivers"
-	_ "gitlab.com/gomidi/midi/v2/drivers/rtmididrv" // autoregisters driver
+	rtmidi "gitlab.com/gomidi/midi/v2/drivers/rtmididrv" // autoregisters driver
 )
 
 const (
@@ -60,12 +59,13 @@ type midi struct {
 // New creates a new midi. It retrieves the connected midi
 // devices and starts a new goroutine for each of them.
 func New() (Midi, error) {
-	devices := gomidi.GetOutPorts()
-	if len(devices) == 0 {
-		return nil, errors.New("no midi drivers")
+	virtualDevice, err := drivers.Get().(*rtmidi.Driver).OpenVirtualOut("no output device")
+	if err != nil {
+		return nil, err
 	}
+	devices := gomidi.GetOutPorts()
 	midi := &midi{
-		devices: devices,
+		devices: append(devices, virtualDevice),
 	}
 	midi.start()
 	return midi, nil
