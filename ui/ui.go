@@ -163,7 +163,11 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, save(m)
 		case key.Matches(msg, m.keymap.AddBang, m.keymap.AddSpread, m.keymap.AddCycle, m.keymap.AddDice, m.keymap.AddToll, m.keymap.AddEuclid, m.keymap.AddZone, m.keymap.AddPass, m.keymap.AddHole):
 			m.grid.AddNodeFromSymbol(m.keymap.EmitterSymbol(msg), m.cursorX, m.cursorY)
-			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
+			newParams := param.NewParamsForNodes(m.grid, m.selectedEmitters())
+			if len(newParams) < m.param+1 {
+				m.param = 0
+			}
+			m.params = newParams
 			return m, save(m)
 		case key.Matches(msg, m.keymap.MuteNode):
 			m.grid.ToggleNodeMutes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
