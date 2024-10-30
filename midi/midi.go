@@ -59,7 +59,7 @@ type midi struct {
 // New creates a new midi. It retrieves the connected midi
 // devices and starts a new goroutine for each of them.
 func New() (Midi, error) {
-	virtualDevice, err := drivers.Get().(*rtmidi.Driver).OpenVirtualOut("no output device")
+	virtualDevice, err := drivers.Get().(*rtmidi.Driver).OpenVirtualOut("default")
 	if err != nil {
 		return nil, err
 	}
