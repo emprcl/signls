@@ -1,9 +1,7 @@
 package music
 
 import (
-	"maps"
 	"math"
-	"slices"
 
 	"signls/midi"
 )
@@ -45,23 +43,41 @@ const (
 	TETRATONIC = Scale(UNISON | MAJOR_3RD | FIFTH | MAJOR_7TH)
 )
 
-// allScales maps each scale constant to its corresponding name.
-// This allows easy lookup of scale names based on their bitwise representation.
-var allScales = map[Scale]string{
-	CHROMATIC:        "chromatic",
-	IONIAN:           "ionian",
-	DORIAN:           "dorian",
-	PHRYGIAN:         "phrygian",
-	LYDIAN:           "lydian",
-	MIXOLYDIAN:       "mixolydian",
-	AEOLIAN:          "aeolian",
-	LOCRIAN:          "locrian",
-	PENTATONIC_MAJOR: "penta maj",
-	PENTATONIC_MINOR: "penta min",
-	HIRAJOSHI:        "hirajoshi",
-	IWATO:            "iwato",
-	TETRATONIC:       "tetratonic",
-}
+var (
+	allScales = []Scale{
+		CHROMATIC,
+		IONIAN,
+		DORIAN,
+		PHRYGIAN,
+		LYDIAN,
+		MIXOLYDIAN,
+		AEOLIAN,
+		LOCRIAN,
+		PENTATONIC_MAJOR,
+		PENTATONIC_MINOR,
+		HIRAJOSHI,
+		IWATO,
+		TETRATONIC,
+	}
+
+	// scaleNames maps each scale constant to its corresponding name.
+	// This allows easy lookup of scale names based on their bitwise representation.
+	scaleNames = map[Scale]string{
+		CHROMATIC:        "chromatic",
+		IONIAN:           "ionian",
+		DORIAN:           "dorian",
+		PHRYGIAN:         "phrygian",
+		LYDIAN:           "lydian",
+		MIXOLYDIAN:       "mixolydian",
+		AEOLIAN:          "aeolian",
+		LOCRIAN:          "locrian",
+		PENTATONIC_MAJOR: "penta maj",
+		PENTATONIC_MINOR: "penta min",
+		HIRAJOSHI:        "hirajoshi",
+		IWATO:            "iwato",
+		TETRATONIC:       "tetratonic",
+	}
+)
 
 // Key represents a musical note by its MIDI key number.
 type Key uint8
@@ -157,9 +173,9 @@ func (in Interval) Int() int {
 // where each bit corresponds to a semitone in an octave.
 type Scale uint16
 
-// AllScales returns a slice of all scales defined in the allScales map.
+// AllScales returns a slice of all scales.
 func AllScales() []Scale {
-	return slices.Collect(maps.Keys(allScales))
+	return allScales
 }
 
 // AllKeysInScale returns all MIDI keys within the given scale, relative to the root key.
@@ -176,7 +192,7 @@ func AllKeysInScale(root Key, scale Scale) []Key {
 
 // Name returns the name of the scale based on its bitwise representation.
 func (s Scale) Name() string {
-	if name, ok := allScales[s]; ok {
+	if name, ok := scaleNames[s]; ok {
 		return name
 	}
 	return ""
