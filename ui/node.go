@@ -12,8 +12,10 @@ import (
 )
 
 var (
-	gridStyle = lipgloss.NewStyle().
+	gridStyleOdd = lipgloss.NewStyle().
 			Background(lipgloss.Color("234"))
+	gridStyleEven = lipgloss.NewStyle().
+			Background(lipgloss.Color("0"))
 	cursorStyle = lipgloss.NewStyle().
 			Background(lipgloss.Color("190")).
 			Foreground(lipgloss.Color("0"))
@@ -67,9 +69,9 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 		return selectionStyle.Render("..")
 	} else if n == nil {
 		if (x+y)%2 == 0 {
-			return "  "
+			return gridStyleEven.Render("  ")
 		}
-		return gridStyle.Render("  ")
+		return gridStyleOdd.Render("  ")
 	}
 
 	// render node

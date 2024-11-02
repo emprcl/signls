@@ -1,9 +1,11 @@
 package filesystem
 
-import(
+import (
 	"github.com/charmbracelet/lipgloss"
 )
 
 type Theme struct {
-	Cursor lipgloss.Color
+	Background lipgloss.Color
+	Grid       lipgloss.Color
+	Cursor     lipgloss.Color
 }
