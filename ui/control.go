@@ -210,7 +210,7 @@ func (m mainModel) selectedNodeName() string {
 		emitterStyle.
 			MarginRight(1).
 			Background(lipgloss.Color(nodes[0].Color())).
-			Render(nodes[0].Symbol()),
+			Render(util.Normalize(nodes[0].Symbol())),
 		nodes[0].Name(),
 	)
 }
