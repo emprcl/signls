@@ -5,6 +5,8 @@ import (
 
 	"signls/core/common"
 	"signls/core/node"
+
+	"golang.org/x/text/unicode/norm"
 )
 
 const (
@@ -21,10 +23,12 @@ func (t Triggers) Name() string {
 
 func (t Triggers) Display() string {
 	if t.nodes[0].(*node.EuclidEmitter).Triggers.RandomAmount() != 0 {
-		return fmt.Sprintf(
-			"%d%+d\u033c",
-			t.nodes[0].(*node.EuclidEmitter).Triggers.Value(),
-			t.nodes[0].(*node.EuclidEmitter).Triggers.RandomAmount(),
+		return norm.NFC.String(
+			fmt.Sprintf(
+				"%d%+d\u033c",
+				t.nodes[0].(*node.EuclidEmitter).Triggers.Value(),
+				t.nodes[0].(*node.EuclidEmitter).Triggers.RandomAmount(),
+			),
 		)
 	}
 	return fmt.Sprintf("%d", t.Value())

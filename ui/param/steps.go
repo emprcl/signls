@@ -5,6 +5,8 @@ import (
 
 	"signls/core/common"
 	"signls/core/node"
+
+	"golang.org/x/text/unicode/norm"
 )
 
 type Steps struct {
@@ -17,10 +19,12 @@ func (s Steps) Name() string {
 
 func (s Steps) Display() string {
 	if s.nodes[0].(*node.EuclidEmitter).Steps.RandomAmount() != 0 {
-		return fmt.Sprintf(
-			"%d%+d\u033c",
-			s.nodes[0].(*node.EuclidEmitter).Steps.Value(),
-			s.nodes[0].(*node.EuclidEmitter).Steps.RandomAmount(),
+		return norm.NFC.String(
+			fmt.Sprintf(
+				"%d%+d\u033c",
+				s.nodes[0].(*node.EuclidEmitter).Steps.Value(),
+				s.nodes[0].(*node.EuclidEmitter).Steps.RandomAmount(),
+			),
 		)
 	}
 	return fmt.Sprintf("%d", s.Value())

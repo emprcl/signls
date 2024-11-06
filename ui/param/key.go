@@ -6,6 +6,8 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+
+	"golang.org/x/text/unicode/norm"
 )
 
 type KeyMode uint8
@@ -32,10 +34,12 @@ func (k *Key) Display() string {
 	}
 
 	if k.nodes[0].(music.Audible).Note().Key.RandomAmount() != 0 {
-		return fmt.Sprintf(
-			"%s%+d\u033c",
-			k.nodes[0].(music.Audible).Note().Key.Display(),
-			k.nodes[0].(music.Audible).Note().Key.RandomAmount(),
+		return norm.NFC.String(
+			fmt.Sprintf(
+				"%s%+d\u033c",
+				k.nodes[0].(music.Audible).Note().Key.Display(),
+				k.nodes[0].(music.Audible).Note().Key.RandomAmount(),
+			),
 		)
 	}
 	return k.nodes[0].(music.Audible).Note().Key.Display()

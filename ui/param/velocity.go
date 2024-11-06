@@ -5,6 +5,8 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+
+	"golang.org/x/text/unicode/norm"
 )
 
 type Velocity struct {
@@ -17,10 +19,12 @@ func (v Velocity) Name() string {
 
 func (v Velocity) Display() string {
 	if v.nodes[0].(music.Audible).Note().Velocity.RandomAmount() != 0 {
-		return fmt.Sprintf(
-			"%d%+d\u033c",
-			v.nodes[0].(music.Audible).Note().Velocity.Value(),
-			v.nodes[0].(music.Audible).Note().Velocity.RandomAmount(),
+		return norm.NFC.String(
+			fmt.Sprintf(
+				"%d%+d\u033c",
+				v.nodes[0].(music.Audible).Note().Velocity.Value(),
+				v.nodes[0].(music.Audible).Note().Velocity.RandomAmount(),
+			),
 		)
 	}
 	return fmt.Sprintf("%d", v.nodes[0].(music.Audible).Note().Velocity.Value())

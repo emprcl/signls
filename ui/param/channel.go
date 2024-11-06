@@ -5,6 +5,8 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+
+	"golang.org/x/text/unicode/norm"
 )
 
 type Channel struct {
@@ -17,10 +19,12 @@ func (c Channel) Name() string {
 
 func (c Channel) Display() string {
 	if c.nodes[0].(music.Audible).Note().Channel.RandomAmount() != 0 {
-		return fmt.Sprintf(
-			"%d%+d\u033c",
-			c.nodes[0].(music.Audible).Note().Channel.Value()+1,
-			c.nodes[0].(music.Audible).Note().Channel.RandomAmount(),
+		return norm.NFC.String(
+			fmt.Sprintf(
+				"%d%+d\u033c",
+				c.nodes[0].(music.Audible).Note().Channel.Value()+1,
+				c.nodes[0].(music.Audible).Note().Channel.RandomAmount(),
+			),
 		)
 	}
 	return fmt.Sprintf("%d", c.nodes[0].(music.Audible).Note().Channel.Value()+1)

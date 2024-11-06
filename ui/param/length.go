@@ -5,6 +5,8 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+
+	"golang.org/x/text/unicode/norm"
 )
 
 const (
@@ -42,10 +44,12 @@ func (l Length) Display() string {
 		display = fmt.Sprintf("%.1f", float64(length)/float64(pulsesPerStep))
 	}
 	if l.nodes[0].(music.Audible).Note().Length.RandomAmount() != 0 {
-		return fmt.Sprintf(
-			"%s%+.1f\u033c",
-			display,
-			float64(l.nodes[0].(music.Audible).Note().Length.RandomAmount())/float64(pulsesPerStep),
+		return norm.NFC.String(
+			fmt.Sprintf(
+				"%s%+.1f\u033c",
+				display,
+				float64(l.nodes[0].(music.Audible).Note().Length.RandomAmount())/float64(pulsesPerStep),
+			),
 		)
 	}
 	return display

@@ -6,6 +6,8 @@ import (
 
 	"signls/core/common"
 	"signls/core/node"
+
+	"golang.org/x/text/unicode/norm"
 )
 
 type Threshold struct {
@@ -18,10 +20,12 @@ func (t Threshold) Name() string {
 
 func (t Threshold) Display() string {
 	if t.control().RandomAmount() != 0 {
-		return fmt.Sprintf(
-			"%d%+d\u033c",
-			t.control().Value(),
-			t.control().RandomAmount(),
+		return norm.NFC.String(
+			fmt.Sprintf(
+				"%d%+d\u033c",
+				t.control().Value(),
+				t.control().RandomAmount(),
+			),
 		)
 	}
 	return fmt.Sprintf("%d", t.Value())
