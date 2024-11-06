@@ -6,7 +6,7 @@ import (
 	"signls/core/common"
 	"signls/core/node"
 
-	"golang.org/x/text/unicode/norm"
+	"signls/ui/util"
 )
 
 type Offset struct {
@@ -19,7 +19,7 @@ func (o Offset) Name() string {
 
 func (o Offset) Display() string {
 	if o.nodes[0].(*node.EuclidEmitter).Offset.RandomAmount() != 0 {
-		return norm.NFC.String(
+		return util.Normalize(
 			fmt.Sprintf(
 				"%d%+d\u033c",
 				o.nodes[0].(*node.EuclidEmitter).Offset.Value(),

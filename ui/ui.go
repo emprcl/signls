@@ -9,6 +9,7 @@ import (
 	"signls/core/node"
 	"signls/filesystem"
 	"signls/ui/param"
+	"signls/ui/util"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -467,5 +468,5 @@ func moveCursor(dir string, speed, x, y, minX, maxX, minY, maxY int) (int, int) 
 	default:
 		newX, newY = 0, 0
 	}
-	return clamp(newX, minX, maxX), clamp(newY, minY, maxY)
+	return util.Clamp(newX, minX, maxX), util.Clamp(newY, minY, maxY)
 }

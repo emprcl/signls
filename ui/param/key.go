@@ -7,7 +7,7 @@ import (
 	"signls/core/common"
 	"signls/core/music"
 
-	"golang.org/x/text/unicode/norm"
+	"signls/ui/util"
 )
 
 type KeyMode uint8
@@ -34,7 +34,7 @@ func (k *Key) Display() string {
 	}
 
 	if k.nodes[0].(music.Audible).Note().Key.RandomAmount() != 0 {
-		return norm.NFC.String(
+		return util.Normalize(
 			fmt.Sprintf(
 				"%s%+d\u033c",
 				k.nodes[0].(music.Audible).Note().Key.Display(),

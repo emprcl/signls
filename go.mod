@@ -7,7 +7,6 @@ require (
 	github.com/charmbracelet/bubbletea v1.1.0
 	github.com/charmbracelet/lipgloss v0.13.0
 	gitlab.com/gomidi/midi/v2 v2.2.10
-	golang.org/x/text v0.17.0
 )
 
 require (
@@ -25,4 +24,5 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.24.0 // indirect
+	golang.org/x/text v0.17.0 // indirect
 )

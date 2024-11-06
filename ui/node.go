@@ -7,9 +7,9 @@ import (
 	"signls/core/music"
 	"signls/core/node"
 	"signls/ui/param"
+	"signls/ui/util"
 
 	"github.com/charmbracelet/lipgloss"
-	"golang.org/x/text/unicode/norm"
 )
 
 var (
@@ -81,7 +81,7 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 		}
 		return activeEmitterStyle.Render("  ")
 	case music.Audible:
-		symbol := norm.NFC.String(n.Symbol())
+		symbol := util.Normalize(n.Symbol())
 
 		if isCursor && !m.edit {
 			return cursorStyle.Render(symbol)

@@ -6,9 +6,9 @@ import (
 	"signls/core/common"
 	"signls/filesystem"
 	"signls/ui/param"
+	"signls/ui/util"
 
 	"github.com/charmbracelet/lipgloss"
-	"golang.org/x/text/unicode/norm"
 )
 
 const (
@@ -218,7 +218,7 @@ func (m mainModel) selectedNodeName() string {
 func bankGridLabel(nb int, g filesystem.Grid) string {
 	label := fmt.Sprintf("%2d", nb+1)
 	if !g.IsEmpty() {
-		label = norm.NFC.String(fmt.Sprintf("%2d\u0320", nb+1))
+		label = util.Normalize(fmt.Sprintf("%2d\u0320", nb+1))
 	}
 	return label
 }
