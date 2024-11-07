@@ -69,6 +69,7 @@ func New(config filesystem.Configuration, grid *field.Grid, bank *filesystem.Ban
 	ti := textinput.New()
 	ti.CharLimit = 10
 	ti.Width = 12
+	ti.Cursor.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("190"))
 	model := mainModel{
 		bank:       bank,
 		grid:       grid,

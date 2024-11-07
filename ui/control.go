@@ -46,9 +46,8 @@ func (m mainModel) renderControl() string {
 	var pane string
 	if m.edit && m.input.Focused() {
 		pane = fmt.Sprintf(
-			"%s (%s) %s",
+			"%s %s",
 			m.params[m.param].Name(),
-			m.params[m.param].Display(),
 			m.input.View(),
 		)
 	} else if m.edit {
