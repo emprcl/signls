@@ -2,7 +2,6 @@ package ui
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 
 	"signls/core/common"
@@ -130,11 +129,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch {
 			case key.Matches(msg, m.keymap.EditNode):
 				m.input.Blur()
-				val, err := strconv.Atoi(m.input.Value())
-				if err != nil {
-					val = m.params[m.param].Value()
-				}
-				m.params[m.param].Set(val)
+				m.params[m.param].SetEditValue(m.input.Value())
 				return m, nil
 			case key.Matches(msg, m.keymap.Cancel, m.keymap.EditInput):
 				m.input.Blur()

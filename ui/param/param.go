@@ -14,6 +14,7 @@ type Param interface {
 	Display() string
 	Set(value int)
 	SetAlt(value int)
+	SetEditValue(input string)
 
 	Up()
 	Down()

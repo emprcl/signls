@@ -3,6 +3,7 @@ package param
 import (
 	"fmt"
 	"math"
+	"strconv"
 
 	"signls/core/common"
 	"signls/core/node"
@@ -80,4 +81,12 @@ func (t Threshold) SetAlt(value int) {
 	for _, n := range t.nodes {
 		n.(*node.Emitter).Behavior().(*node.TollEmitter).Threshold.SetRandomAmount(value)
 	}
+}
+
+func (t Threshold) SetEditValue(input string) {
+	value, err := strconv.Atoi(input)
+	if err != nil {
+		return
+	}
+	t.Set(value)
 }

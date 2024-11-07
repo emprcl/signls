@@ -2,6 +2,7 @@ package param
 
 import (
 	"fmt"
+	"strconv"
 
 	"signls/core/common"
 	"signls/core/music"
@@ -96,4 +97,12 @@ func (l Length) SetAlt(value int) {
 	for _, n := range l.nodes {
 		n.(music.Audible).Note().Length.SetRandomAmount(value)
 	}
+}
+
+func (l Length) SetEditValue(input string) {
+	value, err := strconv.Atoi(input)
+	if err != nil {
+		return
+	}
+	l.Set(value)
 }

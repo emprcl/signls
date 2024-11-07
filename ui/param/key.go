@@ -133,3 +133,11 @@ func (k *Key) keyIndex() int {
 	}
 	return 0
 }
+
+func (k *Key) SetEditValue(input string) {
+	key, err := music.ConvertNoteToMIDI(input)
+	if err != nil {
+		return
+	}
+	k.Set(key)
+}

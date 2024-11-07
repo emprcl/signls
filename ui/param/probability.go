@@ -2,6 +2,7 @@ package param
 
 import (
 	"fmt"
+	"strconv"
 
 	"signls/core/common"
 	"signls/core/music"
@@ -61,3 +62,11 @@ func (p Probability) Set(value int) {
 }
 
 func (p Probability) SetAlt(value int) {}
+
+func (p Probability) SetEditValue(input string) {
+	value, err := strconv.Atoi(input)
+	if err != nil {
+		return
+	}
+	p.Set(value)
+}

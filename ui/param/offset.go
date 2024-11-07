@@ -2,6 +2,7 @@ package param
 
 import (
 	"fmt"
+	"strconv"
 
 	"signls/core/common"
 	"signls/core/node"
@@ -78,4 +79,12 @@ func (o Offset) SetAlt(value int) {
 	for _, n := range o.nodes {
 		n.(*node.EuclidEmitter).Offset.SetRandomAmount(value)
 	}
+}
+
+func (o Offset) SetEditValue(input string) {
+	value, err := strconv.Atoi(input)
+	if err != nil {
+		return
+	}
+	o.Set(value)
 }

@@ -2,6 +2,7 @@ package param
 
 import (
 	"fmt"
+	"strconv"
 
 	"signls/core/common"
 	"signls/core/node"
@@ -81,4 +82,12 @@ func (t Triggers) SetAlt(value int) {
 	for _, n := range t.nodes {
 		n.(*node.EuclidEmitter).Triggers.SetRandomAmount(value)
 	}
+}
+
+func (t Triggers) SetEditValue(input string) {
+	value, err := strconv.Atoi(input)
+	if err != nil {
+		return
+	}
+	t.Set(value)
 }

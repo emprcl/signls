@@ -2,6 +2,8 @@ package param
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"signls/core/common"
 	"signls/core/node"
@@ -93,5 +95,20 @@ func (d Destination) SetDestinationAmount(dAmountX, dAmountY int) {
 	for _, n := range d.nodes {
 		amountX, amountY := n.(*node.HoleEmitter).DestinationAmount()
 		n.(*node.HoleEmitter).SetDestinationAmount(amountX+dAmountX, amountY+dAmountY)
+	}
+}
+
+func (d Destination) SetEditValue(input string) {
+	coordinates := strings.Split(input, ",")
+	if len(coordinates) != 2 {
+		return
+	}
+	x, errX := strconv.Atoi(coordinates[0])
+	y, errY := strconv.Atoi(coordinates[1])
+	if errX != nil || errY != nil {
+		return
+	}
+	for _, n := range d.nodes {
+		n.(*node.HoleEmitter).SetDestination(x, y)
 	}
 }
