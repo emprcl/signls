@@ -136,9 +136,11 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 				m.params[m.param].Set(val)
 				return m, nil
-			case key.Matches(msg, m.keymap.Cancel):
+			case key.Matches(msg, m.keymap.Cancel, m.keymap.EditInput):
 				m.input.Blur()
 				return m, nil
+			case key.Matches(msg, m.keymap.Quit):
+				break
 			default:
 				m.input, cmd = m.input.Update(msg)
 				return m, cmd

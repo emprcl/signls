@@ -80,7 +80,7 @@ func NewDefaultAzertyKeyMap() KeyMap {
 		EditDown:  "ctrl+down",
 		EditLeft:  "ctrl+left",
 
-		EditInput: "<",
+		EditInput: ":",
 
 		Bank: "tab",
 
@@ -143,7 +143,7 @@ func NewDefaultAzertyMacKeyMap() KeyMap {
 		EditDown:  "ctrl+down",
 		EditLeft:  "ctrl+left",
 
-		EditInput: "<",
+		EditInput: ":",
 
 		Bank: "tab",
 
@@ -205,7 +205,7 @@ func NewDefaultQwertyKeyMap() KeyMap {
 		EditDown:  "ctrl+down",
 		EditLeft:  "ctrl+left",
 
-		EditInput: "e",
+		EditInput: ".",
 
 		Bank: "tab",
 
@@ -268,7 +268,7 @@ func NewDefaultQwertyMacKeyMap() KeyMap {
 		EditDown:  "ctrl+down",
 		EditLeft:  "ctrl+left",
 
-		EditInput: "e",
+		EditInput: ".",
 
 		Bank: "tab",
 
