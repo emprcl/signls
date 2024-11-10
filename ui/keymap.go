@@ -180,7 +180,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		EditInput: key.NewBinding(
 			key.WithKeys(keys.EditInput),
-			key.WithHelp(keys.EditInput, "input parameter"),
+			key.WithHelp(keys.EditInput, "modify parameter"),
 		),
 		Bank: key.NewBinding(
 			key.WithKeys(keys.Bank),
