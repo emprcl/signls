@@ -95,6 +95,7 @@ For qwerty keyboards, here's the default mapping:
  - `↑` `↓` `←` `→` **move cursor**
  - `shift`+`↑` `↓` `←` `→` **multiple selection (or modify alt parameter mode in edit mode)**
  - `ctrl`+`↑` `↓` `←` `→` **modify selected node direction (modify parameter or alt parameter value)**
+ - `.` **text edit mode for selected parameter**
  - `backspace` **remove selected nodes (or grid in bank)**
  - `enter` **edit selected nodes**
  - `m` **toggle selected nodes mute**
