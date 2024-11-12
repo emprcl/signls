@@ -2,9 +2,11 @@ package param
 
 import (
 	"fmt"
+	"strconv"
 
 	"signls/core/common"
 	"signls/core/music"
+	"signls/ui/util"
 )
 
 type Velocity struct {
@@ -17,10 +19,12 @@ func (v Velocity) Name() string {
 
 func (v Velocity) Display() string {
 	if v.nodes[0].(music.Audible).Note().Velocity.RandomAmount() != 0 {
-		return fmt.Sprintf(
-			"%d%+d\u033c",
-			v.nodes[0].(music.Audible).Note().Velocity.Value(),
-			v.nodes[0].(music.Audible).Note().Velocity.RandomAmount(),
+		return util.Normalize(
+			fmt.Sprintf(
+				"%d%+d\u033c",
+				v.nodes[0].(music.Audible).Note().Velocity.Value(),
+				v.nodes[0].(music.Audible).Note().Velocity.RandomAmount(),
+			),
 		)
 	}
 	return fmt.Sprintf("%d", v.nodes[0].(music.Audible).Note().Velocity.Value())
@@ -68,4 +72,12 @@ func (v Velocity) SetAlt(value int) {
 	for _, n := range v.nodes {
 		n.(music.Audible).Note().Velocity.SetRandomAmount(value)
 	}
+}
+
+func (v Velocity) SetEditValue(input string) {
+	value, err := strconv.Atoi(input)
+	if err != nil {
+		return
+	}
+	v.Set(value)
 }

@@ -3,9 +3,12 @@ package param
 import (
 	"fmt"
 	"math"
+	"strconv"
 
 	"signls/core/common"
 	"signls/core/node"
+
+	"signls/ui/util"
 )
 
 type Threshold struct {
@@ -18,10 +21,12 @@ func (t Threshold) Name() string {
 
 func (t Threshold) Display() string {
 	if t.control().RandomAmount() != 0 {
-		return fmt.Sprintf(
-			"%d%+d\u033c",
-			t.control().Value(),
-			t.control().RandomAmount(),
+		return util.Normalize(
+			fmt.Sprintf(
+				"%d%+d\u033c",
+				t.control().Value(),
+				t.control().RandomAmount(),
+			),
 		)
 	}
 	return fmt.Sprintf("%d", t.Value())
@@ -76,4 +81,12 @@ func (t Threshold) SetAlt(value int) {
 	for _, n := range t.nodes {
 		n.(*node.Emitter).Behavior().(*node.TollEmitter).Threshold.SetRandomAmount(value)
 	}
+}
+
+func (t Threshold) SetEditValue(input string) {
+	value, err := strconv.Atoi(input)
+	if err != nil {
+		return
+	}
+	t.Set(value)
 }

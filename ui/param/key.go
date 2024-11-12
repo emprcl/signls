@@ -6,6 +6,8 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+
+	"signls/ui/util"
 )
 
 type KeyMode uint8
@@ -32,10 +34,12 @@ func (k *Key) Display() string {
 	}
 
 	if k.nodes[0].(music.Audible).Note().Key.RandomAmount() != 0 {
-		return fmt.Sprintf(
-			"%s%+d\u033c",
-			k.nodes[0].(music.Audible).Note().Key.Display(),
-			k.nodes[0].(music.Audible).Note().Key.RandomAmount(),
+		return util.Normalize(
+			fmt.Sprintf(
+				"%s%+d\u033c",
+				k.nodes[0].(music.Audible).Note().Key.Display(),
+				k.nodes[0].(music.Audible).Note().Key.RandomAmount(),
+			),
 		)
 	}
 	return k.nodes[0].(music.Audible).Note().Key.Display()
@@ -128,4 +132,12 @@ func (k *Key) keyIndex() int {
 		}
 	}
 	return 0
+}
+
+func (k *Key) SetEditValue(input string) {
+	key, err := music.ConvertNoteToMIDI(input)
+	if err != nil {
+		return
+	}
+	k.Set(key)
 }

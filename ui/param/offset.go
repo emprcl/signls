@@ -2,9 +2,12 @@ package param
 
 import (
 	"fmt"
+	"strconv"
 
 	"signls/core/common"
 	"signls/core/node"
+
+	"signls/ui/util"
 )
 
 type Offset struct {
@@ -17,10 +20,12 @@ func (o Offset) Name() string {
 
 func (o Offset) Display() string {
 	if o.nodes[0].(*node.EuclidEmitter).Offset.RandomAmount() != 0 {
-		return fmt.Sprintf(
-			"%d%+d\u033c",
-			o.nodes[0].(*node.EuclidEmitter).Offset.Value(),
-			o.nodes[0].(*node.EuclidEmitter).Offset.RandomAmount(),
+		return util.Normalize(
+			fmt.Sprintf(
+				"%d%+d\u033c",
+				o.nodes[0].(*node.EuclidEmitter).Offset.Value(),
+				o.nodes[0].(*node.EuclidEmitter).Offset.RandomAmount(),
+			),
 		)
 	}
 	return fmt.Sprintf("%d", o.Value())
@@ -74,4 +79,12 @@ func (o Offset) SetAlt(value int) {
 	for _, n := range o.nodes {
 		n.(*node.EuclidEmitter).Offset.SetRandomAmount(value)
 	}
+}
+
+func (o Offset) SetEditValue(input string) {
+	value, err := strconv.Atoi(input)
+	if err != nil {
+		return
+	}
+	o.Set(value)
 }

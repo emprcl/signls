@@ -25,6 +25,8 @@ type keyMap struct {
 	EditDown  key.Binding
 	EditLeft  key.Binding
 
+	EditInput key.Binding
+
 	Bank key.Binding
 
 	AddBang   key.Binding
@@ -75,7 +77,7 @@ func (k keyMap) ShortHelp() []key.Binding {
 func (k keyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
 		{k.Bank, k.AddBang, k.AddEuclid, k.AddPass, k.AddSpread, k.AddCycle, k.AddDice, k.AddToll, k.AddZone, k.AddHole, k.RootNoteUp, k.RootNoteDown, k.ScaleUp, k.ScaleDown, k.Cancel, k.SelectMidiDevice, k.FitGridToWindow, k.Help, k.Quit},
-		{k.Play, k.EditNode, k.RemoveNode, k.TriggerNode, k.MuteNode, k.MuteAllNode, k.Copy, k.Cut, k.Paste, k.Up, k.Right, k.Down, k.Left, k.SelectionUp, k.SelectionRight, k.SelectionDown, k.SelectionLeft, k.EditUp, k.EditDown, k.EditRight, k.EditLeft},
+		{k.Play, k.EditNode, k.RemoveNode, k.TriggerNode, k.MuteNode, k.MuteAllNode, k.Copy, k.Cut, k.Paste, k.Up, k.Right, k.Down, k.Left, k.SelectionUp, k.SelectionRight, k.SelectionDown, k.SelectionLeft, k.EditUp, k.EditDown, k.EditRight, k.EditLeft, k.EditInput},
 	}
 }
 
@@ -175,6 +177,10 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		EditLeft: key.NewBinding(
 			key.WithKeys(keys.EditLeft),
 			key.WithHelp(keys.EditLeft, "decrease parameter mode value"),
+		),
+		EditInput: key.NewBinding(
+			key.WithKeys(keys.EditInput),
+			key.WithHelp(keys.EditInput, "modify parameter"),
 		),
 		Bank: key.NewBinding(
 			key.WithKeys(keys.Bank),

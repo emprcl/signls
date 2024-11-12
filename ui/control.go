@@ -6,6 +6,7 @@ import (
 	"signls/core/common"
 	"signls/filesystem"
 	"signls/ui/param"
+	"signls/ui/util"
 
 	"github.com/charmbracelet/lipgloss"
 )
@@ -43,7 +44,13 @@ func (m mainModel) renderControl() string {
 	}
 
 	var pane string
-	if m.edit {
+	if m.edit && m.input.Focused() {
+		pane = fmt.Sprintf(
+			"%s %s",
+			m.params[m.param].Name(),
+			m.input.View(),
+		)
+	} else if m.edit {
 		pane = m.nodeEdit()
 	} else {
 		pane = m.gridInfo()
@@ -209,7 +216,7 @@ func (m mainModel) selectedNodeName() string {
 		emitterStyle.
 			MarginRight(1).
 			Background(lipgloss.Color(nodes[0].Color())).
-			Render(nodes[0].Symbol()),
+			Render(util.Normalize(nodes[0].Symbol())),
 		nodes[0].Name(),
 	)
 }
@@ -217,7 +224,7 @@ func (m mainModel) selectedNodeName() string {
 func bankGridLabel(nb int, g filesystem.Grid) string {
 	label := fmt.Sprintf("%2d", nb+1)
 	if !g.IsEmpty() {
-		label = fmt.Sprintf("%2d\u0320", nb+1)
+		label = util.Normalize(fmt.Sprintf("%2d\u0320", nb+1))
 	}
 	return label
 }

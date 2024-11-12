@@ -2,9 +2,11 @@ package param
 
 import (
 	"fmt"
+	"strconv"
 
 	"signls/core/common"
 	"signls/core/node"
+	"signls/ui/util"
 )
 
 const (
@@ -21,10 +23,12 @@ func (t Triggers) Name() string {
 
 func (t Triggers) Display() string {
 	if t.nodes[0].(*node.EuclidEmitter).Triggers.RandomAmount() != 0 {
-		return fmt.Sprintf(
-			"%d%+d\u033c",
-			t.nodes[0].(*node.EuclidEmitter).Triggers.Value(),
-			t.nodes[0].(*node.EuclidEmitter).Triggers.RandomAmount(),
+		return util.Normalize(
+			fmt.Sprintf(
+				"%d%+d\u033c",
+				t.nodes[0].(*node.EuclidEmitter).Triggers.Value(),
+				t.nodes[0].(*node.EuclidEmitter).Triggers.RandomAmount(),
+			),
 		)
 	}
 	return fmt.Sprintf("%d", t.Value())
@@ -78,4 +82,12 @@ func (t Triggers) SetAlt(value int) {
 	for _, n := range t.nodes {
 		n.(*node.EuclidEmitter).Triggers.SetRandomAmount(value)
 	}
+}
+
+func (t Triggers) SetEditValue(input string) {
+	value, err := strconv.Atoi(input)
+	if err != nil {
+		return
+	}
+	t.Set(value)
 }

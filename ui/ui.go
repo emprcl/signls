@@ -9,9 +9,11 @@ import (
 	"signls/core/node"
 	"signls/filesystem"
 	"signls/ui/param"
+	"signls/ui/util"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -43,6 +45,7 @@ type mainModel struct {
 	viewport      viewport
 	keymap        keyMap
 	help          help.Model
+	input         textinput.Model
 	params        []param.Param
 	gridParams    []param.Param
 	bankClipboard filesystem.Grid
@@ -62,11 +65,16 @@ type mainModel struct {
 // New creates a new mainModel that hols the ui state. It takes a new grid.
 // Check the core package.
 func New(config filesystem.Configuration, grid *field.Grid, bank *filesystem.Bank) tea.Model {
+	ti := textinput.New()
+	ti.CharLimit = 10
+	ti.Width = 12
+	ti.Cursor.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("190"))
 	model := mainModel{
 		bank:       bank,
 		grid:       grid,
 		keymap:     newKeyMap(config.KeyMap),
 		help:       help.New(),
+		input:      ti,
 		gridParams: param.NewParamsForGrid(grid),
 		cursorX:    1,
 		cursorY:    1,
@@ -112,10 +120,36 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case blinkMsg:
 		m.blink = !m.blink
+		m.input.Cursor.Blink = !m.input.Cursor.Blink
 		return m, blink()
 
 	case tea.KeyMsg:
+		if m.input.Focused() {
+			var cmd tea.Cmd
+			switch {
+			case key.Matches(msg, m.keymap.EditNode):
+				m.input.Blur()
+				m.params[m.param].SetEditValue(m.input.Value())
+				return m, nil
+			case key.Matches(msg, m.keymap.Cancel, m.keymap.EditInput):
+				m.input.Blur()
+				return m, nil
+			case key.Matches(msg, m.keymap.Quit):
+				break
+			default:
+				m.input, cmd = m.input.Update(msg)
+				return m, cmd
+			}
+		}
+
 		switch {
+		case key.Matches(msg, m.keymap.EditInput):
+			if !m.edit {
+				return m, nil
+			}
+			m.input.Focus()
+			m.input.Reset()
+			return m, nil
 		case key.Matches(msg, m.keymap.Play):
 			m.grid.TogglePlay()
 			return m, nil
@@ -467,5 +501,5 @@ func moveCursor(dir string, speed, x, y, minX, maxX, minY, maxY int) (int, int) 
 	default:
 		newX, newY = 0, 0
 	}
-	return clamp(newX, minX, maxX), clamp(newY, minY, maxY)
+	return util.Clamp(newX, minX, maxX), util.Clamp(newY, minY, maxY)
 }

@@ -72,3 +72,5 @@ func (d Direction) SetFromKeyString(key string) {
 		node.SetDirection(dir)
 	}
 }
+
+func (d Direction) SetEditValue(value string) {}

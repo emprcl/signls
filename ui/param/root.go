@@ -57,3 +57,5 @@ func (r Root) Set(value int) {
 }
 
 func (r Root) SetAlt(value int) {}
+
+func (r Root) SetEditValue(input string) {}

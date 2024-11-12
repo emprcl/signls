@@ -2,9 +2,11 @@ package param
 
 import (
 	"fmt"
+	"strconv"
 
 	"signls/core/common"
 	"signls/core/music"
+	"signls/ui/util"
 )
 
 type Channel struct {
@@ -17,10 +19,12 @@ func (c Channel) Name() string {
 
 func (c Channel) Display() string {
 	if c.nodes[0].(music.Audible).Note().Channel.RandomAmount() != 0 {
-		return fmt.Sprintf(
-			"%d%+d\u033c",
-			c.nodes[0].(music.Audible).Note().Channel.Value()+1,
-			c.nodes[0].(music.Audible).Note().Channel.RandomAmount(),
+		return util.Normalize(
+			fmt.Sprintf(
+				"%d%+d\u033c",
+				c.nodes[0].(music.Audible).Note().Channel.Value()+1,
+				c.nodes[0].(music.Audible).Note().Channel.RandomAmount(),
+			),
 		)
 	}
 	return fmt.Sprintf("%d", c.nodes[0].(music.Audible).Note().Channel.Value()+1)
@@ -68,4 +72,12 @@ func (c Channel) SetAlt(value int) {
 	for _, n := range c.nodes {
 		n.(music.Audible).Note().Channel.SetRandomAmount(value)
 	}
+}
+
+func (c Channel) SetEditValue(input string) {
+	value, err := strconv.Atoi(input)
+	if err != nil {
+		return
+	}
+	c.Set(value - 1)
 }

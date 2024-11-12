@@ -2,9 +2,11 @@ package param
 
 import (
 	"fmt"
+	"strconv"
 
 	"signls/core/common"
 	"signls/core/music"
+	"signls/ui/util"
 )
 
 const (
@@ -42,10 +44,12 @@ func (l Length) Display() string {
 		display = fmt.Sprintf("%.1f", float64(length)/float64(pulsesPerStep))
 	}
 	if l.nodes[0].(music.Audible).Note().Length.RandomAmount() != 0 {
-		return fmt.Sprintf(
-			"%s%+.1f\u033c",
-			display,
-			float64(l.nodes[0].(music.Audible).Note().Length.RandomAmount())/float64(pulsesPerStep),
+		return util.Normalize(
+			fmt.Sprintf(
+				"%s%+.1f\u033c",
+				display,
+				float64(l.nodes[0].(music.Audible).Note().Length.RandomAmount())/float64(pulsesPerStep),
+			),
 		)
 	}
 	return display
@@ -93,4 +97,12 @@ func (l Length) SetAlt(value int) {
 	for _, n := range l.nodes {
 		n.(music.Audible).Note().Length.SetRandomAmount(value)
 	}
+}
+
+func (l Length) SetEditValue(input string) {
+	value, err := strconv.Atoi(input)
+	if err != nil {
+		return
+	}
+	l.Set(value)
 }

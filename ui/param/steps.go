@@ -2,9 +2,12 @@ package param
 
 import (
 	"fmt"
+	"strconv"
 
 	"signls/core/common"
 	"signls/core/node"
+
+	"signls/ui/util"
 )
 
 type Steps struct {
@@ -17,10 +20,12 @@ func (s Steps) Name() string {
 
 func (s Steps) Display() string {
 	if s.nodes[0].(*node.EuclidEmitter).Steps.RandomAmount() != 0 {
-		return fmt.Sprintf(
-			"%d%+d\u033c",
-			s.nodes[0].(*node.EuclidEmitter).Steps.Value(),
-			s.nodes[0].(*node.EuclidEmitter).Steps.RandomAmount(),
+		return util.Normalize(
+			fmt.Sprintf(
+				"%d%+d\u033c",
+				s.nodes[0].(*node.EuclidEmitter).Steps.Value(),
+				s.nodes[0].(*node.EuclidEmitter).Steps.RandomAmount(),
+			),
 		)
 	}
 	return fmt.Sprintf("%d", s.Value())
@@ -75,4 +80,12 @@ func (s Steps) SetAlt(value int) {
 	for _, n := range s.nodes {
 		n.(*node.EuclidEmitter).Steps.SetRandomAmount(value)
 	}
+}
+
+func (s Steps) SetEditValue(input string) {
+	value, err := strconv.Atoi(input)
+	if err != nil {
+		return
+	}
+	s.Set(value)
 }

@@ -65,3 +65,5 @@ func (s Scale) scaleIndex() int {
 	}
 	return 0
 }
+
+func (s Scale) SetEditValue(input string) {}

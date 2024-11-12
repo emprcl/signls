@@ -60,8 +60,9 @@ make GOLANG_OS=linux GOLANG_ARCH=arm64 build
 
 Hit `?` to see all keybindings. `esc` to quit.
 
-Some companion apps that receive midi for testing signls:
- - [Enfer](https://neauoire.github.io/Enfer/) ([github](https://github.com/neauoire/Enfer))
+Some companion apps that receive MIDI for testing Signls:
+ - [Webmidi synths](https://synth.playtronica.com/)
+ - [Enfer](https://neauoire.github.io/Enfer/) ([github](https://github.com/neauoire/Enfer)) _*works only on linux*_
  - [QSynth](https://qsynth.sourceforge.io/)
 
 ### Keyboard mapping
@@ -94,6 +95,7 @@ For qwerty keyboards, here's the default mapping:
  - `↑` `↓` `←` `→` **move cursor**
  - `shift`+`↑` `↓` `←` `→` **multiple selection (or modify alt parameter mode in edit mode)**
  - `ctrl`+`↑` `↓` `←` `→` **modify selected node direction (modify parameter or alt parameter value)**
+ - `.` **text edit mode for selected parameter**
  - `backspace` **remove selected nodes (or grid in bank)**
  - `enter` **edit selected nodes**
  - `m` **toggle selected nodes mute**
