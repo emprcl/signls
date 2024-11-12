@@ -17,28 +17,37 @@ const (
 )
 
 var (
-	controlStyle = lipgloss.NewStyle().
-			MarginTop(1).
-			MarginLeft(2)
-	cellStyle = lipgloss.NewStyle().
-			MarginRight(2)
+	backgroundColor = lipgloss.Color("0")
+	foregroundColor = lipgloss.Color("15")
+	baseStyle       = lipgloss.NewStyle().
+			Background(lipgloss.Color(backgroundColor)).
+			Foreground(foregroundColor)
+
+	controlStyle = baseStyle.Copy().
+			PaddingTop(1).
+			PaddingLeft(2)
+	cellStyle = baseStyle.Copy().
+			Background(lipgloss.Color(backgroundColor)).
+			PaddingRight(2)
 	activeCellStyle = cellStyle.
 			Foreground(lipgloss.Color("190"))
-	bankStyle = lipgloss.NewStyle().
-			MarginRight(1).
+	bankStyle = baseStyle.Copy().
+			PaddingRight(1).
 			Background(lipgloss.Color("79")).
 			Foreground(lipgloss.Color("0"))
-	bankStyleOdd = lipgloss.NewStyle().
-			MarginRight(1).
+	bankStyleOdd = baseStyle.Copy().
+			PaddingRight(1).
 			Background(lipgloss.Color("85")).
 			Foreground(lipgloss.Color("0"))
-	activeBankStyle = lipgloss.NewStyle().
-			MarginRight(1).
+	activeBankStyle = baseStyle.Copy().
+			PaddingRight(1).
 			Background(lipgloss.Color("15")).
 			Foreground(lipgloss.Color("0"))
 )
 
 func (m mainModel) renderControl() string {
+	//lipgloss.NewStyle().Background(lipgloss.Color("190")
+
 	if m.bankMode {
 		return controlStyle.Render(m.bankSelection())
 	}
@@ -55,6 +64,21 @@ func (m mainModel) renderControl() string {
 	} else {
 		pane = m.gridInfo()
 	}
+
+	return lipgloss.Place(m.viewport.Width, controlsHeight, lipgloss.Left, lipgloss.Top,
+		controlStyle.Render(
+			lipgloss.JoinHorizontal(
+				lipgloss.Left,
+				lipgloss.JoinVertical(
+					lipgloss.Left,
+					cellStyle.Width(9).Render(m.selectedNodeName()),
+					cellStyle.Render(m.modeName()),
+				),
+				pane,
+			),
+		),
+		lipgloss.WithWhitespaceBackground(backgroundColor),
+	)
 
 	return controlStyle.Render(
 		lipgloss.JoinHorizontal(
