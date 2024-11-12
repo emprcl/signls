@@ -13,10 +13,10 @@ type TollEmitter struct {
 	count     int
 }
 
-func NewTollEmitter(midi midi.Midi, direction common.Direction) *Emitter {
+func NewTollEmitter(midi midi.Midi, device int, direction common.Direction) *Emitter {
 	return &Emitter{
 		direction: direction,
-		note:      music.NewNote(midi),
+		note:      music.NewNote(midi, device),
 		behavior: &TollEmitter{
 			Threshold: common.NewControlValue[int](1, 1, math.MaxInt32),
 		},

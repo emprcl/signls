@@ -99,25 +99,25 @@ func (g *Grid) Load(grid filesystem.Grid) {
 		var newNode common.Node
 		switch n.Type {
 		case "bang":
-			newNode = node.NewBangEmitter(g.midi, common.Direction(n.Direction), true)
+			newNode = node.NewBangEmitter(g.midi, g.Device, common.Direction(n.Direction), true)
 		case "euclid":
-			newNode = node.NewEuclidEmitter(g.midi, common.Direction(n.Direction))
+			newNode = node.NewEuclidEmitter(g.midi, g.Device, common.Direction(n.Direction))
 			newNode.(*node.EuclidEmitter).Steps = filesystem.NewParamFromFile[int](n.Params["steps"])
 			newNode.(*node.EuclidEmitter).Triggers = filesystem.NewParamFromFile[int](n.Params["triggers"])
 			newNode.(*node.EuclidEmitter).Offset = filesystem.NewParamFromFile[int](n.Params["offset"])
 		case "pass":
-			newNode = node.NewPassEmitter(g.midi, common.Direction(n.Direction))
+			newNode = node.NewPassEmitter(g.midi, g.Device, common.Direction(n.Direction))
 		case "spread":
-			newNode = node.NewSpreadEmitter(g.midi, common.Direction(n.Direction))
+			newNode = node.NewSpreadEmitter(g.midi, g.Device, common.Direction(n.Direction))
 		case "cycle":
-			newNode = node.NewCycleEmitter(g.midi, common.Direction(n.Direction))
+			newNode = node.NewCycleEmitter(g.midi, g.Device, common.Direction(n.Direction))
 		case "dice":
-			newNode = node.NewDiceEmitter(g.midi, common.Direction(n.Direction))
+			newNode = node.NewDiceEmitter(g.midi, g.Device, common.Direction(n.Direction))
 		case "toll":
-			newNode = node.NewTollEmitter(g.midi, common.Direction(n.Direction))
+			newNode = node.NewTollEmitter(g.midi, g.Device, common.Direction(n.Direction))
 			newNode.(common.Behavioral).Behavior().(*node.TollEmitter).Threshold = filesystem.NewParamFromFile[int](n.Params["threshold"])
 		case "zone":
-			newNode = node.NewZoneEmitter(g.midi, common.Direction(n.Direction))
+			newNode = node.NewZoneEmitter(g.midi, g.Device, common.Direction(n.Direction))
 		case "hole":
 			newNode = node.NewHoleEmitter(common.Direction(n.Direction), n.X, n.Y, g.Width, g.Height)
 			newNode.(*node.HoleEmitter).DestinationX = filesystem.NewParamFromFile[int](n.Params["destinationX"])
@@ -132,6 +132,10 @@ func (g *Grid) Load(grid filesystem.Grid) {
 			a.Note().SetKey(music.Key(n.Note.Key.Key), g.Key)
 			a.Note().Key.SetRandomAmount(n.Note.Key.Amount)
 			a.Note().Key.SetSilent(n.Note.Key.Silent)
+			a.Note().Device.Set(n.Note.Device.Value)
+			a.Note().Device.SetRandomAmount(n.Note.Device.Amount)
+			a.Note().Device.SetMin(n.Note.Device.Min)
+			a.Note().Device.SetMax(n.Note.Device.Max)
 			a.Note().Channel.Set(uint8(n.Note.Channel.Value))
 			a.Note().Channel.SetRandomAmount(n.Note.Channel.Amount)
 			a.Note().Channel.SetMin(uint8(n.Note.Channel.Min))

@@ -35,14 +35,14 @@ type EuclidEmitter struct {
 	muted     bool
 }
 
-func NewEuclidEmitter(midi midi.Midi, direction common.Direction) *EuclidEmitter {
+func NewEuclidEmitter(midi midi.Midi, device int, direction common.Direction) *EuclidEmitter {
 	return &EuclidEmitter{
 		Steps:     common.NewControlValue[int](defaultSteps, minSteps, maxSteps),
 		Triggers:  common.NewControlValue[int](defaultTriggers, minSteps, maxSteps),
 		Offset:    common.NewControlValue[int](defaultOffset, defaultOffset, maxSteps),
 		direction: direction,
 		armed:     true,
-		note:      music.NewNote(midi),
+		note:      music.NewNote(midi, device),
 	}
 }
 

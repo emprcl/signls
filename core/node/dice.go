@@ -13,11 +13,11 @@ type DiceEmitter struct {
 	rand *rand.Rand
 }
 
-func NewDiceEmitter(midi midi.Midi, direction common.Direction) *Emitter {
+func NewDiceEmitter(midi midi.Midi, device int, direction common.Direction) *Emitter {
 	source := rand.NewSource(time.Now().UnixNano())
 	return &Emitter{
 		direction: direction,
-		note:      music.NewNote(midi),
+		note:      music.NewNote(midi, device),
 		behavior: &DiceEmitter{
 			rand: rand.New(source),
 		},

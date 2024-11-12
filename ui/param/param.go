@@ -71,8 +71,9 @@ func DefaultEmitterParams(grid *field.Grid, nodes []common.Node) []Param {
 		},
 		Velocity{nodes: nodes},
 		Length{nodes: nodes},
-		Channel{nodes: nodes},
 		Probability{nodes: nodes},
+		Channel{nodes: nodes},
+		Device{nodes: nodes},
 	}
 }
 

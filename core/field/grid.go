@@ -10,9 +10,10 @@ import (
 )
 
 const (
-	defaultTempo               = 120.
-	defaultRootKey music.Key   = 60
-	defaultScale   music.Scale = music.CHROMATIC
+	defaultTempo                  = 120.
+	defaultMidiDevice             = 0
+	defaultRootKey    music.Key   = 60
+	defaultScale      music.Scale = music.CHROMATIC
 )
 
 // Grid represents the main structure for the grid-based sequencer.
@@ -24,6 +25,8 @@ type Grid struct {
 	nodes  [][]common.Node
 	Height int
 	Width  int
+
+	Device int
 
 	Key   music.Key
 	Scale music.Scale
@@ -41,6 +44,7 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 		nodes:  make([][]common.Node, height),
 		Height: height,
 		Width:  width,
+		Device: defaultMidiDevice,
 		Key:    defaultRootKey,
 		Scale:  defaultScale,
 	}
@@ -90,17 +94,18 @@ func (g *Grid) SetScale(scale music.Scale) {
 	g.Transpose()
 }
 
-// MidiDevice returns the name of the currently active MIDI device.
-func (g *Grid) MidiDevice() string {
-	if g.midi.ActiveDevice() == nil {
-		return "no midi device"
-	}
-	return g.midi.ActiveDevice().String()
+// DeviceName returns the name of the default MIDI device.
+func (g *Grid) DeviceName() string {
+	return g.midi.Devices()[g.Device].String()
 }
 
 // CycleMidiDevice switches to the next available MIDI device.
 func (g *Grid) CycleMidiDevice() {
-	g.midi.CycleMidiDevices()
+	if len(g.midi.Devices()) < g.Device+2 {
+		g.Device = 0
+		return
+	}
+	g.Device++
 }
 
 // Pulse returns the current pulse step.
@@ -171,21 +176,21 @@ func (g *Grid) Node(x, y int) common.Node {
 func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	switch symbol {
 	case "b":
-		g.AddNode(node.NewBangEmitter(g.midi, common.NONE, !g.Playing), x, y)
+		g.AddNode(node.NewBangEmitter(g.midi, g.Device, common.NONE, !g.Playing), x, y)
 	case "s":
-		g.AddNode(node.NewSpreadEmitter(g.midi, common.NONE), x, y)
+		g.AddNode(node.NewSpreadEmitter(g.midi, g.Device, common.NONE), x, y)
 	case "c":
-		g.AddNode(node.NewCycleEmitter(g.midi, common.NONE), x, y)
+		g.AddNode(node.NewCycleEmitter(g.midi, g.Device, common.NONE), x, y)
 	case "d":
-		g.AddNode(node.NewDiceEmitter(g.midi, common.NONE), x, y)
+		g.AddNode(node.NewDiceEmitter(g.midi, g.Device, common.NONE), x, y)
 	case "t":
-		g.AddNode(node.NewTollEmitter(g.midi, common.NONE), x, y)
+		g.AddNode(node.NewTollEmitter(g.midi, g.Device, common.NONE), x, y)
 	case "e":
-		g.AddNode(node.NewEuclidEmitter(g.midi, common.NONE), x, y)
+		g.AddNode(node.NewEuclidEmitter(g.midi, g.Device, common.NONE), x, y)
 	case "z":
-		g.AddNode(node.NewZoneEmitter(g.midi, common.NONE), x, y)
+		g.AddNode(node.NewZoneEmitter(g.midi, g.Device, common.NONE), x, y)
 	case "p":
-		g.AddNode(node.NewPassEmitter(g.midi, common.NONE), x, y)
+		g.AddNode(node.NewPassEmitter(g.midi, g.Device, common.NONE), x, y)
 	case "h":
 		g.AddNode(node.NewHoleEmitter(common.NONE, x, y, g.Width, g.Height), x, y)
 	}

@@ -18,6 +18,7 @@ import (
 
 const (
 	defaultTempo               = 120.
+	defaultDevice              = 0
 	defaultRootKey music.Key   = 60 // Middle C
 	defaultScale   music.Scale = music.CHROMATIC
 	defaultSize                = 20
@@ -41,6 +42,8 @@ type Grid struct {
 	Height int `json:"height"`
 	Width  int `json:"width"`
 
+	Device int `json:"device"`
+
 	Key   uint8  `json:"key"`
 	Scale uint16 `json:"scale"`
 }
@@ -52,6 +55,7 @@ func NewGrid() Grid {
 		Height: defaultSize,
 		Width:  defaultSize,
 		Tempo:  defaultTempo,
+		Device: defaultDevice,
 		Key:    uint8(defaultRootKey),
 		Scale:  uint16(defaultScale),
 	}
@@ -76,6 +80,7 @@ type Node struct {
 
 type Note struct {
 	Key         Key   `json:"key"`
+	Device      Param `json:"device"`
 	Channel     Param `json:"channel"`
 	Velocity    Param `json:"velocity"`
 	Length      Param `json:"length"`
@@ -85,6 +90,7 @@ type Note struct {
 func NewNote(n music.Note) Note {
 	return Note{
 		Key:         NewKey(*n.Key),
+		Device:      NewParam(*n.Device),
 		Channel:     NewParam(*n.Channel),
 		Velocity:    NewParam(*n.Velocity),
 		Length:      NewParam(*n.Length),
