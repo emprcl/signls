@@ -14,7 +14,7 @@ import (
 
 var (
 	gridStyle = lipgloss.NewStyle().
-			Background(lipgloss.AdaptiveColor{Light: "253", Dark: "235"})
+			Background(lipgloss.AdaptiveColor{Light: "254", Dark: "234"})
 	cursorStyle = lipgloss.NewStyle().
 			Background(lipgloss.Color("190")).
 			Foreground(lipgloss.Color("0"))
