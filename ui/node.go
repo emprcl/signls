@@ -27,10 +27,11 @@ var (
 	emitterStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("15"))
 	mutedEmitterStyle = lipgloss.NewStyle().
-				Background(lipgloss.Color("243"))
+				Background(lipgloss.Color("247")).
+				Foreground(lipgloss.Color("236"))
 	activeEmitterStyle = lipgloss.NewStyle().
-				Background(lipgloss.Color("15")).
-				Foreground(lipgloss.Color("0"))
+				Background(lipgloss.AdaptiveColor{Light: "0", Dark: "15"}).
+				Foreground(lipgloss.AdaptiveColor{Light: "15", Dark: "0"})
 )
 
 func (m mainModel) inSelectionRange(x, y int) bool {
@@ -70,7 +71,7 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 		if (x+y)%2 == 0 {
 			return "  "
 		}
-		return gridStyle.Render("  ")
+		return "░░"
 	}
 
 	// render node
