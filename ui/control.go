@@ -32,15 +32,12 @@ var (
 	activeCellStyle = cellStyle.
 			Foreground(lipgloss.Color("190"))
 	bankStyle = baseStyle.Copy().
-			PaddingRight(1).
 			Background(lipgloss.Color("79")).
 			Foreground(lipgloss.Color("0"))
 	bankStyleOdd = baseStyle.Copy().
-			PaddingRight(1).
 			Background(lipgloss.Color("85")).
 			Foreground(lipgloss.Color("0"))
 	activeBankStyle = baseStyle.Copy().
-			PaddingRight(1).
 			Background(lipgloss.Color("15")).
 			Foreground(lipgloss.Color("0"))
 )
@@ -71,25 +68,13 @@ func (m mainModel) renderControl() string {
 				lipgloss.Left,
 				lipgloss.JoinVertical(
 					lipgloss.Left,
-					cellStyle.Width(9).Render(m.selectedNodeName()),
-					cellStyle.Render(m.modeName()),
+					cellStyle.Width(11).Render(m.selectedNodeName()),
+					cellStyle.Width(11).Render(m.modeName()),
 				),
 				pane,
 			),
 		),
 		lipgloss.WithWhitespaceBackground(backgroundColor),
-	)
-
-	return controlStyle.Render(
-		lipgloss.JoinHorizontal(
-			lipgloss.Left,
-			lipgloss.JoinVertical(
-				lipgloss.Left,
-				cellStyle.Width(9).Render(m.selectedNodeName()),
-				cellStyle.Render(m.modeName()),
-			),
-			pane,
-		),
 	)
 }
 
@@ -138,27 +123,27 @@ func (m mainModel) gridInfo() string {
 		lipgloss.Left,
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			cellStyle.Render(fmt.Sprintf("%d,%d", m.cursorX, m.cursorY)),
-			cellStyle.Render(fmt.Sprintf("%d,%d", m.grid.Width-1, m.grid.Height-1)),
+			cellStyle.Width(8).Render(fmt.Sprintf("%d,%d", m.cursorX, m.cursorY)),
+			cellStyle.Width(8).Render(fmt.Sprintf("%d,%d", m.grid.Width-1, m.grid.Height-1)),
 		),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			cellStyle.Render(fmt.Sprintf("%.f %s", m.grid.Tempo(), m.tempoSymbol())),
-			cellStyle.Render(fmt.Sprintf("%s %d", m.transportSymbol(), m.grid.Pulse())),
+			cellStyle.Width(7).Render(fmt.Sprintf("%.f %s", m.grid.Tempo(), m.tempoSymbol())),
+			cellStyle.Width(7).Render(m.transportSymbol()),
 		),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			cellStyle.Render(root.Display()),
-			cellStyle.Render(scale.Display()),
+			cellStyle.Width(8).Render(root.Display()),
+			cellStyle.Width(8).Render(scale.Display()),
 		),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
 			fmt.Sprintf(
 				"%s%s",
 				activeBankStyle.Render(bankGridLabel(m.bank.Active, m.bank.ActiveGrid())),
-				m.bank.Filename(),
+				cellStyle.PaddingLeft(1).Render(m.bank.Filename()),
 			),
-			m.grid.MidiDevice(),
+			cellStyle.Render(m.grid.MidiDevice()),
 		),
 	)
 }
@@ -238,10 +223,9 @@ func (m mainModel) selectedNodeName() string {
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		emitterStyle.
-			MarginRight(1).
 			Background(lipgloss.Color(nodes[0].Color())).
 			Render(util.Normalize(nodes[0].Symbol())),
-		nodes[0].Name(),
+		baseStyle.PaddingLeft(1).Render(nodes[0].Name()),
 	)
 }
 
