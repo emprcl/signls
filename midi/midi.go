@@ -114,12 +114,12 @@ func (m *midi) Devices() gomidi.OutPorts {
 
 // NoteOn sends a Note On midi meessage to the given device.
 func (m *midi) NoteOn(device int, channel uint8, note uint8, velocity uint8) {
-	m.outputs[channel] <- gomidi.NoteOn(channel, note, velocity)
+	m.outputs[device] <- gomidi.NoteOn(channel, note, velocity)
 }
 
 // NoteOff sends a Note Off midi meessage to the given device.
 func (m *midi) NoteOff(device int, channel uint8, note uint8) {
-	m.outputs[channel] <- gomidi.NoteOff(channel, note)
+	m.outputs[device] <- gomidi.NoteOff(channel, note)
 }
 
 // Silence sends a note off message for every running note on given device and channel.
