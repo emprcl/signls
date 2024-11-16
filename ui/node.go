@@ -14,7 +14,7 @@ import (
 
 var (
 	gridStyle = lipgloss.NewStyle().
-			Background(lipgloss.Color("234"))
+			Background(lipgloss.AdaptiveColor{Light: "254", Dark: "234"})
 	cursorStyle = lipgloss.NewStyle().
 			Background(lipgloss.Color("190")).
 			Foreground(lipgloss.Color("0"))
@@ -27,10 +27,11 @@ var (
 	emitterStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("15"))
 	mutedEmitterStyle = lipgloss.NewStyle().
-				Background(lipgloss.Color("243"))
+				Background(lipgloss.Color("247")).
+				Foreground(lipgloss.Color("236"))
 	activeEmitterStyle = lipgloss.NewStyle().
-				Background(lipgloss.Color("15")).
-				Foreground(lipgloss.Color("0"))
+				Background(lipgloss.AdaptiveColor{Light: "0", Dark: "15"}).
+				Foreground(lipgloss.AdaptiveColor{Light: "15", Dark: "0"})
 )
 
 func (m mainModel) inSelectionRange(x, y int) bool {
