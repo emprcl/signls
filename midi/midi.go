@@ -114,12 +114,12 @@ func (m *midi) Devices() gomidi.OutPorts {
 
 // NoteOn sends a Note On midi meessage to the given device.
 func (m *midi) NoteOn(device int, channel uint8, note uint8, velocity uint8) {
-	m.outputs[channel] <- gomidi.NoteOn(channel, note, velocity)
+	m.outputs[device] <- gomidi.NoteOn(channel, note, velocity)
 }
 
 // NoteOff sends a Note Off midi meessage to the given device.
 func (m *midi) NoteOff(device int, channel uint8, note uint8) {
-	m.outputs[channel] <- gomidi.NoteOff(channel, note)
+	m.outputs[device] <- gomidi.NoteOff(channel, note)
 }
 
 // Silence sends a note off message for every running note on given device and channel.
@@ -131,7 +131,7 @@ func (m *midi) Silence(device int, channel uint8) {
 
 // SilenceAll sends a note off message for every running note on every devices and channels.
 func (m *midi) SilenceAll() {
-	for d, _ := range m.devices {
+	for d := range m.devices {
 		for c := 0; c < 16; c++ {
 			m.Silence(d, uint8(c))
 		}
@@ -160,7 +160,7 @@ func (m *midi) AfterTouch(device int, channel uint8, value uint8) {
 
 // SendClock sends a Clock midi meessage to every devices.
 func (m *midi) SendClock() {
-	for d, _ := range m.devices {
+	for d := range m.devices {
 		m.outputs[d] <- gomidi.TimingClock()
 	}
 }

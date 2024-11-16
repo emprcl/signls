@@ -27,11 +27,11 @@ func (d Device) Display() string {
 			),
 		)
 	}
-	return fmt.Sprintf("%s", d.nodes[0].(music.Audible).Note().DeviceName())
+	return d.nodes[0].(music.Audible).Note().DeviceName()
 }
 
 func (d Device) Value() int {
-	return int(d.nodes[0].(music.Audible).Note().Device.Value())
+	return d.nodes[0].(music.Audible).Note().Device.Value()
 }
 
 func (d Device) AltValue() int {
