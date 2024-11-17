@@ -115,7 +115,7 @@ func (k Key) Transpose(root Key, scale Scale, oldInterval int) Key {
 	}
 
 	// 2) If not in scale, it means that the scale changed.
-	// Let's try to change to push the key up or down
+	// Let's try to push the key up or down
 	// according to its initial interval, and check
 	// if we're in the new scale.
 	switch Interval(1 << (mod(oldInterval, 12))) {
