@@ -22,6 +22,10 @@ const (
 	maxProbability uint8 = 100
 )
 
+var (
+	lastUsedChannel uint8 = defaultChannel
+)
+
 // Note represents a midi note.
 type Note struct {
 	midi midi.Midi
@@ -45,7 +49,7 @@ func NewNote(midi midi.Midi) *Note {
 		midi:        midi,
 		rand:        rand.New(source),
 		Key:         NewKeyValue(defaultKey),
-		Channel:     common.NewControlValue[uint8](defaultChannel, 0, maxChannel),
+		Channel:     common.NewControlValue[uint8](lastUsedChannel, 0, maxChannel),
 		Velocity:    common.NewControlValue[uint8](defaultVelocity, 0, maxVelocity),
 		Length:      common.NewControlValue[uint8](defaultLength, minLength, maxLength),
 		Probability: maxProbability,
@@ -164,6 +168,7 @@ func (n *Note) SetLength(length uint8) {
 // SetChannel updates the MIDI channel of the note.
 func (n *Note) SetChannel(channel uint8) {
 	n.Channel.Set(channel)
+	lastUsedChannel = channel
 }
 
 // ClockDivision returns the pulses per step and steps per quarter note,
