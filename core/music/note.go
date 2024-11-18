@@ -15,7 +15,6 @@ const (
 	defaultVelocity uint8 = 100
 	defaultLength   uint8 = uint8(common.PulsesPerStep)
 
-	maxDevice      int   = 15
 	maxVelocity    uint8 = 127
 	maxLength      uint8 = 127 // 127 is treated as infinity
 	minLength      uint8 = 1
@@ -30,7 +29,7 @@ type Note struct {
 	rand *rand.Rand
 
 	Key         *KeyValue
-	Device      *common.ControlValue[int]
+	Device      midi.Device
 	Channel     *common.ControlValue[uint8]
 	Velocity    *common.ControlValue[uint8]
 	Length      *common.ControlValue[uint8]
@@ -41,13 +40,13 @@ type Note struct {
 }
 
 // NewNote initializes a new Note with default settings and the provided MIDI interface.
-func NewNote(midi midi.Midi, device int) *Note {
+func NewNote(midi midi.Midi, device midi.Device) *Note {
 	source := rand.NewSource(time.Now().UnixNano())
 	return &Note{
 		midi:        midi,
 		rand:        rand.New(source),
 		Key:         NewKeyValue(defaultKey),
-		Device:      common.NewControlValue(device, 0, maxDevice),
+		Device:      device,
 		Channel:     common.NewControlValue(defaultChannel, 0, maxChannel),
 		Velocity:    common.NewControlValue(defaultVelocity, 0, maxVelocity),
 		Length:      common.NewControlValue(defaultLength, minLength, maxLength),
@@ -58,7 +57,6 @@ func NewNote(midi midi.Midi, device int) *Note {
 // Copy creates a copy of the note.
 func (n Note) Copy() *Note {
 	newKey := *n.Key
-	newDevice := *n.Device
 	newChannel := *n.Channel
 	newVelocity := *n.Velocity
 	newLength := *n.Length
@@ -67,7 +65,7 @@ func (n Note) Copy() *Note {
 		midi:        n.midi,
 		rand:        rand.New(source),
 		Key:         &newKey,
-		Device:      &newDevice,
+		Device:      n.Device,
 		Channel:     &newChannel,
 		Velocity:    &newVelocity,
 		Length:      &newLength,
@@ -102,7 +100,7 @@ func (n *Note) TransposeAndPlay(root Key, scale Scale) {
 	n.Transpose(root, scale)
 	n.Stop()
 	n.midi.NoteOn(
-		n.Device.Computed(),
+		n.Device,
 		n.Channel.Computed(),
 		uint8(n.Key.Computed(root, scale)),
 		n.Velocity.Computed(),
@@ -121,7 +119,7 @@ func (n *Note) Play() {
 
 	n.Stop()
 	n.midi.NoteOn(
-		n.Device.Value(),
+		n.Device,
 		n.Channel.Value(),
 		uint8(n.Key.Value()),
 		n.Velocity.Value(),
@@ -133,14 +131,14 @@ func (n *Note) Play() {
 
 // Silence silences the note channel
 func (n *Note) Silence() {
-	n.midi.Silence(n.Device.Value(), n.Channel.Value())
+	n.midi.Silence(n.Device, n.Channel.Value())
 	n.triggered = false
 	n.pulse = 0
 }
 
 // Stop sends a MIDI Note Off message and resets the triggered state.
 func (n *Note) Stop() {
-	n.midi.NoteOff(n.Device.Last(), n.Channel.Last(), uint8(n.Key.Last()))
+	n.midi.NoteOff(n.Device, n.Channel.Last(), uint8(n.Key.Last()))
 	n.triggered = false
 	n.pulse = 0
 }
@@ -169,8 +167,8 @@ func (n *Note) SetLength(length uint8) {
 }
 
 // SetDevice updates the MIDI device of the note.
-func (n *Note) SetDevice(device int) {
-	n.Device.Set(device)
+func (n *Note) SetDevice(device midi.Device) {
+	n.Device = device
 }
 
 // SetChannel updates the MIDI channel of the note.
@@ -180,7 +178,7 @@ func (n *Note) SetChannel(channel uint8) {
 
 // DeviceName returns the name of the note MIDI device.
 func (n *Note) DeviceName() string {
-	return n.midi.Devices()[n.Device.Value()].String()
+	return n.Device.Name
 }
 
 // ClockDivision returns the pulses per step and steps per quarter note,

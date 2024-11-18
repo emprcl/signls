@@ -18,17 +18,25 @@ const (
 	midiBufferSize = 1024
 )
 
+// Device represents a midi device, with an associated fallback
+// in case its not available.
+type Device struct {
+	Name     string
+	Fallback int
+}
+
 // Midi provides a way to interct with midi devices.
 type Midi interface {
 	Devices() gomidi.OutPorts
-	NoteOn(device int, channel uint8, note uint8, velocity uint8)
-	NoteOff(device int, channel uint8, note uint8)
-	Silence(device int, channel uint8)
+	FindDeviceIndex(device Device) int
+	NoteOn(device Device, channel uint8, note uint8, velocity uint8)
+	NoteOff(device Device, channel uint8, note uint8)
+	Silence(device Device, channel uint8)
 	SilenceAll()
-	ControlChange(device int, channel, controller, value uint8)
-	ProgramChange(device int, channel uint8, value uint8)
-	Pitchbend(device int, channel uint8, value int16)
-	AfterTouch(device int, channel uint8, value uint8)
+	ControlChange(device Device, channel, controller, value uint8)
+	ProgramChange(device Device, channel uint8, value uint8)
+	Pitchbend(device Device, channel uint8, value int16)
+	AfterTouch(device Device, channel uint8, value uint8)
 	SendClock()
 	Close()
 }
@@ -112,50 +120,61 @@ func (m *midi) Devices() gomidi.OutPorts {
 	return m.devices
 }
 
+// FindDeviceIndex check if the given device is connected
+// or fallback on the given fallback device.
+func (m *midi) FindDeviceIndex(device Device) int {
+	for i, d := range m.devices {
+		if d.String() == device.Name {
+			return i
+		}
+	}
+	return device.Fallback
+}
+
 // NoteOn sends a Note On midi meessage to the given device.
-func (m *midi) NoteOn(device int, channel uint8, note uint8, velocity uint8) {
-	m.outputs[device] <- gomidi.NoteOn(channel, note, velocity)
+func (m *midi) NoteOn(device Device, channel uint8, note uint8, velocity uint8) {
+	m.outputs[m.FindDeviceIndex(device)] <- gomidi.NoteOn(channel, note, velocity)
 }
 
 // NoteOff sends a Note Off midi meessage to the given device.
-func (m *midi) NoteOff(device int, channel uint8, note uint8) {
-	m.outputs[device] <- gomidi.NoteOff(channel, note)
+func (m *midi) NoteOff(device Device, channel uint8, note uint8) {
+	m.outputs[m.FindDeviceIndex(device)] <- gomidi.NoteOff(channel, note)
 }
 
 // Silence sends a note off message for every running note on given device and channel.
-func (m *midi) Silence(device int, channel uint8) {
+func (m *midi) Silence(device Device, channel uint8) {
 	for _, msg := range gomidi.SilenceChannel(int8(channel)) {
-		m.outputs[device] <- msg
+		m.outputs[m.FindDeviceIndex(device)] <- msg
 	}
 }
 
 // SilenceAll sends a note off message for every running note on every devices and channels.
 func (m *midi) SilenceAll() {
-	for d := range m.devices {
+	for _, d := range m.devices {
 		for c := 0; c < 16; c++ {
-			m.Silence(d, uint8(c))
+			m.Silence(Device{Name: d.String(), Fallback: 0}, uint8(c))
 		}
 	}
 }
 
 // ControlChange sends a Control Change messages to the given device.
-func (m *midi) ControlChange(device int, channel, controller, value uint8) {
-	m.outputs[device] <- gomidi.ControlChange(channel, controller, value)
+func (m *midi) ControlChange(device Device, channel, controller, value uint8) {
+	m.outputs[m.FindDeviceIndex(device)] <- gomidi.ControlChange(channel, controller, value)
 }
 
 // ProgramChange sends a Program Change messages to the given device.
-func (m *midi) ProgramChange(device int, channel uint8, value uint8) {
-	m.outputs[device] <- gomidi.ProgramChange(channel, value)
+func (m *midi) ProgramChange(device Device, channel uint8, value uint8) {
+	m.outputs[m.FindDeviceIndex(device)] <- gomidi.ProgramChange(channel, value)
 }
 
 // Pitchbend sends a Pitch Bend messages to the given device.
-func (m *midi) Pitchbend(device int, channel uint8, value int16) {
-	m.outputs[device] <- gomidi.Pitchbend(channel, value)
+func (m *midi) Pitchbend(device Device, channel uint8, value int16) {
+	m.outputs[m.FindDeviceIndex(device)] <- gomidi.Pitchbend(channel, value)
 }
 
 // AfterTouch sends a After Touch messages to the given device.
-func (m *midi) AfterTouch(device int, channel uint8, value uint8) {
-	m.outputs[device] <- gomidi.AfterTouch(channel, value)
+func (m *midi) AfterTouch(device Device, channel uint8, value uint8) {
+	m.outputs[m.FindDeviceIndex(device)] <- gomidi.AfterTouch(channel, value)
 }
 
 // SendClock sends a Clock midi meessage to every devices.
