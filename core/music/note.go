@@ -22,9 +22,7 @@ const (
 	maxProbability uint8 = 100
 )
 
-var (
-	lastUsedChannel uint8 = defaultChannel
-)
+var lastUsedChannel uint8 = defaultChannel
 
 // Note represents a midi note.
 type Note struct {
