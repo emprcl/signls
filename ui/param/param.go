@@ -67,6 +67,7 @@ func DefaultEmitterParams(grid *field.Grid, nodes []common.Node) []Param {
 			nodes: nodes,
 			keys:  music.AllKeysInScale(grid.Key, grid.Scale),
 			root:  grid.Key,
+			scale: grid.Scale,
 			mode:  keyMode,
 		},
 		Velocity{nodes: nodes},

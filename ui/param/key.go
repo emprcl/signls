@@ -21,6 +21,7 @@ type Key struct {
 	nodes []common.Node
 	keys  []music.Key
 	root  music.Key
+	scale music.Scale
 	mode  KeyMode
 }
 
@@ -99,7 +100,6 @@ func (k *Key) Set(value int) {
 	if value < 0 || value >= len(k.keys) {
 		return
 	}
-	// TODO: fix not updated keys
 	for _, n := range k.nodes {
 		n.(music.Audible).Note().SetKey(k.keys[value], k.root)
 	}
@@ -135,9 +135,13 @@ func (k *Key) keyIndex() int {
 }
 
 func (k *Key) SetEditValue(input string) {
-	key, err := music.ConvertNoteToMIDI(input)
+	midiKey, err := music.ConvertNoteToMIDI(input)
 	if err != nil {
 		return
 	}
-	k.Set(key)
+	key := music.Key(midiKey)
+	for _, n := range k.nodes {
+		n.(music.Audible).Note().SetKey(key, k.root)
+		n.(music.Audible).Note().Transpose(k.root, k.scale)
+	}
 }
