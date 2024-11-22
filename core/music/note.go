@@ -15,6 +15,8 @@ const (
 	defaultVelocity uint8 = 100
 	defaultLength   uint8 = uint8(common.PulsesPerStep)
 
+	defaultCCNumbers int = 8
+
 	maxVelocity    uint8 = 127
 	maxLength      uint8 = 127 // 127 is treated as infinity
 	minLength      uint8 = 1
@@ -36,6 +38,8 @@ type Note struct {
 	Length      *common.ControlValue[uint8]
 	Probability uint8
 
+	Controls []*CC
+
 	pulse     uint64 // Internal pulse counter to manage note length.
 	triggered bool
 }
@@ -43,6 +47,10 @@ type Note struct {
 // NewNote initializes a new Note with default settings and the provided MIDI interface.
 func NewNote(midi midi.Midi) *Note {
 	source := rand.NewSource(time.Now().UnixNano())
+	ccs := make([]*CC, defaultCCNumbers)
+	for i := range ccs {
+		ccs[i] = NewCC(midi, NONEType)
+	}
 	return &Note{
 		midi:        midi,
 		rand:        rand.New(source),
@@ -51,6 +59,7 @@ func NewNote(midi midi.Midi) *Note {
 		Velocity:    common.NewControlValue[uint8](defaultVelocity, 0, maxVelocity),
 		Length:      common.NewControlValue[uint8](defaultLength, minLength, maxLength),
 		Probability: maxProbability,
+		Controls:    ccs,
 	}
 }
 
@@ -104,6 +113,10 @@ func (n *Note) TransposeAndPlay(root Key, scale Scale) {
 		n.Velocity.Computed(),
 	)
 	n.Length.Computed() // Just trigger length computation
+
+	for _, control := range n.Controls {
+		control.Send(n.Channel.Last())
+	}
 
 	n.triggered = true
 	n.pulse = 0
