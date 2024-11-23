@@ -114,9 +114,9 @@ func (g *Grid) MidiDevice() string {
 	return g.midi.ActiveDevice().String()
 }
 
-// CycleMidiDevice switches to the next available MIDI device.
-func (g *Grid) CycleMidiDevice() {
-	g.midi.CycleMidiDevices()
+// Midi returns the Midi interface.
+func (g *Grid) Midi() midi.Midi {
+	return g.midi
 }
 
 // Pulse returns the current pulse step.

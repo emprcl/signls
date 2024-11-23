@@ -22,8 +22,8 @@ const (
 type Midi interface {
 	Devices() gomidi.OutPorts
 	ActiveDevice() drivers.Out
+	ActiveDeviceIndex() int
 	SetActiveDevice(device int)
-	CycleMidiDevices()
 	NoteOn(channel uint8, note uint8, velocity uint8)
 	NoteOff(channel uint8, note uint8)
 	Silence(channel uint8)
@@ -120,20 +120,9 @@ func (m *midi) Devices() gomidi.OutPorts {
 	return m.devices
 }
 
-// CycleMidiDevices cycle through all devices and
-// and sets the next one as active
-func (m *midi) CycleMidiDevices() {
-	if len(m.Devices()) < m.active+2 {
-		m.active = 0
-		return
-	}
-	m.active++
-}
-
 // SetActiveDevice sets the active device
 func (m *midi) SetActiveDevice(device int) {
-	if len(m.devices) < device+1 {
-		m.active = 0
+	if device < 0 || len(m.devices) < device+1 {
 		return
 	}
 	m.active = device
@@ -145,6 +134,11 @@ func (m *midi) ActiveDevice() drivers.Out {
 		return nil
 	}
 	return m.devices[m.active]
+}
+
+// ActiveDeviceIndex returns the active device index
+func (m *midi) ActiveDeviceIndex() int {
+	return m.active
 }
 
 // NoteOn sends a Note On midi meessage to the active device.

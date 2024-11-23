@@ -9,6 +9,7 @@ type Mock struct{}
 
 func (m *Mock) Devices() gomidi.OutPorts                         { return nil }
 func (m *Mock) ActiveDevice() drivers.Out                        { return nil }
+func (m *Mock) ActiveDeviceIndex() int                           { return 0 }
 func (m *Mock) SetActiveDevice(device int)                       {}
 func (m *Mock) CycleMidiDevices()                                {}
 func (m *Mock) NoteOn(channel uint8, note uint8, velocity uint8) {}

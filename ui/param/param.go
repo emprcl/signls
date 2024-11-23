@@ -108,6 +108,16 @@ func NewParamsForGrid(grid *field.Grid) []Param {
 	}
 }
 
+func NewParamsForMidi(grid *field.Grid) [][]Param {
+	return [][]Param{
+		{
+			ClockSend{grid: grid},
+			TransportSend{grid: grid},
+			DefaultDevice{grid: grid},
+		},
+	}
+}
+
 func Get(name string, params []Param) Param {
 	for _, p := range params {
 		if p.Name() == name {

@@ -191,9 +191,9 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, m.keymap.SelectionUp, m.keymap.SelectionRight, m.keymap.SelectionDown, m.keymap.SelectionLeft):
 			dir := m.keymap.Direction(msg)
-			if m.mode == EDIT {
+			if m.mode == EDIT || m.mode == CONFIG {
 				m.handleParamAltEdit(dir)
-				return m, nil
+				return m, save(m)
 			}
 			m.selectionX, m.selectionY = moveCursor(
 				dir, 1, m.selectionX, m.selectionY,
@@ -203,7 +203,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, m.keymap.EditUp, m.keymap.EditRight, m.keymap.EditDown, m.keymap.EditLeft):
 			dir := m.keymap.Direction(msg)
-			if m.mode != EDIT {
+			if m.mode == MOVE {
 				param.NewDirection(m.selectedEmitters()).SetFromKeyString(dir)
 				return m, save(m)
 			}
@@ -239,6 +239,10 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.mode == BANK {
 				m.mode = MOVE
 				return m.loadGridFromBank(), tea.WindowSize()
+			}
+			if m.mode == CONFIG {
+				m.mode = MOVE
+				return m, nil
 			}
 			if len(m.selectedEmitters()) == 0 {
 				return m, nil
@@ -300,9 +304,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, save(m)
 		case key.Matches(msg, m.keymap.Configuration):
 			m.mode = m.toggleMode(CONFIG)
-			m.params = [][]param.Param{
-				m.gridParams,
-			}
+			m.params = param.NewParamsForMidi(m.grid)
 			m.param = 0
 			m.paramPage = 0
 			return m, nil
