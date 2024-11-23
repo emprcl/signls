@@ -16,9 +16,9 @@ type Control struct {
 
 func (c Control) Name() string {
 	switch c.nodes[0].(music.Audible).Note().Controls[c.index].Type {
-	case music.CCControlType:
-		return fmt.Sprintf("cc %d", c.nodes[0].(music.Audible).Note().Controls[c.index].Controller)
-	case music.ATControlType:
+	case music.ControlChangeControlType:
+		return fmt.Sprintf("cc%d", c.nodes[0].(music.Audible).Note().Controls[c.index].Controller)
+	case music.AfterTouchControlType:
 		return "at"
 	default:
 		return "cc"
@@ -26,7 +26,7 @@ func (c Control) Name() string {
 }
 
 func (c Control) Display() string {
-	if c.nodes[0].(music.Audible).Note().Controls[c.index].Type == music.NONEControlType {
+	if c.nodes[0].(music.Audible).Note().Controls[c.index].Type == music.SilentControlType {
 		return "⨯"
 	}
 	if c.nodes[0].(music.Audible).Note().Controls[c.index].Value.RandomAmount() != 0 {

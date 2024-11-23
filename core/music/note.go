@@ -49,7 +49,7 @@ func NewNote(midi midi.Midi) *Note {
 	source := rand.NewSource(time.Now().UnixNano())
 	ccs := make([]*CC, defaultCCNumbers)
 	for i := range ccs {
-		ccs[i] = NewCC(midi, NONEControlType)
+		ccs[i] = NewCC(midi, SilentControlType)
 	}
 	return &Note{
 		midi:        midi,
@@ -70,6 +70,10 @@ func (n Note) Copy() *Note {
 	newVelocity := *n.Velocity
 	newLength := *n.Length
 	source := rand.NewSource(time.Now().UnixNano())
+	newControls := make([]*CC, defaultCCNumbers)
+	for i, c := range n.Controls {
+		newControls[i] = c.Copy()
+	}
 	return &Note{
 		midi:        n.midi,
 		rand:        rand.New(source),
@@ -78,6 +82,7 @@ func (n Note) Copy() *Note {
 		Velocity:    &newVelocity,
 		Length:      &newLength,
 		Probability: n.Probability,
+		Controls:    newControls,
 	}
 }
 

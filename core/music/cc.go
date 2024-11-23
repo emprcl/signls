@@ -13,21 +13,29 @@ const (
 	defaultControlValue uint8 = 0
 	minControlValue     uint8 = 0
 	maxControlValue     uint8 = 127
+
+	defaultPitchBendValue = 64
+	minPitchBendValue     = -128
+	maxPitchBendValue     = 128
 )
 
 type ControlType int
 
 const (
-	NONEControlType ControlType = iota
-	CCControlType
-	ATControlType // After Touch
+	SilentControlType ControlType = iota
+	ControlChangeControlType
+	AfterTouchControlType
+	PitchBendControlType
+	ProgramChangeControlType
 )
 
 var (
 	AllControlTypes = []ControlType{
-		NONEControlType,
-		CCControlType,
-		ATControlType,
+		SilentControlType,
+		ControlChangeControlType,
+		AfterTouchControlType,
+		PitchBendControlType,
+		ProgramChangeControlType,
 	}
 )
 
@@ -48,6 +56,16 @@ func NewCC(midi midi.Midi, controlType ControlType) *CC {
 	}
 }
 
+func (c CC) Copy() *CC {
+	newValue := *c.Value
+	return &CC{
+		midi:       c.midi,
+		Type:       c.Type,
+		Controller: c.Controller,
+		Value:      &newValue,
+	}
+}
+
 func (c *CC) SetController(controller uint8) {
 	if controller < minController || controller > maxController {
 		return
@@ -55,13 +73,41 @@ func (c *CC) SetController(controller uint8) {
 	c.Controller = controller
 }
 
+func (c *CC) SetType(t int) {
+	c.Type = ControlType(t)
+	if c.Type == PitchBendControlType {
+
+	}
+}
+
 func (c CC) Send(channel uint8) {
 	switch c.Type {
-	case NONEControlType:
+	case SilentControlType:
 		return
-	case CCControlType:
+	case ControlChangeControlType:
 		c.midi.ControlChange(channel, c.Controller, uint8(c.Value.Computed()))
-	case ATControlType:
+	case AfterTouchControlType:
 		c.midi.AfterTouch(channel, uint8(c.Value.Computed()))
+	case PitchBendControlType:
+		c.midi.Pitchbend(
+			channel,
+			int16(remap(
+				int(c.Value.Computed()),
+				int(minControlValue),
+				int(maxControlValue),
+				minPitchBendValue,
+				maxPitchBendValue,
+			)),
+		)
 	}
+}
+
+func remap(value, oldMin, oldMax, newMin, newMax int) int {
+	if value < oldMin {
+		value = oldMin
+	} else if value > oldMax {
+		value = oldMax
+	}
+
+	return newMin + (value-oldMin)*(newMax-newMin)/(oldMax-oldMin)
 }
