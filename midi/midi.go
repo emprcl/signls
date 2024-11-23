@@ -33,6 +33,8 @@ type Midi interface {
 	Pitchbend(channel uint8, value int16)
 	AfterTouch(channel uint8, value uint8)
 	SendClock()
+	TransportStart()
+	TransportStop()
 	Close()
 }
 
@@ -192,6 +194,16 @@ func (m *midi) AfterTouch(channel uint8, value uint8) {
 // SendClock sends a Clock midi meessage to the active device.
 func (m *midi) SendClock() {
 	m.outputs[m.active] <- gomidi.TimingClock()
+}
+
+// TransportStart sends a Start midi meessage to the active device.
+func (m *midi) TransportStart() {
+	m.outputs[m.active] <- gomidi.Start()
+}
+
+// TransportStop sends a Stop midi meessage to the active device.
+func (m *midi) TransportStop() {
+	m.outputs[m.active] <- gomidi.Stop()
 }
 
 // Close terminates all the device goroutines gracefully.

@@ -65,6 +65,9 @@ func (g *Grid) TogglePlay() {
 	if !g.Playing {
 		g.Reset()
 		g.midi.SilenceAll()
+		g.midi.TransportStop()
+	} else {
+		g.midi.TransportStart()
 	}
 }
 

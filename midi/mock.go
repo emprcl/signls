@@ -20,4 +20,6 @@ func (m *Mock) ProgramChange(channel uint8, value uint8)         {}
 func (m *Mock) Pitchbend(channel uint8, value int16)             {}
 func (m *Mock) AfterTouch(channel uint8, value uint8)            {}
 func (m *Mock) SendClock()                                       {}
+func (m *Mock) TransportStart()                                  {}
+func (m *Mock) TransportStop()                                   {}
 func (m *Mock) Close()                                           {}
