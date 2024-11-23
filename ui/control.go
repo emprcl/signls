@@ -17,6 +17,16 @@ const (
 )
 
 var (
+	pagesArrows = [][]string{
+		[]string{
+			"\u23F6",
+			"",
+		},
+		[]string{
+			"",
+			"\u23F7",
+		},
+	}
 	controlStyle = lipgloss.NewStyle().
 			MarginTop(1).
 			MarginLeft(2)
@@ -140,7 +150,14 @@ func (m mainModel) gridInfo() string {
 }
 
 func (m mainModel) nodeEdit() string {
-	params := []string{}
+	params := []string{
+		cellStyle.Render(
+			lipgloss.JoinVertical(
+				lipgloss.Left,
+				pagesArrows[m.paramPage]...,
+			),
+		),
+	}
 	for k, p := range m.activeParamPage() {
 		style := cellStyle
 		if k == m.param {
