@@ -454,17 +454,17 @@ func (m *mainModel) moveParam(dir string) {
 	}
 	switch dir {
 	case "up":
-		if m.paramPage+1 >= len(m.params) {
-			return
-		}
-		m.param = 0
-		m.paramPage++
-	case "down":
 		if m.paramPage-1 < 0 {
 			return
 		}
 		m.param = 0
 		m.paramPage--
+	case "down":
+		if m.paramPage+1 >= len(m.params) {
+			return
+		}
+		m.param = 0
+		m.paramPage++
 	case "right":
 		if m.param+1 >= len(m.activeParamPage()) {
 			return

@@ -19,12 +19,12 @@ const (
 var (
 	pagesArrows = [][]string{
 		{
-			"\u23F6",
-			"",
-		},
-		{
 			"",
 			"\u23F7",
+		},
+		{
+			"\u23F6",
+			"",
 		},
 	}
 	controlStyle = lipgloss.NewStyle().
