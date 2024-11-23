@@ -225,20 +225,21 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keymap.EditNode):
 			if m.bankMode {
 				m.bankMode = false
+				m.edit = false
 				return m.loadGridFromBank(), tea.WindowSize()
 			}
 			if len(m.selectedEmitters()) == 0 {
 				return m, nil
+			}
+			m.edit = !m.edit
+			if m.edit {
+				m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			}
 			if len(m.params) < m.paramPage+1 {
 				m.paramPage = 0
 			}
 			if len(m.activeParamPage()) < m.param+1 {
 				m.param = 0
-			}
-			m.edit = !m.edit
-			if m.edit {
-				m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			}
 			return m, nil
 		case key.Matches(msg, m.keymap.TriggerNode):

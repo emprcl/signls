@@ -9,12 +9,12 @@ import (
 	"signls/ui/util"
 )
 
-type Control struct {
+type CC struct {
 	index int
 	nodes []common.Node
 }
 
-func (c Control) Name() string {
+func (c CC) Name() string {
 	switch c.nodes[0].(music.Audible).Note().Controls[c.index].Type {
 	case music.ControlChangeControlType:
 		return fmt.Sprintf("cc%d", c.nodes[0].(music.Audible).Note().Controls[c.index].Controller)
@@ -29,7 +29,7 @@ func (c Control) Name() string {
 	}
 }
 
-func (c Control) Display() string {
+func (c CC) Display() string {
 	if c.nodes[0].(music.Audible).Note().Controls[c.index].Type == music.SilentControlType {
 		return "⨯"
 	}
@@ -45,71 +45,71 @@ func (c Control) Display() string {
 	return fmt.Sprintf("%d", c.nodes[0].(music.Audible).Note().Controls[c.index].Value.Value())
 }
 
-func (c Control) Value() int {
+func (c CC) Value() int {
 	return int(c.nodes[0].(music.Audible).Note().Controls[c.index].Value.Value())
 }
 
-func (c Control) AltValue() int {
+func (c CC) AltValue() int {
 	return 0
 }
 
-func (c Control) Up() {
+func (c CC) Up() {
 	c.Set(c.Value() + 1)
 }
 
-func (c Control) Down() {
+func (c CC) Down() {
 	c.Set(c.Value() - 1)
 }
 
-func (c Control) Left() {
+func (c CC) Left() {
 	c.SetAlt(c.nodes[0].(music.Audible).Note().Controls[c.index].Value.RandomAmount() - 1)
 }
 
-func (c Control) Right() {
+func (c CC) Right() {
 	c.SetAlt(c.nodes[0].(music.Audible).Note().Controls[c.index].Value.RandomAmount() + 1)
 }
 
-func (c Control) AltUp() {
+func (c CC) AltUp() {
 	c.SetController(c.nodes[0].(music.Audible).Note().Controls[c.index].Controller + 1)
 }
 
-func (c Control) AltDown() {
+func (c CC) AltDown() {
 	c.SetController(c.nodes[0].(music.Audible).Note().Controls[c.index].Controller - 1)
 }
 
-func (c Control) AltLeft() {
+func (c CC) AltLeft() {
 	newMode := util.Mod((int(c.nodes[0].(music.Audible).Note().Controls[c.index].Type) - 1), len(music.AllControlTypes))
 	for _, n := range c.nodes {
 		n.(music.Audible).Note().Controls[c.index].SetType(newMode)
 	}
 }
 
-func (c Control) AltRight() {
+func (c CC) AltRight() {
 	newMode := util.Mod((int(c.nodes[0].(music.Audible).Note().Controls[c.index].Type) + 1), len(music.AllControlTypes))
 	for _, n := range c.nodes {
 		n.(music.Audible).Note().Controls[c.index].SetType(newMode)
 	}
 }
 
-func (c Control) Set(value int) {
+func (c CC) Set(value int) {
 	for _, n := range c.nodes {
 		n.(music.Audible).Note().Controls[c.index].Value.Set(uint8(value))
 	}
 }
 
-func (c Control) SetAlt(value int) {
+func (c CC) SetAlt(value int) {
 	for _, n := range c.nodes {
 		n.(music.Audible).Note().Controls[c.index].Value.SetRandomAmount(value)
 	}
 }
 
-func (c Control) SetController(value uint8) {
+func (c CC) SetController(value uint8) {
 	for _, n := range c.nodes {
 		n.(music.Audible).Note().Controls[c.index].SetController(value)
 	}
 }
 
-func (c Control) SetEditValue(input string) {
+func (c CC) SetEditValue(input string) {
 	value, err := strconv.Atoi(input)
 	if err != nil {
 		return

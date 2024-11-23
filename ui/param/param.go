@@ -96,7 +96,7 @@ func DefaultEmitterParams(grid *field.Grid, nodes []common.Node) []Param {
 func DefaultEmitterControlChanges(nodes []common.Node) []Param {
 	params := make([]Param, defaultControlParamsNumber)
 	for i := range params {
-		params[i] = Control{index: i, nodes: nodes}
+		params[i] = CC{index: i, nodes: nodes}
 	}
 	return params
 }
