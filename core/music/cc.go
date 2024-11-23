@@ -14,9 +14,9 @@ const (
 	minControlValue     uint8 = 0
 	maxControlValue     uint8 = 127
 
-	defaultPitchBendValue = 64
-	minPitchBendValue     = -128
-	maxPitchBendValue     = 128
+	defaultPitchBendValue       = 64
+	minPitchBendValue     int16 = -8192
+	maxPitchBendValue     int16 = 8192
 )
 
 type ControlType int
@@ -75,8 +75,11 @@ func (c *CC) SetController(controller uint8) {
 
 func (c *CC) SetType(t int) {
 	c.Type = ControlType(t)
+	c.Value.SetRandomAmount(0)
 	if c.Type == PitchBendControlType {
-
+		c.Value.Set(defaultPitchBendValue)
+	} else {
+		c.Value.Set(defaultControlValue)
 	}
 }
 
@@ -88,17 +91,20 @@ func (c CC) Send(channel uint8) {
 		c.midi.ControlChange(channel, c.Controller, uint8(c.Value.Computed()))
 	case AfterTouchControlType:
 		c.midi.AfterTouch(channel, uint8(c.Value.Computed()))
+	case ProgramChangeControlType:
+		c.midi.ProgramChange(channel, uint8(c.Value.Computed()))
 	case PitchBendControlType:
-		c.midi.Pitchbend(
-			channel,
-			int16(remap(
+		value := 0
+		if c.Value.Computed() != defaultPitchBendValue {
+			value = remap(
 				int(c.Value.Computed()),
 				int(minControlValue),
 				int(maxControlValue),
-				minPitchBendValue,
-				maxPitchBendValue,
-			)),
-		)
+				int(minPitchBendValue),
+				int(maxPitchBendValue),
+			)
+		}
+		c.midi.Pitchbend(channel, int16(value))
 	}
 }
 

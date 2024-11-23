@@ -20,6 +20,10 @@ func (c Control) Name() string {
 		return fmt.Sprintf("cc%d", c.nodes[0].(music.Audible).Note().Controls[c.index].Controller)
 	case music.AfterTouchControlType:
 		return "at"
+	case music.PitchBendControlType:
+		return "pb"
+	case music.ProgramChangeControlType:
+		return "pc"
 	default:
 		return "cc"
 	}
@@ -74,16 +78,16 @@ func (c Control) AltDown() {
 }
 
 func (c Control) AltLeft() {
-	newMode := music.ControlType(util.Mod((int(c.nodes[0].(music.Audible).Note().Controls[c.index].Type) - 1), len(music.AllControlTypes)))
+	newMode := util.Mod((int(c.nodes[0].(music.Audible).Note().Controls[c.index].Type) - 1), len(music.AllControlTypes))
 	for _, n := range c.nodes {
-		n.(music.Audible).Note().Controls[c.index].Type = newMode
+		n.(music.Audible).Note().Controls[c.index].SetType(newMode)
 	}
 }
 
 func (c Control) AltRight() {
-	newMode := music.ControlType(util.Mod((int(c.nodes[0].(music.Audible).Note().Controls[c.index].Type) + 1), len(music.AllControlTypes)))
+	newMode := util.Mod((int(c.nodes[0].(music.Audible).Note().Controls[c.index].Type) + 1), len(music.AllControlTypes))
 	for _, n := range c.nodes {
-		n.(music.Audible).Note().Controls[c.index].Type = newMode
+		n.(music.Audible).Note().Controls[c.index].SetType(newMode)
 	}
 }
 
