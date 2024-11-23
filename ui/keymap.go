@@ -57,8 +57,8 @@ type keyMap struct {
 	TempoUp      key.Binding
 	TempoDown    key.Binding
 
-	SelectMidiDevice key.Binding
-	FitGridToWindow  key.Binding
+	Configuration   key.Binding
+	FitGridToWindow key.Binding
 
 	Cancel key.Binding
 
@@ -76,7 +76,7 @@ func (k keyMap) ShortHelp() []key.Binding {
 // key.Map interface.
 func (k keyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
-		{k.Bank, k.AddBang, k.AddEuclid, k.AddPass, k.AddSpread, k.AddCycle, k.AddDice, k.AddToll, k.AddZone, k.AddHole, k.RootNoteUp, k.RootNoteDown, k.ScaleUp, k.ScaleDown, k.Cancel, k.SelectMidiDevice, k.FitGridToWindow, k.Help, k.Quit},
+		{k.Bank, k.AddBang, k.AddEuclid, k.AddPass, k.AddSpread, k.AddCycle, k.AddDice, k.AddToll, k.AddZone, k.AddHole, k.RootNoteUp, k.RootNoteDown, k.ScaleUp, k.ScaleDown, k.Cancel, k.Configuration, k.FitGridToWindow, k.Help, k.Quit},
 		{k.Play, k.EditNode, k.RemoveNode, k.TriggerNode, k.MuteNode, k.MuteAllNode, k.Copy, k.Cut, k.Paste, k.Up, k.Right, k.Down, k.Left, k.SelectionUp, k.SelectionRight, k.SelectionDown, k.SelectionLeft, k.EditUp, k.EditDown, k.EditRight, k.EditLeft, k.EditInput},
 	}
 }
@@ -132,7 +132,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		Up: key.NewBinding(
 			key.WithKeys(keys.Up),
-			key.WithHelp(keys.Up, "move cursor up"),
+			key.WithHelp(keys.Up, "move cursor|selection up"),
 		),
 		Right: key.NewBinding(
 			key.WithKeys(keys.Right),
@@ -140,7 +140,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		Down: key.NewBinding(
 			key.WithKeys(keys.Down),
-			key.WithHelp(keys.Down, "move cursor down"),
+			key.WithHelp(keys.Down, "move cursor|selection down"),
 		),
 		Left: key.NewBinding(
 			key.WithKeys(keys.Left),
@@ -278,9 +278,9 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 			key.WithKeys(keys.TempoDown),
 			key.WithHelp(keys.TempoDown, "decrease tempo"),
 		),
-		SelectMidiDevice: key.NewBinding(
-			key.WithKeys(keys.SelectMidiDevice),
-			key.WithHelp(keys.SelectMidiDevice, "select midi device"),
+		Configuration: key.NewBinding(
+			key.WithKeys(keys.Configuration),
+			key.WithHelp(keys.Configuration, "global configuration"),
 		),
 		FitGridToWindow: key.NewBinding(
 			key.WithKeys(keys.FitGridToWindow),

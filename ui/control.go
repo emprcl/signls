@@ -60,8 +60,8 @@ func (m mainModel) renderControl() string {
 			m.activeParam().Name(),
 			m.input.View(),
 		)
-	} else if m.mode == EDIT {
-		pane = m.nodeEdit()
+	} else if m.mode == EDIT || m.mode == CONFIG {
+		pane = m.paramEdit()
 	} else {
 		pane = m.gridInfo()
 	}
@@ -149,15 +149,20 @@ func (m mainModel) gridInfo() string {
 	)
 }
 
-func (m mainModel) nodeEdit() string {
-	params := []string{
-		cellStyle.Render(
-			lipgloss.JoinVertical(
-				lipgloss.Left,
-				pagesArrows[m.paramPage]...,
+func (m mainModel) paramEdit() string {
+	var params []string
+
+	if len(m.params) > 1 {
+		params = []string{
+			cellStyle.Render(
+				lipgloss.JoinVertical(
+					lipgloss.Left,
+					pagesArrows[m.paramPage]...,
+				),
 			),
-		),
+		}
 	}
+
 	for k, p := range m.activeParamPage() {
 		style := cellStyle
 		if k == m.param {

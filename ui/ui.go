@@ -173,7 +173,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.moveBankGrid(dir)
 				return m, nil
 			}
-			if m.mode == EDIT {
+			if m.mode == EDIT || m.mode == CONFIG {
 				m.moveParam(dir)
 				return m, nil
 			}
@@ -243,11 +243,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if len(m.selectedEmitters()) == 0 {
 				return m, nil
 			}
-			if m.mode == EDIT {
-				m.mode = MOVE
-			} else {
-				m.mode = EDIT
-			}
+			m.mode = m.toggleMode(EDIT)
 			if m.mode == EDIT {
 				m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			}
@@ -270,11 +266,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, m.keymap.Bank):
 			m.selectedGrid = m.bank.Active
-			if m.mode == BANK {
-				m.mode = MOVE
-			} else {
-				m.mode = BANK
-			}
+			m.mode = m.toggleMode(BANK)
 			return m, nil
 		case key.Matches(msg, m.keymap.RootNoteUp):
 			if m.mode == EDIT {
@@ -306,8 +298,13 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keymap.TempoDown):
 			m.grid.SetTempo(m.grid.Tempo() - 1)
 			return m, save(m)
-		case key.Matches(msg, m.keymap.SelectMidiDevice):
-			m.grid.CycleMidiDevice()
+		case key.Matches(msg, m.keymap.Configuration):
+			m.mode = m.toggleMode(CONFIG)
+			m.params = [][]param.Param{
+				m.gridParams,
+			}
+			m.param = 0
+			m.paramPage = 0
 			return m, nil
 		case key.Matches(msg, m.keymap.Copy):
 			if m.mode == BANK {
@@ -531,6 +528,13 @@ func (m mainModel) windowResize(width, height int) mainModel {
 		m.cursorY = m.grid.Height - 1
 	}
 	return m
+}
+
+func (m mainModel) toggleMode(mo mode) mode {
+	if m.mode == mo {
+		return MOVE
+	}
+	return mo
 }
 
 func moveCursor(dir string, speed, x, y, minX, maxX, minY, maxY int) (int, int) {

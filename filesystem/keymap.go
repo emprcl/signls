@@ -51,8 +51,8 @@ type KeyMap struct {
 	TempoUp      string `json:"tempo_up"`
 	TempoDown    string `json:"tempo_down"`
 
-	SelectMidiDevice string `json:"select_midi_device"`
-	FitGridToWindow  string `json:"fit_grid_to_window"`
+	Configuration   string `json:"configuration"`
+	FitGridToWindow string `json:"fit_grid_to_window"`
 
 	Cancel string `json:"cancel"`
 
@@ -112,8 +112,8 @@ func NewDefaultAzertyKeyMap() KeyMap {
 		TempoUp:      "=",
 		TempoDown:    ")",
 
-		SelectMidiDevice: "f2",
-		FitGridToWindow:  "f10",
+		Configuration:   "f2",
+		FitGridToWindow: "f10",
 
 		Cancel: "esc",
 
@@ -175,8 +175,8 @@ func NewDefaultAzertyMacKeyMap() KeyMap {
 		TempoUp:      "-",
 		TempoDown:    ")",
 
-		SelectMidiDevice: "f2",
-		FitGridToWindow:  "f10",
+		Configuration:   "f2",
+		FitGridToWindow: "f10",
 
 		Cancel: "esc",
 
@@ -237,8 +237,8 @@ func NewDefaultQwertyKeyMap() KeyMap {
 		TempoUp:      "=",
 		TempoDown:    "-",
 
-		SelectMidiDevice: "f2",
-		FitGridToWindow:  "f10",
+		Configuration:   "f2",
+		FitGridToWindow: "f10",
 
 		Cancel: "esc",
 
@@ -300,8 +300,8 @@ func NewDefaultQwertyMacKeyMap() KeyMap {
 		TempoUp:      "=",
 		TempoDown:    "-",
 
-		SelectMidiDevice: "f2",
-		FitGridToWindow:  "f10",
+		Configuration:   "f2",
+		FitGridToWindow: "f10",
 
 		Cancel: "esc",
 
