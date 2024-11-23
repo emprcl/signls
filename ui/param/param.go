@@ -37,7 +37,7 @@ func NewParamsForNodes(grid *field.Grid, nodes []common.Node) [][]Param {
 
 	if isHomogeneousNode[*node.HoleEmitter](nodes) {
 		return [][]Param{
-			[]Param{
+			{
 				Destination{
 					nodes:  nodes,
 					width:  grid.Width,

@@ -29,15 +29,13 @@ const (
 	ProgramChangeControlType
 )
 
-var (
-	AllControlTypes = []ControlType{
-		SilentControlType,
-		ControlChangeControlType,
-		AfterTouchControlType,
-		PitchBendControlType,
-		ProgramChangeControlType,
-	}
-)
+var AllControlTypes = []ControlType{
+	SilentControlType,
+	ControlChangeControlType,
+	AfterTouchControlType,
+	PitchBendControlType,
+	ProgramChangeControlType,
+}
 
 type CC struct {
 	midi midi.Midi
@@ -89,11 +87,11 @@ func (c CC) Send(channel uint8) {
 	case SilentControlType:
 		return
 	case ControlChangeControlType:
-		c.midi.ControlChange(channel, c.Controller, uint8(c.Value.Computed()))
+		c.midi.ControlChange(channel, c.Controller, c.Value.Computed())
 	case AfterTouchControlType:
-		c.midi.AfterTouch(channel, uint8(c.Value.Computed()))
+		c.midi.AfterTouch(channel, c.Value.Computed())
 	case ProgramChangeControlType:
-		c.midi.ProgramChange(channel, uint8(c.Value.Computed()))
+		c.midi.ProgramChange(channel, c.Value.Computed())
 	case PitchBendControlType:
 		value := 0
 		if c.Value.Computed() != defaultPitchBendValue {

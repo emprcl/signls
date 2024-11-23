@@ -18,11 +18,11 @@ const (
 
 var (
 	pagesArrows = [][]string{
-		[]string{
+		{
 			"\u23F6",
 			"",
 		},
-		[]string{
+		{
 			"",
 			"\u23F7",
 		},
@@ -49,18 +49,18 @@ var (
 )
 
 func (m mainModel) renderControl() string {
-	if m.bankMode {
+	if m.mode == BANK {
 		return controlStyle.Render(m.bankSelection())
 	}
 
 	var pane string
-	if m.edit && m.input.Focused() {
+	if m.mode == EDIT && m.input.Focused() {
 		pane = fmt.Sprintf(
 			"%s %s",
 			m.activeParam().Name(),
 			m.input.View(),
 		)
-	} else if m.edit {
+	} else if m.mode == EDIT {
 		pane = m.nodeEdit()
 	} else {
 		pane = m.gridInfo()
@@ -193,13 +193,16 @@ func (m mainModel) transportSymbol() string {
 }
 
 func (m mainModel) modeName() string {
-	if m.bankMode {
+	switch m.mode {
+	case BANK:
 		return "bank"
-	}
-	if m.edit {
+	case EDIT:
 		return "edit"
+	case CONFIG:
+		return "config"
+	default:
+		return "move"
 	}
-	return "move"
 }
 
 func (m mainModel) selectedNode() common.Node {

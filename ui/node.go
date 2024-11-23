@@ -44,12 +44,12 @@ func (m mainModel) inSelectionRange(x, y int) bool {
 func (m mainModel) renderNode(n common.Node, x, y int) string {
 	// render cursor
 	isCursor := false
-	if x == m.cursorX && y == m.cursorY && !m.bankMode {
+	if x == m.cursorX && y == m.cursorY && m.mode != BANK {
 		isCursor = true
 	}
 
 	isTeleportDestination := false
-	if m.edit && len(m.params) > 0 {
+	if m.mode == EDIT && len(m.params) > 0 {
 		p, ok := m.activeParam().(param.Destination)
 		if ok {
 			destinationX, destinationY := p.Position()
@@ -61,11 +61,11 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 	teleportDestinationSymbol := node.HoleDestinationSymbol
 	if n == nil && isCursor {
 		return cursorStyle.Render("  ")
-	} else if n == nil && isTeleportDestination && !m.blink && !m.bankMode {
+	} else if n == nil && isTeleportDestination && !m.blink && m.mode != BANK {
 		return cursorStyle.Render(teleportDestinationSymbol)
-	} else if n == nil && isTeleportDestination && (m.blink || m.bankMode) {
+	} else if n == nil && isTeleportDestination && (m.blink || m.mode == BANK) {
 		return teleportDestinationStyle.Render(teleportDestinationSymbol)
-	} else if n == nil && m.inSelectionRange(x, y) && !m.bankMode {
+	} else if n == nil && m.inSelectionRange(x, y) && m.mode != BANK {
 		return selectionStyle.Render("..")
 	} else if n == nil {
 		if (x+y)%2 == 0 {
@@ -84,11 +84,11 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 	case music.Audible:
 		symbol := util.Normalize(n.Symbol())
 
-		if isCursor && !m.edit {
+		if isCursor && m.mode != EDIT {
 			return cursorStyle.Render(symbol)
-		} else if isTeleportDestination && m.edit && m.blink {
+		} else if isTeleportDestination && m.mode == EDIT && m.blink {
 			return teleportDestinationStyle.Render(teleportDestinationSymbol)
-		} else if isCursor && m.edit && m.blink {
+		} else if isCursor && m.mode == EDIT && m.blink {
 			return cursorStyle.Render(symbol)
 		} else if n.Activated() && t.Muted() {
 			return activeEmitterStyle.Render(symbol)
@@ -106,9 +106,9 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 	case *node.HoleEmitter:
 		symbol := n.Symbol()
 
-		if isCursor && !m.edit {
+		if isCursor && m.mode != EDIT {
 			return cursorStyle.Render(symbol)
-		} else if isCursor && m.edit && m.blink {
+		} else if isCursor && m.mode == EDIT && m.blink {
 			return cursorStyle.Render(symbol)
 		} else if n.Activated() {
 			return activeEmitterStyle.

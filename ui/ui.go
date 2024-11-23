@@ -30,6 +30,20 @@ const (
 	helpHeader = "signls %s - docs: https://empr.cl/signls/"
 )
 
+// mode is a representation of a ui mode
+type mode uint8
+
+const (
+	// MOVE mode allows moving the cursor on the grid
+	MOVE mode = iota
+	// EDIT mode allows node parameters edits
+	EDIT
+	// CONFIG mode allows global parameters edits
+	CONFIG
+	// BANK mode allows bank grids selection
+	BANK
+)
+
 // tickMsg is a message that triggers ui rrefresh
 type tickMsg time.Time
 
@@ -49,6 +63,7 @@ type mainModel struct {
 	params        [][]param.Param
 	gridParams    []param.Param
 	bankClipboard filesystem.Grid
+	mode          mode
 	version       string
 	cursorX       int
 	cursorY       int
@@ -57,8 +72,6 @@ type mainModel struct {
 	selectedGrid  int
 	param         int
 	paramPage     int
-	edit          bool
-	bankMode      bool
 	blink         bool
 	mute          bool
 }
@@ -145,7 +158,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		switch {
 		case key.Matches(msg, m.keymap.EditInput):
-			if !m.edit {
+			if m.mode != EDIT {
 				return m, nil
 			}
 			m.input.Focus()
@@ -156,11 +169,11 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, m.keymap.Up, m.keymap.Right, m.keymap.Down, m.keymap.Left):
 			dir := m.keymap.Direction(msg)
-			if m.bankMode {
+			if m.mode == BANK {
 				m.moveBankGrid(dir)
 				return m, nil
 			}
-			if m.edit {
+			if m.mode == EDIT {
 				m.moveParam(dir)
 				return m, nil
 			}
@@ -178,7 +191,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, m.keymap.SelectionUp, m.keymap.SelectionRight, m.keymap.SelectionDown, m.keymap.SelectionLeft):
 			dir := m.keymap.Direction(msg)
-			if m.edit {
+			if m.mode == EDIT {
 				m.handleParamAltEdit(dir)
 				return m, nil
 			}
@@ -190,7 +203,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, m.keymap.EditUp, m.keymap.EditRight, m.keymap.EditDown, m.keymap.EditLeft):
 			dir := m.keymap.Direction(msg)
-			if !m.edit {
+			if m.mode != EDIT {
 				param.NewDirection(m.selectedEmitters()).SetFromKeyString(dir)
 				return m, save(m)
 			}
@@ -215,24 +228,27 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.mute = !m.mute
 			return m, save(m)
 		case key.Matches(msg, m.keymap.RemoveNode):
-			if m.bankMode {
+			if m.mode != BANK {
 				m.bank.ClearGrid(m.selectedGrid)
 				return m.loadGridFromBank(), tea.WindowSize()
 			}
-			m.edit = false
+			m.mode = MOVE
 			m.grid.RemoveNodes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			return m, save(m)
 		case key.Matches(msg, m.keymap.EditNode):
-			if m.bankMode {
-				m.bankMode = false
-				m.edit = false
+			if m.mode == BANK {
+				m.mode = MOVE
 				return m.loadGridFromBank(), tea.WindowSize()
 			}
 			if len(m.selectedEmitters()) == 0 {
 				return m, nil
 			}
-			m.edit = !m.edit
-			if m.edit {
+			if m.mode == EDIT {
+				m.mode = MOVE
+			} else {
+				m.mode = EDIT
+			}
+			if m.mode == EDIT {
 				m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			}
 			if len(m.params) < m.paramPage+1 {
@@ -254,28 +270,32 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, m.keymap.Bank):
 			m.selectedGrid = m.bank.Active
-			m.bankMode = !m.bankMode
+			if m.mode == BANK {
+				m.mode = MOVE
+			} else {
+				m.mode = BANK
+			}
 			return m, nil
 		case key.Matches(msg, m.keymap.RootNoteUp):
-			if m.edit {
+			if m.mode == EDIT {
 				return m, nil
 			}
 			param.Get("root", m.gridParams).Up()
 			return m, save(m)
 		case key.Matches(msg, m.keymap.RootNoteDown):
-			if m.edit {
+			if m.mode == EDIT {
 				return m, nil
 			}
 			param.Get("root", m.gridParams).Down()
 			return m, save(m)
 		case key.Matches(msg, m.keymap.ScaleUp):
-			if m.edit {
+			if m.mode == EDIT {
 				return m, nil
 			}
 			param.Get("scale", m.gridParams).Up()
 			return m, save(m)
 		case key.Matches(msg, m.keymap.ScaleDown):
-			if m.edit {
+			if m.mode == EDIT {
 				return m, nil
 			}
 			param.Get("scale", m.gridParams).Down()
@@ -290,14 +310,14 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.grid.CycleMidiDevice()
 			return m, nil
 		case key.Matches(msg, m.keymap.Copy):
-			if m.bankMode {
+			if m.mode == BANK {
 				m.bankClipboard = m.bank.Grids[m.selectedGrid]
 				return m, nil
 			}
 			m.grid.CopyOrCut(m.cursorX, m.cursorY, m.selectionX, m.selectionY, false)
 			return m, nil
 		case key.Matches(msg, m.keymap.Cut):
-			if m.bankMode {
+			if m.mode == BANK {
 				m.bankClipboard = m.bank.Grids[m.selectedGrid]
 				m.bank.ClearGrid(m.selectedGrid)
 				if m.bank.Active == m.selectedGrid {
@@ -308,15 +328,14 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.grid.CopyOrCut(m.cursorX, m.cursorY, m.selectionX, m.selectionY, true)
 			return m, nil
 		case key.Matches(msg, m.keymap.Paste):
-			if m.bankMode {
+			if m.mode == BANK {
 				m.bank.Grids[m.selectedGrid] = m.bankClipboard
 			}
 			m.grid.Paste(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 			return m, save(m)
 		case key.Matches(msg, m.keymap.Cancel):
-			m.edit = false
-			m.bankMode = false
+			m.mode = MOVE
 			m.selectionX = m.cursorX
 			m.selectionY = m.cursorY
 			m.help.ShowAll = false

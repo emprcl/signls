@@ -29,7 +29,11 @@ type Grid struct {
 	Scale music.Scale
 
 	Playing bool
-	pulse   uint64 // Global pulse counter for timing events
+
+	SendClock     bool
+	SendTransport bool
+
+	pulse uint64 // Global pulse counter for timing events
 
 	clipboard [][]common.Node
 }
@@ -52,7 +56,9 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 		if !grid.Playing {
 			return
 		}
-		grid.midi.SendClock()
+		if grid.SendClock {
+			grid.midi.SendClock()
+		}
 		grid.Update()
 	})
 
@@ -65,9 +71,16 @@ func (g *Grid) TogglePlay() {
 	if !g.Playing {
 		g.Reset()
 		g.midi.SilenceAll()
-		g.midi.TransportStop()
-	} else {
+	}
+
+	if !g.SendTransport {
+		return
+	}
+
+	if g.Playing {
 		g.midi.TransportStart()
+	} else {
+		g.midi.TransportStop()
 	}
 }
 
