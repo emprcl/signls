@@ -145,6 +145,15 @@ func (g *Grid) Load(grid filesystem.Grid) {
 			a.Note().Length.SetMin(uint8(n.Note.Length.Min))
 			a.Note().Length.SetMax(uint8(n.Note.Length.Max))
 			a.Note().Probability = uint8(n.Note.Probability)
+
+			for i, c := range n.Note.Controls {
+				a.Note().Controls[i].Type = music.ControlType(c.Type)
+				a.Note().Controls[i].Controller = uint8(c.Controller)
+				a.Note().Controls[i].Value.Set(uint8(c.Value.Value))
+				a.Note().Controls[i].Value.SetMin(uint8(c.Value.Min))
+				a.Note().Controls[i].Value.SetMax(uint8(c.Value.Max))
+				a.Note().Controls[i].Value.SetRandomAmount(c.Value.Amount)
+			}
 		}
 
 		g.nodes[n.Y][n.X] = newNode

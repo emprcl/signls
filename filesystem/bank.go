@@ -80,15 +80,21 @@ type Note struct {
 	Velocity    Param `json:"velocity"`
 	Length      Param `json:"length"`
 	Probability int   `json:"probability"`
+	Controls    []CC  `json:"controls"`
 }
 
 func NewNote(n music.Note) Note {
+	controls := make([]CC, len(n.Controls))
+	for i, c := range n.Controls {
+		controls[i] = NewCC(*c)
+	}
 	return Note{
 		Key:         NewKey(*n.Key),
 		Channel:     NewParam(*n.Channel),
 		Velocity:    NewParam(*n.Velocity),
 		Length:      NewParam(*n.Length),
 		Probability: int(n.Probability),
+		Controls:    controls,
 	}
 }
 
@@ -103,6 +109,20 @@ func NewKey(key music.KeyValue) Key {
 		Key:    int(key.BaseValue()),
 		Amount: key.RandomAmount(),
 		Silent: key.IsSilent(),
+	}
+}
+
+type CC struct {
+	Type       int   `json:"type"`
+	Controller int   `json:"controller"`
+	Value      Param `json:"value"`
+}
+
+func NewCC(cc music.CC) CC {
+	return CC{
+		Type:       int(cc.Type),
+		Controller: int(cc.Controller),
+		Value:      NewParam(*cc.Value),
 	}
 }
 

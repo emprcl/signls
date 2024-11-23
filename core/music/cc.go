@@ -8,7 +8,7 @@ import (
 const (
 	defaultController uint8 = 0
 	minController     uint8 = 0
-	maxController     uint8 = 127
+	maxController     uint8 = 119
 
 	defaultControlValue uint8 = 0
 	minControlValue     uint8 = 0
