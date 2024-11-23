@@ -3,7 +3,7 @@ package common
 import "time"
 
 const (
-	PulsesPerStep       int = 4
+	PulsesPerStep       int = 6
 	StepsPerQuarterNote int = 4
 
 	tempoMin         float64 = 1.0
