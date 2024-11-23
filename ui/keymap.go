@@ -69,7 +69,7 @@ type keyMap struct {
 // ShortHelp returns keybindings to be shown in the mini help view. It's part
 // of the key.Map interface.
 func (k keyMap) ShortHelp() []key.Binding {
-	return []key.Binding{k.Help, k.Quit}
+	return []key.Binding{k.Help, k.Configuration, k.Quit}
 }
 
 // FullHelp returns keybindings for the expanded help view. It's part of the
@@ -280,7 +280,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		Configuration: key.NewBinding(
 			key.WithKeys(keys.Configuration),
-			key.WithHelp(keys.Configuration, "global configuration"),
+			key.WithHelp(keys.Configuration, "config"),
 		),
 		FitGridToWindow: key.NewBinding(
 			key.WithKeys(keys.FitGridToWindow),

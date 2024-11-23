@@ -144,7 +144,6 @@ func (m mainModel) gridInfo() string {
 				activeBankStyle.Render(bankGridLabel(m.bank.Active, m.bank.ActiveGrid())),
 				m.bank.Filename(),
 			),
-			m.grid.MidiDevice(),
 		),
 	)
 }
