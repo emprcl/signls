@@ -1,45 +1,67 @@
 package music
 
 import (
-	"math/rand"
 	"signls/core/common"
 	"signls/midi"
-	"time"
+)
+
+const (
+	defaultController uint8 = 0
+	minController     uint8 = 0
+	maxController     uint8 = 127
+
+	defaultControlValue uint8 = 0
+	minControlValue     uint8 = 0
+	maxControlValue     uint8 = 127
 )
 
 type ControlType int
 
 const (
-	NONEType ControlType = iota
-	CCType
-	RPNType
-	NRPNType
+	NONEControlType ControlType = iota
+	CCControlType
+	ATControlType // After Touch
+)
+
+var (
+	AllControlTypes = []ControlType{
+		NONEControlType,
+		CCControlType,
+		ATControlType,
+	}
 )
 
 type CC struct {
 	midi midi.Midi
 
-	rand *rand.Rand
-
 	Type       ControlType
 	Controller uint8
-	Value      common.ControlValue[uint8]
+	Value      *common.ControlValue[uint8]
 }
 
 func NewCC(midi midi.Midi, controlType ControlType) *CC {
-	source := rand.NewSource(time.Now().UnixNano())
 	return &CC{
-		midi: midi,
-		rand: rand.New(source),
-		Type: controlType,
+		midi:       midi,
+		Type:       controlType,
+		Controller: defaultController,
+		Value:      common.NewControlValue[uint8](defaultControlValue, minControlValue, maxControlValue),
 	}
+}
+
+func (c *CC) SetController(controller uint8) {
+	if controller < minController || controller > maxController {
+		return
+	}
+	c.Controller = controller
 }
 
 func (c CC) Send(channel uint8) {
 	switch c.Type {
-	case NONEType:
+	case NONEControlType:
 		return
-	case CCType:
-		c.midi.ControlChange(channel, c.Controller, c.Value.Computed())
+	case CCControlType:
+		c.midi.ControlChange(channel, c.Controller, uint8(c.Value.Computed()))
+	case ATControlType:
+		c.midi.AfterTouch(channel, uint8(c.Value.Computed()))
 	}
 }

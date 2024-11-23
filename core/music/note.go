@@ -49,7 +49,7 @@ func NewNote(midi midi.Midi) *Note {
 	source := rand.NewSource(time.Now().UnixNano())
 	ccs := make([]*CC, defaultCCNumbers)
 	for i := range ccs {
-		ccs[i] = NewCC(midi, NONEType)
+		ccs[i] = NewCC(midi, NONEControlType)
 	}
 	return &Note{
 		midi:        midi,

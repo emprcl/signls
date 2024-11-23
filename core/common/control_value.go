@@ -7,7 +7,7 @@ import (
 )
 
 type Number interface {
-	int | uint8
+	int | uint8 | int16
 }
 
 type ControlValue[T Number] struct {
