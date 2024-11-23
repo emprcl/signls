@@ -75,6 +75,7 @@ func (c *CC) SetController(controller uint8) {
 
 func (c *CC) SetType(t int) {
 	c.Type = ControlType(t)
+	c.Controller = defaultController
 	c.Value.SetRandomAmount(0)
 	if c.Type == PitchBendControlType {
 		c.Value.Set(defaultPitchBendValue)

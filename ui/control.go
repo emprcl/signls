@@ -47,7 +47,7 @@ func (m mainModel) renderControl() string {
 	if m.edit && m.input.Focused() {
 		pane = fmt.Sprintf(
 			"%s %s",
-			m.params[m.param].Name(),
+			m.activeParam().Name(),
 			m.input.View(),
 		)
 	} else if m.edit {
@@ -141,7 +141,7 @@ func (m mainModel) gridInfo() string {
 
 func (m mainModel) nodeEdit() string {
 	params := []string{}
-	for k, p := range m.params {
+	for k, p := range m.activeParamPage() {
 		style := cellStyle
 		if k == m.param {
 			style = activeCellStyle

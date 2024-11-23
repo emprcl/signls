@@ -50,7 +50,7 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 
 	isTeleportDestination := false
 	if m.edit && len(m.params) > 0 {
-		p, ok := m.params[m.param].(param.Destination)
+		p, ok := m.activeParam().(param.Destination)
 		if ok {
 			destinationX, destinationY := p.Position()
 			isTeleportDestination = (destinationX == x && destinationY == y)

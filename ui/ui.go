@@ -46,7 +46,7 @@ type mainModel struct {
 	keymap        keyMap
 	help          help.Model
 	input         textinput.Model
-	params        []param.Param
+	params        [][]param.Param
 	gridParams    []param.Param
 	bankClipboard filesystem.Grid
 	version       string
@@ -56,6 +56,7 @@ type mainModel struct {
 	selectionY    int
 	selectedGrid  int
 	param         int
+	paramPage     int
 	edit          bool
 	bankMode      bool
 	blink         bool
@@ -129,7 +130,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch {
 			case key.Matches(msg, m.keymap.EditNode):
 				m.input.Blur()
-				m.params[m.param].SetEditValue(m.input.Value())
+				m.activeParam().SetEditValue(m.input.Value())
 				return m, nil
 			case key.Matches(msg, m.keymap.Cancel, m.keymap.EditInput):
 				m.input.Blur()
@@ -198,7 +199,10 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keymap.AddBang, m.keymap.AddSpread, m.keymap.AddCycle, m.keymap.AddDice, m.keymap.AddToll, m.keymap.AddEuclid, m.keymap.AddZone, m.keymap.AddPass, m.keymap.AddHole):
 			m.grid.AddNodeFromSymbol(m.keymap.EmitterSymbol(msg), m.cursorX, m.cursorY)
 			newParams := param.NewParamsForNodes(m.grid, m.selectedEmitters())
-			if len(newParams) < m.param+1 {
+			if len(newParams) < m.paramPage+1 {
+				m.paramPage = 0
+			}
+			if len(newParams[m.paramPage]) < m.param+1 {
 				m.param = 0
 			}
 			m.params = newParams
@@ -226,7 +230,10 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if len(m.selectedEmitters()) == 0 {
 				return m, nil
 			}
-			if len(m.params) < m.param+1 {
+			if len(m.params) < m.paramPage+1 {
+				m.paramPage = 0
+			}
+			if len(m.activeParamPage()) < m.param+1 {
 				m.param = 0
 			}
 			m.edit = !m.edit
@@ -309,7 +316,6 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keymap.Cancel):
 			m.edit = false
 			m.bankMode = false
-			m.param = 0
 			m.selectionX = m.cursorX
 			m.selectionY = m.cursorY
 			m.help.ShowAll = false
@@ -359,24 +365,24 @@ func (m mainModel) View() string {
 }
 
 func (m mainModel) handleParamEdit(dir string) {
-	if len(m.params) < m.param+1 {
+	if len(m.activeParamPage()) < m.param+1 {
 		return
 	}
 
 	switch dir {
 	case "up":
-		m.params[m.param].Up()
+		m.activeParam().Up()
 	case "down":
-		m.params[m.param].Down()
+		m.activeParam().Down()
 	case "left":
-		m.params[m.param].Left()
+		m.activeParam().Left()
 		return // no preview for alt param
 	case "right":
-		m.params[m.param].Right()
+		m.activeParam().Right()
 		return // no preview for alt param
 	}
 
-	switch p := m.params[m.param].(type) {
+	switch p := m.activeParam().(type) {
 	case *param.Key:
 		if m.grid.Playing {
 			return
@@ -386,20 +392,28 @@ func (m mainModel) handleParamEdit(dir string) {
 }
 
 func (m mainModel) handleParamAltEdit(dir string) {
-	if len(m.params) < m.param+1 {
+	if len(m.activeParamPage()) < m.param+1 {
 		return
 	}
 
 	switch dir {
 	case "up":
-		m.params[m.param].AltUp()
+		m.activeParam().AltUp()
 	case "down":
-		m.params[m.param].AltDown()
+		m.activeParam().AltDown()
 	case "left":
-		m.params[m.param].AltLeft()
+		m.activeParam().AltLeft()
 	case "right":
-		m.params[m.param].AltRight()
+		m.activeParam().AltRight()
 	}
+}
+
+func (m mainModel) activeParam() param.Param {
+	return m.params[m.paramPage][m.param]
+}
+
+func (m mainModel) activeParamPage() []param.Param {
+	return m.params[m.paramPage]
 }
 
 func (m mainModel) renderGrid() string {
@@ -416,12 +430,24 @@ func (m mainModel) renderGrid() string {
 }
 
 func (m *mainModel) moveParam(dir string) {
-	if len(m.params) == 0 {
+	if len(m.activeParamPage()) == 0 {
 		return
 	}
 	switch dir {
+	case "up":
+		if m.paramPage+1 >= len(m.params) {
+			return
+		}
+		m.param = 0
+		m.paramPage++
+	case "down":
+		if m.paramPage-1 < 0 {
+			return
+		}
+		m.param = 0
+		m.paramPage--
 	case "right":
-		if m.param+1 >= len(m.params) {
+		if m.param+1 >= len(m.activeParamPage()) {
 			return
 		}
 		m.param++

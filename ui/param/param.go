@@ -7,6 +7,10 @@ import (
 	"signls/core/node"
 )
 
+const (
+	defaultControlParamsNumber = 8
+)
+
 type Param interface {
 	Name() string
 	Value() int
@@ -26,35 +30,47 @@ type Param interface {
 	AltRight()
 }
 
-func NewParamsForNodes(grid *field.Grid, nodes []common.Node) []Param {
+func NewParamsForNodes(grid *field.Grid, nodes []common.Node) [][]Param {
 	if len(nodes) == 0 {
-		return []Param{}
+		return [][]Param{}
 	}
 
 	if isHomogeneousNode[*node.HoleEmitter](nodes) {
-		return []Param{
-			Destination{
-				nodes:  nodes,
-				width:  grid.Width,
-				height: grid.Height,
+		return [][]Param{
+			[]Param{
+				Destination{
+					nodes:  nodes,
+					width:  grid.Width,
+					height: grid.Height,
+				},
 			},
 		}
 	} else if isHomogeneousBehavior[*node.TollEmitter](nodes) {
-		return append(
-			DefaultEmitterParams(grid, nodes),
-			Threshold{nodes: nodes},
-		)
+		return [][]Param{
+			append(
+				DefaultEmitterParams(grid, nodes),
+				Threshold{nodes: nodes},
+			),
+			DefaultEmitterControlChanges(nodes),
+		}
 	} else if isHomogeneousNode[*node.EuclidEmitter](nodes) {
-		return append(
-			DefaultEmitterParams(grid, nodes),
-			Steps{nodes: nodes},
-			Triggers{nodes: nodes},
-			Offset{nodes: nodes},
-		)
+		return [][]Param{
+			append(
+				DefaultEmitterParams(grid, nodes),
+				Steps{nodes: nodes},
+				Triggers{nodes: nodes},
+				Offset{nodes: nodes},
+			),
+			DefaultEmitterControlChanges(nodes),
+		}
 	}
 
 	emitters := filterNodes[music.Audible](nodes)
-	return DefaultEmitterParams(grid, emitters)
+
+	return [][]Param{
+		DefaultEmitterParams(grid, emitters),
+		DefaultEmitterControlChanges(emitters),
+	}
 }
 
 func DefaultEmitterParams(grid *field.Grid, nodes []common.Node) []Param {
@@ -74,10 +90,15 @@ func DefaultEmitterParams(grid *field.Grid, nodes []common.Node) []Param {
 		Length{nodes: nodes},
 		Channel{nodes: nodes},
 		Probability{nodes: nodes},
-		Control{index: 0, nodes: nodes},
-		Control{index: 1, nodes: nodes},
-		Control{index: 2, nodes: nodes},
 	}
+}
+
+func DefaultEmitterControlChanges(nodes []common.Node) []Param {
+	params := make([]Param, defaultControlParamsNumber)
+	for i := range params {
+		params[i] = Control{index: i, nodes: nodes}
+	}
+	return params
 }
 
 func NewParamsForGrid(grid *field.Grid) []Param {
