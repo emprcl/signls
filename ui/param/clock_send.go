@@ -9,7 +9,7 @@ type ClockSend struct {
 }
 
 func (c ClockSend) Name() string {
-	return "clock send"
+	return "clock"
 }
 
 func (c ClockSend) Display() string {

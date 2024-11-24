@@ -9,7 +9,7 @@ type TransportSend struct {
 }
 
 func (t TransportSend) Name() string {
-	return "transport send"
+	return "transport"
 }
 
 func (t TransportSend) Display() string {
