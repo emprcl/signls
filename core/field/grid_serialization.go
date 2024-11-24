@@ -69,12 +69,14 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 	}
 
 	bank.Save(filesystem.Grid{
-		Nodes:  nodes,
-		Tempo:  g.Tempo(),
-		Height: g.Height,
-		Width:  g.Width,
-		Key:    uint8(g.Key),
-		Scale:  uint16(g.Scale),
+		Nodes:         nodes,
+		Tempo:         g.Tempo(),
+		Height:        g.Height,
+		Width:         g.Width,
+		Key:           uint8(g.Key),
+		Scale:         uint16(g.Scale),
+		SendClock:     g.SendClock,
+		SendTransport: g.SendTransport,
 	})
 }
 
@@ -88,6 +90,8 @@ func (g *Grid) Load(grid filesystem.Grid) {
 	g.clock.SetTempo(grid.Tempo)
 	g.Key = music.Key(grid.Key)
 	g.Scale = music.Scale(grid.Scale)
+	g.SendClock = grid.SendClock
+	g.SendTransport = grid.SendTransport
 	g.Resize(grid.Width, grid.Height)
 
 	g.nodes = make([][]common.Node, g.Height)

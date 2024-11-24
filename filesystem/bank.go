@@ -43,6 +43,9 @@ type Grid struct {
 
 	Key   uint8  `json:"key"`
 	Scale uint16 `json:"scale"`
+
+	SendClock     bool `json:"send_clock"`
+	SendTransport bool `json:"send_transport"`
 }
 
 // NewGrid creates a new grid with default values.
