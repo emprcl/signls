@@ -107,7 +107,7 @@ For qwerty keyboards, here's the default mapping:
  - `"` `:` **modify scale**
  - `ctrl`+`c` `x` `v`  **copy, cut, paste selection**
  - `escape` **exit parameter edit or bank selection**
- - `f2` **select midi device**
+ - `f2` **edit configuration**
  - `f10` **fit grid to window**
  - `?` **show help**
  - `ctrl`+`q` **quit**
