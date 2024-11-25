@@ -228,7 +228,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.mute = !m.mute
 			return m, save(m)
 		case key.Matches(msg, m.keymap.RemoveNode):
-			if m.mode != BANK {
+			if m.mode == BANK {
 				m.bank.ClearGrid(m.selectedGrid)
 				return m.loadGridFromBank(), tea.WindowSize()
 			}
