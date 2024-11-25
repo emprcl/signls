@@ -26,7 +26,7 @@ type Key struct {
 }
 
 func (k *Key) Name() string {
-	return k.nodes[0].(music.Audible).Note().Key.Name()
+	return "key"
 }
 
 func (k *Key) Display() string {

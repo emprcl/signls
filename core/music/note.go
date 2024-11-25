@@ -1,6 +1,7 @@
 package music
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -191,4 +192,21 @@ func (n *Note) SetChannel(channel uint8) {
 // which might be used for timing or synchronization purposes.
 func (n *Note) ClockDivision() (int, int) {
 	return common.PulsesPerStep, common.StepsPerQuarterNote
+}
+
+// Symbol returns the string symbol associated with the current note.
+func (n *Note) Symbol() string {
+	var keySymbol, ccSymbol string
+	if n.Key.silent {
+		keySymbol = "\u0353"
+	} else if n.Key.amount != 0 {
+		keySymbol = "\u033c"
+	}
+	for _, c := range n.Controls {
+		if c.Type != SilentControlType {
+			ccSymbol = "\u0307"
+			break
+		}
+	}
+	return fmt.Sprintf("%s%s", keySymbol, ccSymbol)
 }

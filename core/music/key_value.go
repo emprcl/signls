@@ -109,17 +109,3 @@ func (p *KeyValue) IsSilent() bool {
 func (p *KeyValue) SetSilent(silent bool) {
 	p.silent = silent
 }
-
-func (p *KeyValue) Name() string {
-	return "key"
-}
-
-func (p *KeyValue) Symbol() string {
-	if p.silent {
-		return "\u0353"
-	}
-	if p.amount != 0 {
-		return "\u033c"
-	}
-	return ""
-}

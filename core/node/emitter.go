@@ -117,12 +117,12 @@ func (e *Emitter) Symbol() string {
 		return fmt.Sprintf("%.2s", symbol)
 	}
 	if _, ok := e.behavior.(*PassEmitter); ok {
-		return fmt.Sprintf("%s%s%s", symbol, e.note.Key.Symbol(), "⇌")
+		return fmt.Sprintf("%s%s%s", symbol, e.note.Symbol(), "⇌")
 	}
 	if e.note == nil {
 		return fmt.Sprintf("%s%s", symbol, e.direction.Symbol())
 	}
-	return fmt.Sprintf("%s%s%s", symbol, e.note.Key.Symbol(), e.direction.Symbol())
+	return fmt.Sprintf("%s%s%s", symbol, e.note.Symbol(), e.direction.Symbol())
 }
 
 func (e *Emitter) Name() string {
