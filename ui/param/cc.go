@@ -114,5 +114,5 @@ func (c CC) SetEditValue(input string) {
 	if err != nil {
 		return
 	}
-	c.Set(value - 1)
+	c.Set(value)
 }
