@@ -46,6 +46,10 @@ jobs:
         run: go build -ldflags "-linkmode 'external' -extldflags '-static'" -o bin/signls.exe
         if: startsWith(matrix.os, 'windows')
 
+      - name: Build windows 32
+        run: go build GOARCH=386 -ldflags "-linkmode 'external' -extldflags '-static'" -o bin/signls32.exe
+        if: startsWith(matrix.os, 'windows')
+
       - name: Tar.gz linux|mac files
         run: tar -zcvf signls_${{ github.ref_name }}_${{ runner.os}}.tar.gz LICENSE -C bin signls
         if: ${{ !startsWith(matrix.os, 'windows') }}
@@ -54,6 +58,12 @@ jobs:
         shell: pwsh
         run: |
           Compress-Archive bin\signls.exe signls_${{ github.ref_name }}_${{ runner.os}}.zip
+        if: ${{ startsWith(matrix.os, 'windows') }}
+
+      - name: Zip windows 32 files
+        shell: pwsh
+        run: |
+          Compress-Archive bin\signls32.exe signls_${{ github.ref_name }}_${{ runner.os}}_32.zip
         if: ${{ startsWith(matrix.os, 'windows') }}
 
       - name: Upload linux|mac artifact
@@ -69,6 +79,14 @@ jobs:
         with:
           name: signls_${{ github.sha }}_${{ runner.os}}
           path: signls_${{ github.ref_name }}_${{ runner.os}}.zip
+          if-no-files-found: error
+        if: ${{ startsWith(matrix.os, 'windows') }}
+
+      - name: Upload windows 32 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: signls_${{ github.sha }}_${{ runner.os}}_32
+          path: signls_${{ github.ref_name }}_${{ runner.os}}_32.zip
           if-no-files-found: error
         if: ${{ startsWith(matrix.os, 'windows') }}
 
