@@ -47,7 +47,7 @@ jobs:
         if: startsWith(matrix.os, 'windows')
 
       - name: Build windows 32
-        run: go build GOARCH=386 -ldflags "-linkmode 'external' -extldflags '-static'" -o bin/signls32.exe
+        run: GOARCH=386 go build -ldflags "-linkmode 'external' -extldflags '-static'" -o bin/signls32.exe
         if: startsWith(matrix.os, 'windows')
 
       - name: Tar.gz linux|mac files
