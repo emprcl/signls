@@ -1,6 +1,6 @@
 module signls
 
-go 1.23
+go 1.20
 
 require (
 	github.com/charmbracelet/bubbles v0.20.0
