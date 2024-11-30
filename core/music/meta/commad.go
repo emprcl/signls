@@ -14,7 +14,7 @@ const (
 type Command interface {
 	Active() bool
 	SetActive(active bool)
-	//Copy() Command
+	Copy() Command
 	Execute()
 	Executed() bool
 	Value() *common.ControlValue[int]
@@ -31,6 +31,14 @@ type RootCommand struct {
 func NewRootCommand() *RootCommand {
 	return &RootCommand{
 		value: common.NewControlValue[int](defaultKey, minKey, maxKey),
+	}
+}
+
+func (c *RootCommand) Copy() Command {
+	newValue := *c.value
+	return &RootCommand{
+		value:  &newValue,
+		active: c.active,
 	}
 }
 

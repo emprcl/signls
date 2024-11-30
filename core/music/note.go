@@ -81,15 +81,20 @@ func (n Note) Copy() *Note {
 	for i, c := range n.Controls {
 		newControls[i] = c.Copy()
 	}
+	newCmds := make([]meta.Command, len(n.MetaCommands))
+	for i, c := range n.MetaCommands {
+		newCmds[i] = c.Copy()
+	}
 	return &Note{
-		midi:        n.midi,
-		rand:        rand.New(source),
-		Key:         &newKey,
-		Channel:     &newChannel,
-		Velocity:    &newVelocity,
-		Length:      &newLength,
-		Probability: n.Probability,
-		Controls:    newControls,
+		midi:         n.midi,
+		rand:         rand.New(source),
+		Key:          &newKey,
+		Channel:      &newChannel,
+		Velocity:     &newVelocity,
+		Length:       &newLength,
+		Probability:  n.Probability,
+		Controls:     newControls,
+		MetaCommands: newCmds,
 	}
 }
 
