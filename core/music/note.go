@@ -57,6 +57,7 @@ func NewNote(midi midi.Midi) *Note {
 	}
 	cmds := []meta.Command{
 		meta.NewTempoCommand(),
+		meta.NewBankCommand(),
 		meta.NewRootCommand(),
 		meta.NewScaleCommand(),
 	}

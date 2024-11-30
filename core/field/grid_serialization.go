@@ -11,9 +11,9 @@ import (
 	"signls/midi"
 )
 
-func NewFromBank(grid filesystem.Grid, midi midi.Midi) *Grid {
+func NewFromBank(bankIndex int, grid filesystem.Grid, midi midi.Midi) *Grid {
 	newGrid := NewGrid(grid.Width, grid.Height, midi)
-	newGrid.Load(grid)
+	newGrid.Load(bankIndex, grid)
 	return newGrid
 }
 
@@ -81,13 +81,14 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 	})
 }
 
-func (g *Grid) Load(grid filesystem.Grid) {
+func (g *Grid) Load(index int, grid filesystem.Grid) {
 	g.Reset()
 	g.midi.SilenceAll()
 
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
+	g.BankIndex = index
 	g.clock.SetTempo(grid.Tempo)
 	g.Key = theory.Key(grid.Key)
 	g.Scale = theory.Scale(grid.Scale)
@@ -107,9 +108,12 @@ func (g *Grid) Load(grid filesystem.Grid) {
 			newNode = node.NewBangEmitter(g.midi, common.Direction(n.Direction), true)
 		case "euclid":
 			newNode = node.NewEuclidEmitter(g.midi, common.Direction(n.Direction))
-			newNode.(*node.EuclidEmitter).Steps = filesystem.NewParamFromFile[int](n.Params["steps"])
-			newNode.(*node.EuclidEmitter).Triggers = filesystem.NewParamFromFile[int](n.Params["triggers"])
-			newNode.(*node.EuclidEmitter).Offset = filesystem.NewParamFromFile[int](n.Params["offset"])
+			newNode.(*node.EuclidEmitter).Steps.Set(n.Params["steps"].Value)
+			newNode.(*node.EuclidEmitter).Steps.SetRandomAmount(n.Params["steps"].Amount)
+			newNode.(*node.EuclidEmitter).Steps.Set(n.Params["triggers"].Value)
+			newNode.(*node.EuclidEmitter).Steps.SetRandomAmount(n.Params["triggers"].Amount)
+			newNode.(*node.EuclidEmitter).Steps.Set(n.Params["offset"].Value)
+			newNode.(*node.EuclidEmitter).Steps.SetRandomAmount(n.Params["offset"].Amount)
 		case "pass":
 			newNode = node.NewPassEmitter(g.midi, common.Direction(n.Direction))
 		case "spread":
@@ -120,13 +124,16 @@ func (g *Grid) Load(grid filesystem.Grid) {
 			newNode = node.NewDiceEmitter(g.midi, common.Direction(n.Direction))
 		case "toll":
 			newNode = node.NewTollEmitter(g.midi, common.Direction(n.Direction))
-			newNode.(common.Behavioral).Behavior().(*node.TollEmitter).Threshold = filesystem.NewParamFromFile[int](n.Params["threshold"])
+			newNode.(common.Behavioral).Behavior().(*node.TollEmitter).Threshold.Set(n.Params["threshold"].Value)
+			newNode.(common.Behavioral).Behavior().(*node.TollEmitter).Threshold.SetRandomAmount(n.Params["threshold"].Amount)
 		case "zone":
 			newNode = node.NewZoneEmitter(g.midi, common.Direction(n.Direction))
 		case "hole":
 			newNode = node.NewHoleEmitter(common.Direction(n.Direction), n.X, n.Y, g.Width, g.Height)
-			newNode.(*node.HoleEmitter).DestinationX = filesystem.NewParamFromFile[int](n.Params["destinationX"])
-			newNode.(*node.HoleEmitter).DestinationY = filesystem.NewParamFromFile[int](n.Params["destinationY"])
+			newNode.(*node.HoleEmitter).DestinationX.Set(n.Params["destinationX"].Value)
+			newNode.(*node.HoleEmitter).DestinationX.SetRandomAmount(n.Params["destinationX"].Amount)
+			newNode.(*node.HoleEmitter).DestinationX.Set(n.Params["destinationY"].Value)
+			newNode.(*node.HoleEmitter).DestinationX.SetRandomAmount(n.Params["destinationY"].Amount)
 		default:
 			log.Printf("cannot load node of type %s", n.Type)
 			continue
@@ -139,24 +146,16 @@ func (g *Grid) Load(grid filesystem.Grid) {
 			a.Note().Key.SetSilent(n.Note.Key.Silent)
 			a.Note().Channel.Set(uint8(n.Note.Channel.Value))
 			a.Note().Channel.SetRandomAmount(n.Note.Channel.Amount)
-			a.Note().Channel.SetMin(uint8(n.Note.Channel.Min))
-			a.Note().Channel.SetMax(uint8(n.Note.Channel.Max))
 			a.Note().Velocity.Set(uint8(n.Note.Velocity.Value))
 			a.Note().Velocity.SetRandomAmount(n.Note.Velocity.Amount)
-			a.Note().Velocity.SetMin(uint8(n.Note.Velocity.Min))
-			a.Note().Velocity.SetMax(uint8(n.Note.Velocity.Max))
 			a.Note().Length.Set(uint8(n.Note.Length.Value))
 			a.Note().Length.SetRandomAmount(n.Note.Length.Amount)
-			a.Note().Length.SetMin(uint8(n.Note.Length.Min))
-			a.Note().Length.SetMax(uint8(n.Note.Length.Max))
 			a.Note().Probability = uint8(n.Note.Probability)
 
 			for i, c := range n.Note.Controls {
 				a.Note().Controls[i].Type = music.ControlType(c.Type)
 				a.Note().Controls[i].Controller = uint8(c.Controller)
 				a.Note().Controls[i].Value.Set(uint8(c.Value.Value))
-				a.Note().Controls[i].Value.SetMin(uint8(c.Value.Min))
-				a.Note().Controls[i].Value.SetMax(uint8(c.Value.Max))
 				a.Note().Controls[i].Value.SetRandomAmount(c.Value.Amount)
 			}
 
@@ -164,8 +163,6 @@ func (g *Grid) Load(grid filesystem.Grid) {
 				cmd := n.Note.MetaCommands[c.Name()]
 				c.SetActive(cmd.Active)
 				c.Value().Set(cmd.Value.Value)
-				c.Value().SetMin(cmd.Value.Min)
-				c.Value().SetMax(cmd.Value.Max)
 				c.Value().SetRandomAmount(cmd.Value.Amount)
 			}
 		}

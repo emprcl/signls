@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	rootCmdIndex = 1
+	rootCmdIndex = 2
 )
 
 type RootCmd struct {

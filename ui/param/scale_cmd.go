@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	scaleCmdIndex = 2
+	scaleCmdIndex = 3
 )
 
 type ScaleCmd struct {

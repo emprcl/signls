@@ -49,7 +49,7 @@ func main() {
 	}
 
 	bank := filesystem.New(*bankFile)
-	grid := field.NewFromBank(bank.ActiveGrid(), midi)
+	grid := field.NewFromBank(bank.Active, bank.ActiveGrid(), midi)
 
 	p := tea.NewProgram(ui.New(config, grid, bank))
 	if _, err := p.Run(); err != nil {

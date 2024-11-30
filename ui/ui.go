@@ -130,7 +130,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.windowResize(msg.Width, msg.Height), nil
 
 	case tickMsg:
-		return m, tick()
+		return m.handleBankMetaCommand(), tick()
 
 	case blinkMsg:
 		m.blink = !m.blink
@@ -506,13 +506,29 @@ func (m *mainModel) moveBankGrid(dir string) {
 func (m mainModel) loadGridFromBank() mainModel {
 	m.bank.Active = m.selectedGrid
 	isPlaying := m.grid.Playing
-	m.grid.Load(m.bank.ActiveGrid())
+	m.grid.Load(m.bank.Active, m.bank.ActiveGrid())
 	m.grid.Playing = isPlaying
 	m.cursorX = 1
 	m.cursorY = 1
 	m.selectionX = 1
 	m.selectionY = 1
+	m.mode = MOVE
+	m.param = 0
+	m.paramPage = 0
 	return m.windowResize(m.viewport.Width, m.viewport.Height)
+}
+
+func (m mainModel) handleBankMetaCommand() mainModel {
+	if m.grid.BankIndex == m.bank.Active {
+		return m
+	}
+	m.bank.Active = m.grid.BankIndex
+	m.grid.Load(m.bank.Active, m.bank.ActiveGrid())
+	m.grid.Playing = true
+	m.mode = MOVE
+	m.param = 0
+	m.paramPage = 0
+	return m
 }
 
 func (m mainModel) windowResize(width, height int) mainModel {

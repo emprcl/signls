@@ -21,11 +21,12 @@ const (
 type Grid struct {
 	mu sync.Mutex
 
-	midi   midi.Midi
-	clock  *common.Clock
-	nodes  [][]common.Node
-	Height int
-	Width  int
+	midi      midi.Midi
+	clock     *common.Clock
+	nodes     [][]common.Node
+	Height    int
+	Width     int
+	BankIndex int
 
 	Key   theory.Key
 	Scale theory.Scale
@@ -365,6 +366,8 @@ func (g *Grid) ExecuteMetaCommands(node music.Audible) {
 			g.Scale = theory.Scale(theory.AllScales()[c.Value().Computed()])
 		case *meta.TempoCommand:
 			g.SetTempo(float64(c.Value().Computed()))
+		case *meta.BankCommand:
+			g.BankIndex = c.Value().Computed()
 		}
 
 		cmd.Reset()

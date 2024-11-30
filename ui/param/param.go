@@ -108,6 +108,7 @@ func DefaultEmitterControlChanges(nodes []common.Node) []Param {
 func DefaultEmitterMetaCommands(nodes []common.Node) []Param {
 	return []Param{
 		TempoCmd{nodes: nodes},
+		BankCmd{nodes: nodes},
 		RootCmd{nodes: nodes},
 		ScaleCmd{nodes: nodes},
 	}

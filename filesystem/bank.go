@@ -151,28 +151,14 @@ func NewMetaCommand(cmd meta.Command) MetaCommand {
 
 type Param struct {
 	Value  int
-	Min    int
-	Max    int
 	Amount int
 }
 
 func NewParam[T uint8 | int](p common.ControlValue[T]) Param {
 	return Param{
 		Value:  int(p.Value()),
-		Min:    int(p.Min()),
-		Max:    int(p.Max()),
 		Amount: p.RandomAmount(),
 	}
-}
-
-func NewParamFromFile[T uint8 | int](param Param) *common.ControlValue[T] {
-	value := common.NewControlValue[T](
-		T(param.Value),
-		T(param.Min),
-		T(param.Max),
-	)
-	value.SetRandomAmount(param.Amount)
-	return value
 }
 
 // New creates and loads a new bank from a given file.
