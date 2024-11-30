@@ -57,6 +57,7 @@ func NewNote(midi midi.Midi) *Note {
 	}
 	cmds := []meta.Command{
 		meta.NewRootCommand(),
+		meta.NewScaleCommand(),
 	}
 	return &Note{
 		midi:         midi,

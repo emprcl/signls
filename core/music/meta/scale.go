@@ -3,11 +3,11 @@ package meta
 import (
 	"signls/core/common"
 	"signls/core/theory"
-	"signls/midi"
 )
 
 const (
-	defaultScale theory.Scale = theory.CHROMATIC
+	defaultScale = 0
+	minScale     = 0
 )
 
 type ScaleCommand struct {
@@ -18,7 +18,7 @@ type ScaleCommand struct {
 
 func NewScaleCommand() *ScaleCommand {
 	return &ScaleCommand{
-		value: common.NewControlValue[int](defaultKey, minKey, maxKey),
+		value: common.NewControlValue[int](defaultScale, minScale, len(theory.AllScales())-1),
 	}
 }
 
@@ -54,7 +54,7 @@ func (c *ScaleCommand) Value() *common.ControlValue[int] {
 }
 
 func (c *ScaleCommand) Display() string {
-	return midi.Note(uint8(c.value.Value()))
+	return theory.AllScales()[c.Value().Value()].Name()
 }
 
 func (c *ScaleCommand) Reset() {

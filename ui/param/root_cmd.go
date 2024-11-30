@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	cmdIndex = 0
+	rootCmdIndex = 0
 )
 
 type RootCmd struct {
@@ -20,27 +20,27 @@ func (r RootCmd) Name() string {
 }
 
 func (r RootCmd) Display() string {
-	if !r.nodes[0].(music.Audible).Note().MetaCommands[cmdIndex].Active() {
+	if !r.nodes[0].(music.Audible).Note().MetaCommands[rootCmdIndex].Active() {
 		return "⨯"
 	}
-	if r.nodes[0].(music.Audible).Note().MetaCommands[cmdIndex].Value().RandomAmount() != 0 {
+	if r.nodes[0].(music.Audible).Note().MetaCommands[rootCmdIndex].Value().RandomAmount() != 0 {
 		return util.Normalize(
 			fmt.Sprintf(
 				"%s%+d\u033c",
-				r.nodes[0].(music.Audible).Note().MetaCommands[cmdIndex].Display(),
-				r.nodes[0].(music.Audible).Note().MetaCommands[cmdIndex].Value().RandomAmount(),
+				r.nodes[0].(music.Audible).Note().MetaCommands[rootCmdIndex].Display(),
+				r.nodes[0].(music.Audible).Note().MetaCommands[rootCmdIndex].Value().RandomAmount(),
 			),
 		)
 	}
-	return r.nodes[0].(music.Audible).Note().MetaCommands[cmdIndex].Display()
+	return r.nodes[0].(music.Audible).Note().MetaCommands[rootCmdIndex].Display()
 }
 
 func (r RootCmd) Value() int {
-	return r.nodes[0].(music.Audible).Note().MetaCommands[cmdIndex].Value().Value()
+	return r.nodes[0].(music.Audible).Note().MetaCommands[rootCmdIndex].Value().Value()
 }
 
 func (r RootCmd) AltValue() int {
-	return r.nodes[0].(music.Audible).Note().MetaCommands[cmdIndex].Value().RandomAmount()
+	return r.nodes[0].(music.Audible).Note().MetaCommands[rootCmdIndex].Value().RandomAmount()
 }
 
 func (r RootCmd) Up() {
@@ -64,16 +64,16 @@ func (r RootCmd) AltUp() {}
 func (r RootCmd) AltDown() {}
 
 func (r RootCmd) AltLeft() {
-	active := r.nodes[0].(music.Audible).Note().MetaCommands[cmdIndex].Active()
+	active := r.nodes[0].(music.Audible).Note().MetaCommands[rootCmdIndex].Active()
 	for _, n := range r.nodes {
-		n.(music.Audible).Note().MetaCommands[cmdIndex].SetActive(!active)
+		n.(music.Audible).Note().MetaCommands[rootCmdIndex].SetActive(!active)
 	}
 }
 
 func (r RootCmd) AltRight() {
-	active := r.nodes[0].(music.Audible).Note().MetaCommands[cmdIndex].Active()
+	active := r.nodes[0].(music.Audible).Note().MetaCommands[rootCmdIndex].Active()
 	for _, n := range r.nodes {
-		n.(music.Audible).Note().MetaCommands[cmdIndex].SetActive(!active)
+		n.(music.Audible).Note().MetaCommands[rootCmdIndex].SetActive(!active)
 	}
 }
 
@@ -82,13 +82,13 @@ func (r RootCmd) Set(value int) {
 		return
 	}
 	for _, n := range r.nodes {
-		n.(music.Audible).Note().MetaCommands[cmdIndex].Value().Set(value)
+		n.(music.Audible).Note().MetaCommands[rootCmdIndex].Value().Set(value)
 	}
 }
 
 func (r RootCmd) SetAlt(value int) {
 	for _, n := range r.nodes {
-		n.(music.Audible).Note().MetaCommands[cmdIndex].Value().SetRandomAmount(value)
+		n.(music.Audible).Note().MetaCommands[rootCmdIndex].Value().SetRandomAmount(value)
 	}
 }
 

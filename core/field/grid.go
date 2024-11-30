@@ -361,6 +361,8 @@ func (g *Grid) ExecuteMetaCommands(node music.Audible) {
 		switch c := cmd.(type) {
 		case *meta.RootCommand:
 			g.Key = theory.Key(c.Value().Computed())
+		case *meta.ScaleCommand:
+			g.Scale = theory.Scale(theory.AllScales()[c.Value().Computed()])
 		}
 
 		cmd.Reset()
