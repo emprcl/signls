@@ -52,6 +52,7 @@ func NewParamsForNodes(grid *field.Grid, nodes []common.Node) [][]Param {
 				Threshold{nodes: nodes},
 			),
 			DefaultEmitterControlChanges(nodes),
+			DefaultEmitterMetaCommands(nodes),
 		}
 	} else if isHomogeneousNode[*node.EuclidEmitter](nodes) {
 		return [][]Param{
@@ -62,6 +63,7 @@ func NewParamsForNodes(grid *field.Grid, nodes []common.Node) [][]Param {
 				Offset{nodes: nodes},
 			),
 			DefaultEmitterControlChanges(nodes),
+			DefaultEmitterMetaCommands(nodes),
 		}
 	}
 
@@ -70,6 +72,7 @@ func NewParamsForNodes(grid *field.Grid, nodes []common.Node) [][]Param {
 	return [][]Param{
 		DefaultEmitterParams(grid, emitters),
 		DefaultEmitterControlChanges(emitters),
+		DefaultEmitterMetaCommands(emitters),
 	}
 }
 
@@ -99,6 +102,12 @@ func DefaultEmitterControlChanges(nodes []common.Node) []Param {
 		params[i] = CC{index: i, nodes: nodes}
 	}
 	return params
+}
+
+func DefaultEmitterMetaCommands(nodes []common.Node) []Param {
+	return []Param{
+		RootCmd{nodes: nodes},
+	}
 }
 
 func NewParamsForGrid(grid *field.Grid) []Param {

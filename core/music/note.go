@@ -54,15 +54,19 @@ func NewNote(midi midi.Midi) *Note {
 	for i := range ccs {
 		ccs[i] = NewCC(midi, SilentControlType)
 	}
+	cmds := []meta.Command{
+		meta.NewRootCommand(),
+	}
 	return &Note{
-		midi:        midi,
-		rand:        rand.New(source),
-		Key:         NewKeyValue(defaultKey),
-		Channel:     common.NewControlValue[uint8](lastUsedChannel, 0, maxChannel),
-		Velocity:    common.NewControlValue[uint8](defaultVelocity, 0, maxVelocity),
-		Length:      common.NewControlValue[uint8](defaultLength, minLength, maxLength),
-		Probability: maxProbability,
-		Controls:    ccs,
+		midi:         midi,
+		rand:         rand.New(source),
+		Key:          NewKeyValue(defaultKey),
+		Channel:      common.NewControlValue[uint8](lastUsedChannel, 0, maxChannel),
+		Velocity:     common.NewControlValue[uint8](defaultVelocity, 0, maxVelocity),
+		Length:       common.NewControlValue[uint8](defaultLength, minLength, maxLength),
+		Probability:  maxProbability,
+		Controls:     ccs,
+		MetaCommands: cmds,
 	}
 }
 

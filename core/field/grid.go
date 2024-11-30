@@ -359,7 +359,7 @@ func (g *Grid) ExecuteMetaCommands(node music.Audible) {
 		}
 		switch c := cmd.(type) {
 		case *meta.RootCommand:
-			g.Key = music.Key(c.Value.Computed())
+			g.Key = music.Key(c.Value().Computed())
 		}
 	}
 }
