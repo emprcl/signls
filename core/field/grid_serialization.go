@@ -110,10 +110,10 @@ func (g *Grid) Load(index int, grid filesystem.Grid) {
 			newNode = node.NewEuclidEmitter(g.midi, common.Direction(n.Direction))
 			newNode.(*node.EuclidEmitter).Steps.Set(n.Params["steps"].Value)
 			newNode.(*node.EuclidEmitter).Steps.SetRandomAmount(n.Params["steps"].Amount)
-			newNode.(*node.EuclidEmitter).Steps.Set(n.Params["triggers"].Value)
-			newNode.(*node.EuclidEmitter).Steps.SetRandomAmount(n.Params["triggers"].Amount)
-			newNode.(*node.EuclidEmitter).Steps.Set(n.Params["offset"].Value)
-			newNode.(*node.EuclidEmitter).Steps.SetRandomAmount(n.Params["offset"].Amount)
+			newNode.(*node.EuclidEmitter).Triggers.Set(n.Params["triggers"].Value)
+			newNode.(*node.EuclidEmitter).Triggers.SetRandomAmount(n.Params["triggers"].Amount)
+			newNode.(*node.EuclidEmitter).Offset.Set(n.Params["offset"].Value)
+			newNode.(*node.EuclidEmitter).Offset.SetRandomAmount(n.Params["offset"].Amount)
 		case "pass":
 			newNode = node.NewPassEmitter(g.midi, common.Direction(n.Direction))
 		case "spread":
@@ -132,8 +132,8 @@ func (g *Grid) Load(index int, grid filesystem.Grid) {
 			newNode = node.NewHoleEmitter(common.Direction(n.Direction), n.X, n.Y, g.Width, g.Height)
 			newNode.(*node.HoleEmitter).DestinationX.Set(n.Params["destinationX"].Value)
 			newNode.(*node.HoleEmitter).DestinationX.SetRandomAmount(n.Params["destinationX"].Amount)
-			newNode.(*node.HoleEmitter).DestinationX.Set(n.Params["destinationY"].Value)
-			newNode.(*node.HoleEmitter).DestinationX.SetRandomAmount(n.Params["destinationY"].Amount)
+			newNode.(*node.HoleEmitter).DestinationY.Set(n.Params["destinationY"].Value)
+			newNode.(*node.HoleEmitter).DestinationY.SetRandomAmount(n.Params["destinationY"].Amount)
 		default:
 			log.Printf("cannot load node of type %s", n.Type)
 			continue

@@ -130,7 +130,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.windowResize(msg.Width, msg.Height), nil
 
 	case tickMsg:
-		return m.handleBankMetaCommand(), tick()
+		return m.handleBankMetaCommand()
 
 	case blinkMsg:
 		m.blink = !m.blink
@@ -518,9 +518,9 @@ func (m mainModel) loadGridFromBank() mainModel {
 	return m.windowResize(m.viewport.Width, m.viewport.Height)
 }
 
-func (m mainModel) handleBankMetaCommand() mainModel {
+func (m mainModel) handleBankMetaCommand() (mainModel, tea.Cmd) {
 	if m.grid.BankIndex == m.bank.Active {
-		return m
+		return m, tick()
 	}
 	m.bank.Active = m.grid.BankIndex
 	m.grid.Load(m.bank.Active, m.bank.ActiveGrid())
@@ -528,7 +528,7 @@ func (m mainModel) handleBankMetaCommand() mainModel {
 	m.mode = MOVE
 	m.param = 0
 	m.paramPage = 0
-	return m
+	return m.windowResize(m.viewport.Width, m.viewport.Height), tea.Batch(tea.WindowSize(), tick())
 }
 
 func (m mainModel) windowResize(width, height int) mainModel {
@@ -544,6 +544,12 @@ func (m mainModel) windowResize(width, height int) mainModel {
 	}
 	if m.cursorY > m.grid.Height-1 {
 		m.cursorY = m.grid.Height - 1
+	}
+	if m.selectionX > m.grid.Width-1 {
+		m.selectionX = m.grid.Width - 1
+	}
+	if m.selectionY > m.grid.Height-1 {
+		m.selectionY = m.grid.Height - 1
 	}
 	return m
 }
