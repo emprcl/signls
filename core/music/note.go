@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"signls/core/common"
-	"signls/core/meta"
+	"signls/core/music/meta"
 	"signls/core/theory"
 	"signls/midi"
 )
