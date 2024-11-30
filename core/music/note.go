@@ -215,7 +215,7 @@ func (n *Note) ClockDivision() (int, int) {
 
 // Symbol returns the string symbol associated with the current note.
 func (n *Note) Symbol() string {
-	var keySymbol, ccSymbol string
+	var keySymbol, paramSymbol string
 	if n.Key.silent {
 		keySymbol = "\u0353"
 	} else if n.Key.amount != 0 {
@@ -223,9 +223,15 @@ func (n *Note) Symbol() string {
 	}
 	for _, c := range n.Controls {
 		if c.Type != SilentControlType {
-			ccSymbol = "\u0307"
+			paramSymbol = "\u0307"
 			break
 		}
 	}
-	return fmt.Sprintf("%s%s", keySymbol, ccSymbol)
+	for _, c := range n.MetaCommands {
+		if c.Active() {
+			paramSymbol += "\u030A"
+			break
+		}
+	}
+	return fmt.Sprintf("%s%s", keySymbol, paramSymbol)
 }
