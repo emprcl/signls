@@ -6,16 +6,17 @@ import (
 	"time"
 
 	"signls/core/common"
-	"signls/core/music/meta"
+	"signls/core/meta"
+	"signls/core/theory"
 	"signls/midi"
 )
 
 // Constants defining default values for note properties and their limits.
 const (
-	defaultKey      Key   = 60 // Middle C
-	defaultChannel  uint8 = 0
-	defaultVelocity uint8 = 100
-	defaultLength   uint8 = uint8(common.PulsesPerStep)
+	defaultKey      theory.Key = 60 // Middle C
+	defaultChannel  uint8      = 0
+	defaultVelocity uint8      = 100
+	defaultLength   uint8      = uint8(common.PulsesPerStep)
 
 	defaultCCNumbers int = 8
 
@@ -112,7 +113,7 @@ func (n *Note) Tick() {
 }
 
 // TransposeAndPlay triggers the note with a specific root and scale, resetting internal state.
-func (n *Note) TransposeAndPlay(root Key, scale Scale) {
+func (n *Note) TransposeAndPlay(root theory.Key, scale theory.Scale) {
 	if n.Key.IsSilent() {
 		return
 	}
@@ -175,12 +176,12 @@ func (n *Note) Stop() {
 }
 
 // Transpose transposes current key for a given root and scale.
-func (n *Note) Transpose(root Key, scale Scale) {
+func (n *Note) Transpose(root theory.Key, scale theory.Scale) {
 	n.Key.SetNext(n.Key.key.Transpose(root, scale, n.Key.interval), root)
 }
 
 // SetKey sets the next key to play.
-func (n *Note) SetKey(key Key, root Key) {
+func (n *Note) SetKey(key theory.Key, root theory.Key) {
 	n.Key.SetNext(key, root)
 	if !n.triggered {
 		n.Key.Set(n.Key.Value())

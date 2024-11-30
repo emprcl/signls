@@ -6,6 +6,7 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+	"signls/core/theory"
 )
 
 type Emitter struct {
@@ -62,7 +63,7 @@ func (e *Emitter) Muted() bool {
 	return e.muted
 }
 
-func (e *Emitter) Trig(key music.Key, scale music.Scale, inDir common.Direction, pulse uint64) {
+func (e *Emitter) Trig(key theory.Key, scale theory.Scale, inDir common.Direction, pulse uint64) {
 	if !e.updated(pulse) {
 		e.note.Tick()
 	}

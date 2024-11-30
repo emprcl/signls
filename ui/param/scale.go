@@ -2,12 +2,12 @@ package param
 
 import (
 	"signls/core/field"
-	"signls/core/music"
+	"signls/core/theory"
 )
 
 type Scale struct {
 	grid   *field.Grid
-	scales []music.Scale
+	scales []theory.Scale
 }
 
 func (s Scale) Name() string {

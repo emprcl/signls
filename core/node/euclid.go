@@ -5,6 +5,7 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+	"signls/core/theory"
 	"signls/midi"
 )
 
@@ -83,7 +84,7 @@ func (e *EuclidEmitter) Muted() bool {
 	return e.muted
 }
 
-func (e *EuclidEmitter) Trig(key music.Key, scale music.Scale, inDir common.Direction, pulse uint64) {
+func (e *EuclidEmitter) Trig(key theory.Key, scale theory.Scale, inDir common.Direction, pulse uint64) {
 	if !e.armed {
 		return
 	}

@@ -2,7 +2,7 @@ package param
 
 import (
 	"signls/core/field"
-	"signls/core/music"
+	"signls/core/theory"
 )
 
 const (
@@ -53,7 +53,7 @@ func (r Root) Set(value int) {
 	if value < 0 || value > maxKey {
 		return
 	}
-	r.grid.SetKey(music.Key(value))
+	r.grid.SetKey(theory.Key(value))
 }
 
 func (r Root) SetAlt(value int) {}

@@ -14,14 +14,15 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+	"signls/core/theory"
 )
 
 const (
-	defaultTempo               = 120.
-	defaultRootKey music.Key   = 60 // Middle C
-	defaultScale   music.Scale = music.CHROMATIC
-	defaultSize                = 20
-	maxGrids                   = 32
+	defaultTempo                = 120.
+	defaultRootKey theory.Key   = 60 // Middle C
+	defaultScale   theory.Scale = theory.CHROMATIC
+	defaultSize                 = 20
+	maxGrids                    = 32
 )
 
 // Bank holds a slice of grids in memory

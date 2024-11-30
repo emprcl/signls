@@ -5,27 +5,28 @@ import (
 	"math/rand"
 	"time"
 
+	"signls/core/theory"
 	"signls/midi"
 )
 
 const (
-	maxKey Key = 127
-	minKey Key = 21
+	maxKey theory.Key = 127
+	minKey theory.Key = 21
 )
 
 type KeyValue struct {
 	rand *rand.Rand
 
-	key      Key
-	nextKey  Key
-	lastKey  Key
+	key      theory.Key
+	nextKey  theory.Key
+	lastKey  theory.Key
 	interval int
 	amount   int
 
 	silent bool
 }
 
-func NewKeyValue(key Key) *KeyValue {
+func NewKeyValue(key theory.Key) *KeyValue {
 	source := rand.NewSource(time.Now().UnixNano())
 	return &KeyValue{
 		key:  key,
@@ -33,18 +34,18 @@ func NewKeyValue(key Key) *KeyValue {
 	}
 }
 
-func (p *KeyValue) BaseValue() Key {
+func (p *KeyValue) BaseValue() theory.Key {
 	return p.key
 }
 
-func (p *KeyValue) Value() Key {
+func (p *KeyValue) Value() theory.Key {
 	if p.nextKey > 0 {
 		return p.nextKey
 	}
 	return p.key
 }
 
-func (p *KeyValue) Last() Key {
+func (p *KeyValue) Last() theory.Key {
 	return p.lastKey
 }
 
@@ -52,7 +53,7 @@ func (p *KeyValue) Display() string {
 	return midi.Note(uint8(p.Value()))
 }
 
-func (p *KeyValue) Computed(root Key, scale Scale) Key {
+func (p *KeyValue) Computed(root theory.Key, scale theory.Scale) theory.Key {
 	if p.nextKey > 0 {
 		p.key = p.nextKey
 		p.nextKey = 0
@@ -61,7 +62,7 @@ func (p *KeyValue) Computed(root Key, scale Scale) Key {
 		p.lastKey = p.key
 		return p.lastKey
 	}
-	key := Key(p.rand.Intn(int(math.Abs(float64(p.amount))) + 1))
+	key := theory.Key(p.rand.Intn(int(math.Abs(float64(p.amount))) + 1))
 	if p.amount > 0 {
 		key = p.key + key
 	} else {
@@ -72,7 +73,7 @@ func (p *KeyValue) Computed(root Key, scale Scale) Key {
 	return p.lastKey
 }
 
-func (p *KeyValue) SetNext(key Key, root Key) {
+func (p *KeyValue) SetNext(key theory.Key, root theory.Key) {
 	if key < minKey || key > maxKey {
 		return
 	}
@@ -86,7 +87,7 @@ func (p *KeyValue) SetNext(key Key, root Key) {
 	p.interval = p.nextKey.AllSemitonesFrom(root)
 }
 
-func (p *KeyValue) Set(key Key) {
+func (p *KeyValue) Set(key theory.Key) {
 	p.key = key
 	p.nextKey = 0
 }

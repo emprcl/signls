@@ -4,16 +4,17 @@ import (
 	"sync"
 
 	"signls/core/common"
+	"signls/core/meta"
 	"signls/core/music"
-	"signls/core/music/meta"
 	"signls/core/node"
+	"signls/core/theory"
 	"signls/midi"
 )
 
 const (
-	defaultTempo               = 120.
-	defaultRootKey music.Key   = 60
-	defaultScale   music.Scale = music.CHROMATIC
+	defaultTempo                = 120.
+	defaultRootKey theory.Key   = 60
+	defaultScale   theory.Scale = theory.CHROMATIC
 )
 
 // Grid represents the main structure for the grid-based sequencer.
@@ -26,8 +27,8 @@ type Grid struct {
 	Height int
 	Width  int
 
-	Key   music.Key
-	Scale music.Scale
+	Key   theory.Key
+	Scale theory.Scale
 
 	Playing bool
 
@@ -96,13 +97,13 @@ func (g *Grid) Tempo() float64 {
 }
 
 // SetKey changes the root key of the grid and transposes all notes accordingly.
-func (g *Grid) SetKey(key music.Key) {
+func (g *Grid) SetKey(key theory.Key) {
 	g.Key = key
 	g.Transpose()
 }
 
 // SetScale changes the scale of the grid and transposes all notes accordingly.
-func (g *Grid) SetScale(scale music.Scale) {
+func (g *Grid) SetScale(scale theory.Scale) {
 	g.Scale = scale
 	g.Transpose()
 }
@@ -359,7 +360,7 @@ func (g *Grid) ExecuteMetaCommands(node music.Audible) {
 		}
 		switch c := cmd.(type) {
 		case *meta.RootCommand:
-			g.Key = music.Key(c.Value().Computed())
+			g.Key = theory.Key(c.Value().Computed())
 		}
 
 		cmd.Reset()

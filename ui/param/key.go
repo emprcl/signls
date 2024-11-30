@@ -6,6 +6,7 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+	"signls/core/theory"
 
 	"signls/ui/util"
 )
@@ -19,9 +20,9 @@ const (
 
 type Key struct {
 	nodes []common.Node
-	keys  []music.Key
-	root  music.Key
-	scale music.Scale
+	keys  []theory.Key
+	root  theory.Key
+	scale theory.Scale
 	mode  KeyMode
 }
 
@@ -139,7 +140,7 @@ func (k *Key) SetEditValue(input string) {
 	if err != nil {
 		return
 	}
-	key := music.Key(midiKey)
+	key := theory.Key(midiKey)
 	for _, n := range k.nodes {
 		n.(music.Audible).Note().SetKey(key, k.root)
 		n.(music.Audible).Note().Transpose(k.root, k.scale)

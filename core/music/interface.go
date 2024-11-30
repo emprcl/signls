@@ -1,6 +1,9 @@
 package music
 
-import "signls/core/common"
+import (
+	"signls/core/common"
+	"signls/core/theory"
+)
 
 // Audible represents an interface for nodes that trigger notes.
 type Audible interface {
@@ -8,6 +11,6 @@ type Audible interface {
 	Note() *Note
 	Muted() bool
 	SetMute(mute bool)
-	Trig(key Key, scale Scale, inDir common.Direction, pulse uint64)
+	Trig(key theory.Key, scale theory.Scale, inDir common.Direction, pulse uint64)
 	Emit(pulse uint64) []common.Direction
 }

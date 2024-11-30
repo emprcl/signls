@@ -5,6 +5,7 @@ import (
 	"signls/core/field"
 	"signls/core/music"
 	"signls/core/node"
+	"signls/core/theory"
 )
 
 const (
@@ -84,7 +85,7 @@ func DefaultEmitterParams(grid *field.Grid, nodes []common.Node) []Param {
 	return []Param{
 		&Key{
 			nodes: nodes,
-			keys:  music.AllKeysInScale(grid.Key, grid.Scale),
+			keys:  theory.AllKeysInScale(grid.Key, grid.Scale),
 			root:  grid.Key,
 			scale: grid.Scale,
 			mode:  keyMode,
@@ -113,7 +114,7 @@ func DefaultEmitterMetaCommands(nodes []common.Node) []Param {
 func NewParamsForGrid(grid *field.Grid) []Param {
 	return []Param{
 		Root{grid: grid},
-		Scale{grid: grid, scales: music.AllScales()},
+		Scale{grid: grid, scales: theory.AllScales()},
 	}
 }
 
