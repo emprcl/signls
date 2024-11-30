@@ -12,5 +12,6 @@ type Command interface {
 	Executed() bool
 	Value() *common.ControlValue[int]
 	Display() string
+	Name() string
 	Reset()
 }

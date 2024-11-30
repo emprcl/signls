@@ -56,6 +56,7 @@ func NewNote(midi midi.Midi) *Note {
 		ccs[i] = NewCC(midi, SilentControlType)
 	}
 	cmds := []meta.Command{
+		meta.NewTempoCommand(),
 		meta.NewRootCommand(),
 		meta.NewScaleCommand(),
 	}

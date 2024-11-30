@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	rootCmdIndex = 0
+	rootCmdIndex = 1
 )
 
 type RootCmd struct {
@@ -78,9 +78,6 @@ func (r RootCmd) AltRight() {
 }
 
 func (r RootCmd) Set(value int) {
-	if value < 0 || value > maxKey {
-		return
-	}
 	for _, n := range r.nodes {
 		n.(music.Audible).Note().MetaCommands[rootCmdIndex].Value().Set(value)
 	}

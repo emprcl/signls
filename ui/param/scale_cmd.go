@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	scaleCmdIndex = 1
+	scaleCmdIndex = 2
 )
 
 type ScaleCmd struct {
@@ -78,9 +78,6 @@ func (s ScaleCmd) AltRight() {
 }
 
 func (s ScaleCmd) Set(value int) {
-	if value < 0 || value > maxKey {
-		return
-	}
 	for _, n := range s.nodes {
 		n.(music.Audible).Note().MetaCommands[scaleCmdIndex].Value().Set(value)
 	}

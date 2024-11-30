@@ -160,12 +160,13 @@ func (g *Grid) Load(grid filesystem.Grid) {
 				a.Note().Controls[i].Value.SetRandomAmount(c.Value.Amount)
 			}
 
-			for i, c := range n.Note.MetaCommands {
-				a.Note().MetaCommands[i].SetActive(c.Active)
-				a.Note().MetaCommands[i].Value().Set(c.Value.Value)
-				a.Note().MetaCommands[i].Value().SetMin(c.Value.Min)
-				a.Note().MetaCommands[i].Value().SetMax(c.Value.Max)
-				a.Note().MetaCommands[i].Value().SetRandomAmount(c.Value.Amount)
+			for _, c := range a.Note().MetaCommands {
+				cmd := n.Note.MetaCommands[c.Name()]
+				c.SetActive(cmd.Active)
+				c.Value().Set(cmd.Value.Value)
+				c.Value().SetMin(cmd.Value.Min)
+				c.Value().SetMax(cmd.Value.Max)
+				c.Value().SetRandomAmount(cmd.Value.Amount)
 			}
 		}
 

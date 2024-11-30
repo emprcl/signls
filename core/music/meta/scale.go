@@ -57,6 +57,10 @@ func (c *ScaleCommand) Display() string {
 	return theory.AllScales()[c.Value().Value()].Name()
 }
 
+func (c *ScaleCommand) Name() string {
+	return "scale"
+}
+
 func (c *ScaleCommand) Reset() {
 	c.executed = false
 }

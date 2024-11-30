@@ -58,6 +58,10 @@ func (c *RootCommand) Display() string {
 	return midi.Note(uint8(c.value.Value()))
 }
 
+func (c *RootCommand) Name() string {
+	return "root"
+}
+
 func (c *RootCommand) Reset() {
 	c.executed = false
 }

@@ -80,13 +80,13 @@ type Node struct {
 }
 
 type Note struct {
-	Key          Key           `json:"key"`
-	Channel      Param         `json:"channel"`
-	Velocity     Param         `json:"velocity"`
-	Length       Param         `json:"length"`
-	Probability  int           `json:"probability"`
-	Controls     []CC          `json:"controls"`
-	MetaCommands []MetaCommand `json:"meta_commands"`
+	Key          Key                    `json:"key"`
+	Channel      Param                  `json:"channel"`
+	Velocity     Param                  `json:"velocity"`
+	Length       Param                  `json:"length"`
+	Probability  int                    `json:"probability"`
+	Controls     []CC                   `json:"controls"`
+	MetaCommands map[string]MetaCommand `json:"meta_commands"`
 }
 
 func NewNote(n music.Note) Note {
@@ -94,9 +94,9 @@ func NewNote(n music.Note) Note {
 	for i, c := range n.Controls {
 		controls[i] = NewCC(*c)
 	}
-	metaCmds := make([]MetaCommand, len(n.MetaCommands))
-	for i, c := range n.MetaCommands {
-		metaCmds[i] = NewMetaCommand(c)
+	metaCmds := make(map[string]MetaCommand, len(n.MetaCommands))
+	for _, c := range n.MetaCommands {
+		metaCmds[c.Name()] = NewMetaCommand(c)
 	}
 	return Note{
 		Key:          NewKey(*n.Key),
