@@ -159,6 +159,14 @@ func (g *Grid) Load(grid filesystem.Grid) {
 				a.Note().Controls[i].Value.SetMax(uint8(c.Value.Max))
 				a.Note().Controls[i].Value.SetRandomAmount(c.Value.Amount)
 			}
+
+			for i, c := range n.Note.MetaCommands {
+				a.Note().MetaCommands[i].SetActive(c.Active)
+				a.Note().MetaCommands[i].Value().Set(c.Value.Value)
+				a.Note().MetaCommands[i].Value().SetMin(c.Value.Min)
+				a.Note().MetaCommands[i].Value().SetMax(c.Value.Max)
+				a.Note().MetaCommands[i].Value().SetRandomAmount(c.Value.Amount)
+			}
 		}
 
 		g.nodes[n.Y][n.X] = newNode

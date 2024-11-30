@@ -14,6 +14,7 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+	"signls/core/music/meta"
 	"signls/core/theory"
 )
 
@@ -79,12 +80,13 @@ type Node struct {
 }
 
 type Note struct {
-	Key         Key   `json:"key"`
-	Channel     Param `json:"channel"`
-	Velocity    Param `json:"velocity"`
-	Length      Param `json:"length"`
-	Probability int   `json:"probability"`
-	Controls    []CC  `json:"controls"`
+	Key          Key           `json:"key"`
+	Channel      Param         `json:"channel"`
+	Velocity     Param         `json:"velocity"`
+	Length       Param         `json:"length"`
+	Probability  int           `json:"probability"`
+	Controls     []CC          `json:"controls"`
+	MetaCommands []MetaCommand `json:"meta_commands"`
 }
 
 func NewNote(n music.Note) Note {
@@ -92,13 +94,18 @@ func NewNote(n music.Note) Note {
 	for i, c := range n.Controls {
 		controls[i] = NewCC(*c)
 	}
+	metaCmds := make([]MetaCommand, len(n.MetaCommands))
+	for i, c := range n.MetaCommands {
+		metaCmds[i] = NewMetaCommand(c)
+	}
 	return Note{
-		Key:         NewKey(*n.Key),
-		Channel:     NewParam(*n.Channel),
-		Velocity:    NewParam(*n.Velocity),
-		Length:      NewParam(*n.Length),
-		Probability: int(n.Probability),
-		Controls:    controls,
+		Key:          NewKey(*n.Key),
+		Channel:      NewParam(*n.Channel),
+		Velocity:     NewParam(*n.Velocity),
+		Length:       NewParam(*n.Length),
+		Probability:  int(n.Probability),
+		Controls:     controls,
+		MetaCommands: metaCmds,
 	}
 }
 
@@ -127,6 +134,18 @@ func NewCC(cc music.CC) CC {
 		Type:       int(cc.Type),
 		Controller: int(cc.Controller),
 		Value:      NewParam(*cc.Value),
+	}
+}
+
+type MetaCommand struct {
+	Active bool  `json:"active"`
+	Value  Param `json:"value"`
+}
+
+func NewMetaCommand(cmd meta.Command) MetaCommand {
+	return MetaCommand{
+		Active: cmd.Active(),
+		Value:  NewParam(*cmd.Value()),
 	}
 }
 
