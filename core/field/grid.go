@@ -5,6 +5,7 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+	"signls/core/music/meta"
 	"signls/core/node"
 	"signls/midi"
 )
@@ -275,6 +276,7 @@ func (g *Grid) Update() {
 
 			if n, ok := g.nodes[y][x].(music.Audible); ok {
 				n.Trig(g.Key, g.Scale, common.NONE, g.pulse)
+				g.ExecuteMetaCommands(n)
 				g.Emit(n, x, y)
 			}
 		}
@@ -346,6 +348,19 @@ func (g *Grid) Emit(emitter music.Audible, x, y int) {
 			g.Move(n, newX, newY)
 		}
 		g.nodes[newY][newX] = node.NewSignal(direction, g.pulse)
+	}
+}
+
+// ExecuteMetaCommands executes meta commands from the node.
+func (g *Grid) ExecuteMetaCommands(node music.Audible) {
+	for _, cmd := range node.Note().MetaCommands {
+		if !cmd.Executed() {
+			continue
+		}
+		switch c := cmd.(type) {
+		case *meta.RootCommand:
+			g.Key = music.Key(c.Value.Computed())
+		}
 	}
 }
 

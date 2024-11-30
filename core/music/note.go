@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"signls/core/common"
+	"signls/core/music/meta"
 	"signls/midi"
 )
 
@@ -39,7 +40,8 @@ type Note struct {
 	Length      *common.ControlValue[uint8]
 	Probability uint8
 
-	Controls []*CC
+	Controls     []*CC
+	MetaCommands []meta.Command
 
 	pulse     uint64 // Internal pulse counter to manage note length.
 	triggered bool
@@ -122,6 +124,10 @@ func (n *Note) TransposeAndPlay(root Key, scale Scale) {
 
 	for _, control := range n.Controls {
 		control.Send(n.Channel.Last())
+	}
+
+	for _, cmd := range n.MetaCommands {
+		cmd.Execute()
 	}
 
 	n.triggered = true
