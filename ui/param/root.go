@@ -18,7 +18,7 @@ func (r Root) Name() string {
 }
 
 func (r Root) Display() string {
-	return "key"
+	return r.grid.Key.Name()
 }
 
 func (r Root) Value() int {
