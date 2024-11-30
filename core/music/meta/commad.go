@@ -12,13 +12,14 @@ const (
 )
 
 type Command interface {
-	// Active() bool
-	// SetActive(active bool)
-	// Copy() Command
+	Active() bool
+	SetActive(active bool)
+	//Copy() Command
 	Execute()
 	Executed() bool
 	Value() *common.ControlValue[int]
 	Display() string
+	Reset()
 }
 
 type RootCommand struct {
@@ -33,11 +34,22 @@ func NewRootCommand() *RootCommand {
 	}
 }
 
+func (c *RootCommand) Active() bool {
+	return c.active
+}
+
+func (c *RootCommand) SetActive(active bool) {
+	c.active = active
+}
+
 func (c *RootCommand) Executed() bool {
 	return c.executed
 }
 
 func (c *RootCommand) Execute() {
+	if !c.active {
+		return
+	}
 	c.executed = true
 }
 
@@ -47,4 +59,8 @@ func (c *RootCommand) Value() *common.ControlValue[int] {
 
 func (c *RootCommand) Display() string {
 	return midi.Note(uint8(c.value.Value()))
+}
+
+func (c *RootCommand) Reset() {
+	c.executed = false
 }

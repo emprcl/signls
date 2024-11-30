@@ -361,6 +361,8 @@ func (g *Grid) ExecuteMetaCommands(node music.Audible) {
 		case *meta.RootCommand:
 			g.Key = music.Key(c.Value().Computed())
 		}
+
+		cmd.Reset()
 	}
 }
 
