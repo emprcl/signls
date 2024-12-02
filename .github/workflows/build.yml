@@ -95,3 +95,24 @@ jobs:
           files: |
             signls_*.tar.gz
             signls_*.zip
+
+  itchio-release:
+    needs: release
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [Linux, macOS, Windows]
+    env:
+      itchio_project: "emprcl/signls"
+    steps:
+      - uses: actions/download-artifact@v4.1.7
+        with:
+          name: signls_${{ github.sha }}_${{ matrix.os }}
+      - uses: robpc/itchio-upload-action@v1
+        with:
+          path: signls_${{ github.sha }}_${{ matrix.os }}
+          project: ${{ env.itchio_project }}
+          channel: ${{ matrix.os }}
+          version: ${{ github.ref_name}}
+          api-key: ${{ secrets.ITCHIO_API_KEY }}
