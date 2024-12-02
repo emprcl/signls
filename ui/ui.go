@@ -350,7 +350,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.ClearScreen
 		case key.Matches(msg, m.keymap.Quit):
 			m.grid.Reset()
-			return m, tea.Batch(save(m), tea.Quit)
+			return m, tea.Sequence(save(m), tea.Quit)
 		}
 	}
 
