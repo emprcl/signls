@@ -21,6 +21,10 @@ func (l Length) Name() string {
 	return "len"
 }
 
+func (l Length) Help() string {
+	return ""
+}
+
 func (l Length) Display() string {
 	length := int(l.nodes[0].(music.Audible).Note().Length.Value())
 	pulsesPerStep, stepsPerQuarterNote := l.nodes[0].(music.Audible).Note().ClockDivision()

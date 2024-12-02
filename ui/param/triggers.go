@@ -21,6 +21,10 @@ func (t Triggers) Name() string {
 	return "trg"
 }
 
+func (t Triggers) Help() string {
+	return ""
+}
+
 func (t Triggers) Display() string {
 	if t.nodes[0].(*node.EuclidEmitter).Triggers.RandomAmount() != 0 {
 		return util.Normalize(

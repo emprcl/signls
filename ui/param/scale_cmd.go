@@ -19,6 +19,10 @@ func (s ScaleCmd) Name() string {
 	return "scale"
 }
 
+func (s ScaleCmd) Help() string {
+	return ""
+}
+
 func (s ScaleCmd) Display() string {
 	if !s.nodes[0].(music.Audible).Note().MetaCommands[scaleCmdIndex].Active() {
 		return "⨯"

@@ -20,6 +20,10 @@ func (p Probability) Name() string {
 	return "prb"
 }
 
+func (p Probability) Help() string {
+	return ""
+}
+
 func (p Probability) Display() string {
 	return fmt.Sprintf("%d", p.Value())
 }

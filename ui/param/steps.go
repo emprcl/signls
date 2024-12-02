@@ -18,6 +18,10 @@ func (s Steps) Name() string {
 	return "stp"
 }
 
+func (s Steps) Help() string {
+	return ""
+}
+
 func (s Steps) Display() string {
 	if s.nodes[0].(*node.EuclidEmitter).Steps.RandomAmount() != 0 {
 		return util.Normalize(

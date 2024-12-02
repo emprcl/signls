@@ -14,6 +14,7 @@ const (
 
 type Param interface {
 	Name() string
+	Help() string
 	Value() int
 	AltValue() int
 	Display() string

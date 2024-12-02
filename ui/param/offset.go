@@ -18,6 +18,10 @@ func (o Offset) Name() string {
 	return "off"
 }
 
+func (o Offset) Help() string {
+	return ""
+}
+
 func (o Offset) Display() string {
 	if o.nodes[0].(*node.EuclidEmitter).Offset.RandomAmount() != 0 {
 		return util.Normalize(

@@ -19,6 +19,10 @@ func (b BankCmd) Name() string {
 	return "bank"
 }
 
+func (b BankCmd) Help() string {
+	return ""
+}
+
 func (b BankCmd) Display() string {
 	if !b.nodes[0].(music.Audible).Note().MetaCommands[bankCmdIndex].Active() {
 		return "⨯"

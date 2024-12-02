@@ -78,6 +78,11 @@ func Note(note uint8) string {
 	return gomidi.Note(note).String()
 }
 
+// CC retruns the string representation of a cc message
+func CC(controller uint8) string {
+	return gomidi.ControlChangeName[controller]
+}
+
 func (m *midi) start() {
 	var wg sync.WaitGroup
 	wg.Add(len(m.devices))

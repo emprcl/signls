@@ -18,6 +18,10 @@ func (d Direction) Name() string {
 	return "direction"
 }
 
+func (d Direction) Help() string {
+	return ""
+}
+
 func (d Direction) Display() string {
 	return d.nodes[0].Direction().Symbol()
 }

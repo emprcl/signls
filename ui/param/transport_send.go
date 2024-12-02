@@ -12,6 +12,10 @@ func (t TransportSend) Name() string {
 	return "transport"
 }
 
+func (t TransportSend) Help() string {
+	return ""
+}
+
 func (t TransportSend) Display() string {
 	if t.grid.SendTransport {
 		return "on"

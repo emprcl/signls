@@ -12,6 +12,10 @@ func (c ClockSend) Name() string {
 	return "clock"
 }
 
+func (c ClockSend) Help() string {
+	return ""
+}
+
 func (c ClockSend) Display() string {
 	if c.grid.SendClock {
 		return "on"

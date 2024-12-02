@@ -12,6 +12,10 @@ func (d DefaultDevice) Name() string {
 	return "device"
 }
 
+func (d DefaultDevice) Help() string {
+	return ""
+}
+
 func (d DefaultDevice) Display() string {
 	return d.grid.MidiDevice()
 }

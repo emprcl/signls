@@ -19,6 +19,10 @@ func (t TempoCmd) Name() string {
 	return "tempo"
 }
 
+func (t TempoCmd) Help() string {
+	return ""
+}
+
 func (t TempoCmd) Display() string {
 	if !t.nodes[0].(music.Audible).Note().MetaCommands[tempoCmdIndex].Active() {
 		return "⨯"

@@ -17,6 +17,10 @@ func (c Channel) Name() string {
 	return "cha"
 }
 
+func (c Channel) Help() string {
+	return ""
+}
+
 func (c Channel) Display() string {
 	if c.nodes[0].(music.Audible).Note().Channel.RandomAmount() != 0 {
 		return util.Normalize(

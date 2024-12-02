@@ -19,6 +19,10 @@ func (t Threshold) Name() string {
 	return "thd"
 }
 
+func (t Threshold) Help() string {
+	return ""
+}
+
 func (t Threshold) Display() string {
 	if t.control().RandomAmount() != 0 {
 		return util.Normalize(

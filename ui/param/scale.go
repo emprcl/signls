@@ -14,6 +14,10 @@ func (s Scale) Name() string {
 	return "scale"
 }
 
+func (s Scale) Help() string {
+	return ""
+}
+
 func (s Scale) Display() string {
 	return s.grid.Scale.Name()
 }

@@ -17,6 +17,10 @@ func (v Velocity) Name() string {
 	return "vel"
 }
 
+func (v Velocity) Help() string {
+	return ""
+}
+
 func (v Velocity) Display() string {
 	if v.nodes[0].(music.Audible).Note().Velocity.RandomAmount() != 0 {
 		return util.Normalize(

@@ -3,9 +3,11 @@ package param
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"signls/core/common"
 	"signls/core/music"
+	"signls/midi"
 	"signls/ui/util"
 )
 
@@ -26,6 +28,21 @@ func (c CC) Name() string {
 		return "pc"
 	default:
 		return "cc"
+	}
+}
+
+func (c CC) Help() string {
+	switch c.nodes[0].(music.Audible).Note().Controls[c.index].Type {
+	case music.ControlChangeControlType:
+		return strings.ToLower(midi.CC(c.nodes[0].(music.Audible).Note().Controls[c.index].Controller))
+	case music.AfterTouchControlType:
+		return "after touch"
+	case music.PitchBendControlType:
+		return "pitch bend"
+	case music.ProgramChangeControlType:
+		return "program change"
+	default:
+		return ""
 	}
 }
 

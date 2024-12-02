@@ -19,6 +19,10 @@ func (d Destination) Name() string {
 	return "dest"
 }
 
+func (s Destination) Help() string {
+	return ""
+}
+
 func (d Destination) Display() string {
 	x, y := d.nodes[0].(*node.HoleEmitter).Destination()
 	amountX, amountY := d.nodes[0].(*node.HoleEmitter).DestinationAmount()

@@ -17,6 +17,10 @@ func (r Root) Name() string {
 	return "root"
 }
 
+func (r Root) Help() string {
+	return ""
+}
+
 func (r Root) Display() string {
 	return r.grid.Key.Name()
 }

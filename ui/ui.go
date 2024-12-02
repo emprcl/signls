@@ -360,8 +360,14 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m mainModel) View() string {
 	help := lipgloss.NewStyle().
 		MarginLeft(2).
-		MarginTop(1).
 		Render(m.help.View(m.keymap))
+
+	paramHelp := ""
+	if m.mode == EDIT {
+		paramHelp = m.help.Styles.ShortDesc.
+			MarginLeft(16).
+			Render(m.activeParam().Help())
+	}
 
 	if m.help.ShowAll {
 		return lipgloss.JoinVertical(
@@ -379,6 +385,7 @@ func (m mainModel) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		m.renderGrid(),
+		paramHelp,
 		help,
 	)
 }

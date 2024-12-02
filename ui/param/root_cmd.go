@@ -19,6 +19,10 @@ func (r RootCmd) Name() string {
 	return "root"
 }
 
+func (r RootCmd) Help() string {
+	return ""
+}
+
 func (r RootCmd) Display() string {
 	if !r.nodes[0].(music.Audible).Note().MetaCommands[rootCmdIndex].Active() {
 		return "⨯"

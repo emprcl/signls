@@ -30,6 +30,10 @@ func (k *Key) Name() string {
 	return "key"
 }
 
+func (k *Key) Help() string {
+	return ""
+}
+
 func (k *Key) Display() string {
 	if k.mode == KeyModeSilent {
 		return "⨯"
