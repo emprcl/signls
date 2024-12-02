@@ -221,17 +221,24 @@ func (n *Note) Symbol() string {
 	} else if n.Key.amount != 0 {
 		keySymbol = "\u033c"
 	}
+	controlsTypeNb := 0
 	for _, c := range n.Controls {
 		if c.Type != SilentControlType {
-			paramSymbol = "\u0307"
+			controlsTypeNb += 1
 			break
 		}
 	}
 	for _, c := range n.MetaCommands {
 		if c.Active() {
-			paramSymbol += "\u030A"
+			controlsTypeNb += 1
 			break
 		}
+	}
+	switch controlsTypeNb {
+	case 1:
+		paramSymbol = "\u0307"
+	case 2:
+		paramSymbol = "\u0308"
 	}
 	return fmt.Sprintf("%s%s", keySymbol, paramSymbol)
 }
