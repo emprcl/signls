@@ -98,3 +98,17 @@ func (p *ControlValue[T]) SetMax(max T) {
 	}
 	p.max = max
 }
+
+func min[T Number](a, b T) T {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func max[T Number](a, b T) T {
+	if a > b {
+		return a
+	}
+	return b
+}

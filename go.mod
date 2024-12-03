@@ -1,12 +1,12 @@
 module signls
 
-go 1.23
+go 1.20
 
 require (
 	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.2.4
 	github.com/charmbracelet/lipgloss v1.0.0
-	gitlab.com/gomidi/midi/v2 v2.2.19
+	gitlab.com/gomidi/midi/v2 v2.1.7
 )
 
 require (

@@ -9,3 +9,17 @@ func Clamp(value, minimum, maximum int) int {
 func Mod(a, b int) int {
 	return (a%b + b) % b
 }
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
