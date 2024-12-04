@@ -227,4 +227,5 @@ func (b *Bank) Read(filename string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	b.Grids = b.Grids[:cap(b.Grids)]
 }
