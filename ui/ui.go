@@ -377,6 +377,7 @@ func (m mainModel) View() string {
 				MarginLeft(2).
 				Render(fmt.Sprintf(helpHeader, m.version)),
 			lipgloss.NewStyle().
+				MarginTop(1).
 				Height(m.viewport.Height+controlsHeight-1).
 				Render(help),
 		)
