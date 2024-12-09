@@ -54,6 +54,10 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 					"triggers": filesystem.NewParam(*n.(*node.EuclidEmitter).Triggers),
 					"offset":   filesystem.NewParam(*n.(*node.EuclidEmitter).Offset),
 				}
+			case "cycle", "dice":
+				fnode.Params = map[string]filesystem.Param{
+					"repeat": filesystem.NewParam(*n.(common.Behavioral).Behavior().(common.Repeatable).Repeat()),
+				}
 			case "toll":
 				fnode.Params = map[string]filesystem.Param{
 					"threshold": filesystem.NewParam(*n.(common.Behavioral).Behavior().(*node.TollEmitter).Threshold),
@@ -120,8 +124,12 @@ func (g *Grid) Load(index int, grid filesystem.Grid) {
 			newNode = node.NewSpreadEmitter(g.midi, common.Direction(n.Direction))
 		case "cycle":
 			newNode = node.NewCycleEmitter(g.midi, common.Direction(n.Direction))
+			newNode.(common.Behavioral).Behavior().(*node.CycleEmitter).Repeat().Set(n.Params["repeat"].Value)
+			newNode.(common.Behavioral).Behavior().(*node.CycleEmitter).Repeat().SetRandomAmount(n.Params["repeat"].Amount)
 		case "dice":
 			newNode = node.NewDiceEmitter(g.midi, common.Direction(n.Direction))
+			newNode.(common.Behavioral).Behavior().(*node.DiceEmitter).Repeat().Set(n.Params["repeat"].Value)
+			newNode.(common.Behavioral).Behavior().(*node.DiceEmitter).Repeat().SetRandomAmount(n.Params["repeat"].Amount)
 		case "toll":
 			newNode = node.NewTollEmitter(g.midi, common.Direction(n.Direction))
 			newNode.(common.Behavioral).Behavior().(*node.TollEmitter).Threshold.Set(n.Params["threshold"].Value)

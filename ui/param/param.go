@@ -67,6 +67,15 @@ func NewParamsForNodes(grid *field.Grid, nodes []common.Node) [][]Param {
 			DefaultEmitterControlChanges(nodes),
 			DefaultEmitterMetaCommands(nodes),
 		}
+	} else if isHomogeneousBehavior[common.Repeatable](nodes) {
+		return [][]Param{
+			append(
+				DefaultEmitterParams(grid, nodes),
+				Repeat{nodes: nodes},
+			),
+			DefaultEmitterControlChanges(nodes),
+			DefaultEmitterMetaCommands(nodes),
+		}
 	}
 
 	emitters := filterNodes[music.Audible](nodes)

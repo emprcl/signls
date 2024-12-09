@@ -58,6 +58,11 @@ type Movable interface {
 	MustMove(pulse uint64) bool
 }
 
+// Repeatable represents an interface for nodes that can repeat directions.
+type Repeatable interface {
+	Repeat() *ControlValue[int]
+}
+
 // Behavioral represents an interface for nodes that have a specific behavior.
 type Behavioral interface {
 	Behavior() EmitterBehavior
