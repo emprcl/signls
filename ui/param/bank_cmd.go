@@ -5,6 +5,7 @@ import (
 	"signls/core/common"
 	"signls/core/music"
 	"signls/ui/util"
+	"strconv"
 )
 
 const (
@@ -93,4 +94,10 @@ func (b BankCmd) SetAlt(value int) {
 	}
 }
 
-func (b BankCmd) SetEditValue(input string) {}
+func (b BankCmd) SetEditValue(input string) {
+	value, err := strconv.Atoi(input)
+	if err != nil {
+		return
+	}
+	b.Set(value - 1)
+}

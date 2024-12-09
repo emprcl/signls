@@ -5,6 +5,7 @@ import (
 	"signls/core/common"
 	"signls/core/music"
 	"signls/ui/util"
+	"strconv"
 )
 
 const (
@@ -93,4 +94,10 @@ func (t TempoCmd) SetAlt(value int) {
 	}
 }
 
-func (t TempoCmd) SetEditValue(input string) {}
+func (t TempoCmd) SetEditValue(input string) {
+	value, err := strconv.Atoi(input)
+	if err != nil {
+		return
+	}
+	t.Set(value)
+}

@@ -93,4 +93,10 @@ func (r RootCmd) SetAlt(value int) {
 	}
 }
 
-func (r RootCmd) SetEditValue(input string) {}
+func (r RootCmd) SetEditValue(input string) {
+	midiKey, err := music.ConvertNoteToMIDI(input)
+	if err != nil {
+		return
+	}
+	r.Set(midiKey)
+}
