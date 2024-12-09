@@ -8,6 +8,10 @@ import (
 	"signls/midi"
 )
 
+const (
+	defaultThreshold = 2
+)
+
 type TollEmitter struct {
 	Threshold *common.ControlValue[int]
 	count     int
@@ -18,7 +22,7 @@ func NewTollEmitter(midi midi.Midi, direction common.Direction) *Emitter {
 		direction: direction,
 		note:      music.NewNote(midi),
 		behavior: &TollEmitter{
-			Threshold: common.NewControlValue[int](1, 1, math.MaxInt32),
+			Threshold: common.NewControlValue[int](defaultThreshold, 1, math.MaxInt32),
 		},
 	}
 }
