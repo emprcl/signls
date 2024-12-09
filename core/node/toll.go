@@ -46,8 +46,9 @@ func (e *TollEmitter) ShouldPropagate() bool {
 }
 
 func (e *TollEmitter) Copy() common.EmitterBehavior {
+	newThreshold := *e.Threshold
 	return &TollEmitter{
-		Threshold: e.Threshold,
+		Threshold: &newThreshold,
 	}
 }
 
