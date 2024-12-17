@@ -258,10 +258,10 @@ func (g *Grid) SetAllNodeMutes(mute bool) {
 func (g *Grid) Update() {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if g.pulse%uint64(common.PulsesPerStep) != 0 {
-		g.Tick()
-		return
-	}
+	// if g.pulse%uint64(common.PulsesPerStep/2) != 0 {
+	// 	g.Tick()
+	// 	return
+	// }
 	for y := g.Height - 1; y >= 0; y-- {
 		for x := g.Width - 1; x >= 0; x-- {
 			if g.nodes[y][x] == nil {
@@ -341,15 +341,15 @@ func (g *Grid) Emit(emitter music.Audible, x, y int) {
 			continue
 		} else if n, ok := g.nodes[newY][newX].(music.Audible); ok {
 			n.Arm()
-			n.Trig(g.Key, g.Scale, direction, g.pulse)
+			n.Trig(g.Key, g.Scale, direction, emitter.Division(), g.pulse)
 			continue
 		} else if n, ok := g.nodes[newY][newX].(*node.HoleEmitter); ok {
-			g.Teleport(n, node.NewSignal(direction, g.pulse), newX, newY)
+			g.Teleport(n, node.NewSignal(direction, g.pulse, emitter.Division()), newX, newY)
 			continue
 		} else if n, ok := g.nodes[newY][newX].(*node.Signal); ok {
 			g.Move(n, newX, newY)
 		}
-		g.nodes[newY][newX] = node.NewSignal(direction, g.pulse)
+		g.nodes[newY][newX] = node.NewSignal(direction, g.pulse, emitter.Division())
 	}
 }
 
@@ -394,7 +394,7 @@ func (g *Grid) Move(movable common.Movable, x, y int) {
 		g.PropagateZone(g.nodes[newY][newX].(*node.Emitter), direction, newX, newY)
 	} else if n, ok := g.nodes[newY][newX].(music.Audible); ok {
 		n.Arm()
-		n.Trig(g.Key, g.Scale, direction, g.pulse)
+		n.Trig(g.Key, g.Scale, direction, movable.Division(), g.pulse)
 	} else if n, ok := g.nodes[newY][newX].(*node.HoleEmitter); ok {
 		g.Teleport(n, g.nodes[y][x], newX, newY)
 	} else if n, ok := g.nodes[newY][newX].(*node.Signal); ok {
@@ -411,7 +411,7 @@ func (g *Grid) PropagateZone(e *node.Emitter, direction common.Direction, x, y i
 		return
 	}
 	e.Arm()
-	e.Trig(g.Key, g.Scale, direction, g.pulse)
+	e.Trig(g.Key, g.Scale, direction, e.Division(), g.pulse)
 	for dy := -1; dy <= 1; dy++ {
 		for dx := -1; dx <= 1; dx++ {
 			newX, newY := x+dx, y+dy
@@ -423,7 +423,7 @@ func (g *Grid) PropagateZone(e *node.Emitter, direction common.Direction, x, y i
 				g.PropagateZone(n, direction, newX, newY)
 			} else if n, ok := g.nodes[newY][newX].(*node.Emitter); ok && !n.Activated() {
 				n.Arm()
-				n.Trig(g.Key, g.Scale, direction, g.pulse)
+				n.Trig(g.Key, g.Scale, direction, e.Division(), g.pulse)
 			} else if n, ok := g.nodes[newY][newX].(*node.HoleEmitter); ok {
 				g.Teleport(n, node.NewSignal(direction, g.pulse), newX, newY)
 			}

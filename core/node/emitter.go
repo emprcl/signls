@@ -14,6 +14,7 @@ type Emitter struct {
 
 	direction         common.Direction
 	incomingDirection common.Direction
+	incomingDivision  int
 	note              *music.Note
 
 	pulse     uint64
@@ -63,7 +64,7 @@ func (e *Emitter) Muted() bool {
 	return e.muted
 }
 
-func (e *Emitter) Trig(key theory.Key, scale theory.Scale, inDir common.Direction, pulse uint64) {
+func (e *Emitter) Trig(key theory.Key, scale theory.Scale, inDir common.Direction, inDiv int, pulse uint64) {
 	if !e.updated(pulse) {
 		e.note.Tick()
 	}
@@ -79,6 +80,7 @@ func (e *Emitter) Trig(key theory.Key, scale theory.Scale, inDir common.Directio
 		e.pulse = pulse
 	}
 	e.incomingDirection = inDir
+	e.incomingDivision = inDiv
 	e.triggered = true
 	e.armed = false
 }
@@ -102,6 +104,10 @@ func (e *Emitter) Tick() {
 
 func (e *Emitter) Direction() common.Direction {
 	return e.direction
+}
+
+func (e *Emitter) Division() int {
+	return e.incomingDivision
 }
 
 func (e *Emitter) SetDirection(dir common.Direction) {

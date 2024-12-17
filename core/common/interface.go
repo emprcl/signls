@@ -10,6 +10,9 @@ type Node interface {
 	// the emitting directions (emitters).
 	Direction() Direction
 
+	// Division returns the timing division of the signal.
+	Division() int
+
 	// SetDirection sets the direction for the node.
 	SetDirection(dir Direction)
 
@@ -56,6 +59,9 @@ type EmitterBehavior interface {
 type Movable interface {
 	// MustMove checks if the node must move during the current pulse.
 	MustMove(pulse uint64) bool
+
+	// Division returns the timing division of the signal.
+	Division() int
 }
 
 // Repeatable represents an interface for nodes that can repeat directions.
