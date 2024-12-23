@@ -17,6 +17,7 @@ func (d DefaultDevice) Help() string {
 }
 
 func (d DefaultDevice) Display() string {
+	// TODO: handle disconnected as well
 	return d.grid.MidiDevice().Name
 }
 

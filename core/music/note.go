@@ -101,6 +101,7 @@ func NewNote(midi midi.Midi, device *midi.Device) *Note {
 
 // Copy creates a copy of the note.
 func (n Note) Copy() *Note {
+	newDevice := *n.Device
 	newKey := *n.Key
 	newChannel := *n.Channel
 	newVelocity := *n.Velocity
@@ -117,6 +118,7 @@ func (n Note) Copy() *Note {
 	return &Note{
 		midi:         n.midi,
 		rand:         rand.New(source),
+		Device:       &newDevice,
 		Key:          &newKey,
 		Channel:      &newChannel,
 		Velocity:     &newVelocity,
