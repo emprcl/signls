@@ -164,9 +164,10 @@ func (g *Grid) Load(index int, grid filesystem.Grid) {
 			a.Note().Length.Set(uint8(n.Note.Length.Value))
 			a.Note().Length.SetRandomAmount(n.Note.Length.Amount)
 			a.Note().Probability = uint8(n.Note.Probability)
+
 			device := g.midi.NewDevice(n.Device, g.device.Name)
-			a.Note().Device.Device = g.midi.NewDevice(n.Device, g.device.Name)
-			a.Note().Device.Enabled = !device.Empty()
+			a.Note().Device.Device = device
+			a.Note().Device.Enabled = device.Enabled()
 
 			for i, c := range n.Note.Controls {
 				a.Note().Controls[i].Type = music.ControlType(c.Type)

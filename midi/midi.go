@@ -47,8 +47,8 @@ type Device struct {
 	Fallback bool
 }
 
-func (d Device) Empty() bool {
-	return d.Name == ""
+func (d Device) Enabled() bool {
+	return d.Name != "" && !d.Fallback
 }
 
 // midi contains the midi devices state. We use the gomidi package
@@ -142,6 +142,7 @@ func (m *midi) NewDevice(device, fallback string) Device {
 	id, err = m.findDeviceIndex(fallback)
 	if err == nil {
 		return Device{
+			Name:     device,
 			ID:       id,
 			Fallback: true,
 		}

@@ -269,3 +269,8 @@ func (n *Note) Symbol() string {
 	}
 	return fmt.Sprintf("%s%s", keySymbol, paramSymbol)
 }
+
+// Midi returns the Midi interface.
+func (n *Note) Midi() midi.Midi {
+	return n.midi
+}
