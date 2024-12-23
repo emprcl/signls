@@ -91,22 +91,13 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 
 func (g *Grid) Load(index int, grid filesystem.Grid) {
 	g.Reset()
-	g.midi.SilenceAll(g.device.ID)
-
-	// TODO: make a silence all method in grid
-	for y := range g.nodes {
-		for x := range g.nodes[y] {
-			if n, ok := g.nodes[y][x].(music.Audible); ok {
-				g.midi.SilenceAll(n.Note().Device.ID)
-			}
-		}
-	}
+	g.midi.SilenceAll()
 
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
 	g.BankIndex = index
-	g.device = g.midi.NewDevice(grid.Device)
+	g.device = g.midi.NewDevice(grid.Device, "")
 	g.clock.SetTempo(grid.Tempo)
 	g.Key = theory.Key(grid.Key)
 	g.Scale = theory.Scale(grid.Scale)
@@ -121,8 +112,7 @@ func (g *Grid) Load(index int, grid filesystem.Grid) {
 
 	for _, n := range grid.Nodes {
 		var newNode common.Node
-		// TODO: add fallback to grid device
-		device := g.midi.NewDevice(n.Device)
+		device := g.midi.NewDevice(n.Device, g.device.Name)
 		switch n.Type {
 		case "bang":
 			newNode = node.NewBangEmitter(g.midi, device, common.Direction(n.Direction), true)

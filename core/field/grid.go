@@ -44,7 +44,7 @@ type Grid struct {
 
 // NewGrid initializes and returns a new Grid with the given dimensions and MIDI interface.
 func NewGrid(width, height int, midi midi.Midi, device string) *Grid {
-	d := midi.NewDevice(device)
+	d := midi.NewDevice(device, "")
 	grid := &Grid{
 		midi:   midi,
 		device: d,
@@ -76,7 +76,7 @@ func (g *Grid) TogglePlay() {
 	g.Playing = !g.Playing
 	if !g.Playing {
 		g.Reset()
-		g.midi.SilenceAll(g.device.ID)
+		g.midi.SilenceAll()
 	}
 
 	if !g.SendTransport {
@@ -368,7 +368,7 @@ func (g *Grid) ExecuteMetaCommands(node music.Audible) {
 		case *meta.RootCommand:
 			g.Key = theory.Key(c.Value().Computed())
 		case *meta.ScaleCommand:
-			g.Scale = theory.Scale(theory.AllScales()[c.Value().Computed()])
+			g.Scale = theory.AllScales()[c.Value().Computed()]
 		case *meta.TempoCommand:
 			g.SetTempo(float64(c.Value().Computed()))
 		case *meta.BankCommand:

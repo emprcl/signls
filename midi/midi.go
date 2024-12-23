@@ -27,7 +27,7 @@ type Midi interface {
 	NoteOn(device int, channel uint8, note uint8, velocity uint8)
 	NoteOff(device int, channel uint8, note uint8)
 	Silence(device int, channel uint8)
-	SilenceAll(device int)
+	SilenceAll()
 	ControlChange(device int, channel, controller, value uint8)
 	ProgramChange(device int, channel uint8, value uint8)
 	Pitchbend(device int, channel uint8, value int16)
@@ -35,7 +35,7 @@ type Midi interface {
 	SendClock(device int)
 	TransportStart(device int)
 	TransportStop(device int)
-	NewDevice(device string) Device
+	NewDevice(device, fallback string) Device
 	GetDevice(device int) Device
 	Close()
 }
@@ -127,8 +127,11 @@ func (m *midi) start() {
 }
 
 // NewDevice creates a new device.
-func (m *midi) NewDevice(device string) Device {
+func (m *midi) NewDevice(device, fallback string) Device {
 	id, err := m.findDeviceIndex(device)
+	if err != nil {
+		id, err = m.findDeviceIndex(fallback)
+	}
 	if err != nil {
 		return Device{
 			Name:     m.Devices()[defaultDevice].String(),
@@ -165,9 +168,11 @@ func (m *midi) Silence(device int, channel uint8) {
 }
 
 // SilenceAll sends a note off message for every running note on every channel.
-func (m *midi) SilenceAll(device int) {
-	for c := 0; c < 16; c++ {
-		m.Silence(device, uint8(c))
+func (m *midi) SilenceAll() {
+	for device := range m.devices {
+		for c := 0; c < 16; c++ {
+			m.Silence(device, uint8(c))
+		}
 	}
 }
 
