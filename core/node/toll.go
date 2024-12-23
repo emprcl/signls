@@ -17,7 +17,7 @@ type TollEmitter struct {
 	count     int
 }
 
-func NewTollEmitter(midi midi.Midi, device midi.Device, direction common.Direction) *Emitter {
+func NewTollEmitter(midi midi.Midi, device *midi.Device, direction common.Direction) *Emitter {
 	return &Emitter{
 		direction: direction,
 		note:      music.NewNote(midi, device),

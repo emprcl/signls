@@ -29,13 +29,33 @@ const (
 
 var lastUsedChannel uint8 = defaultChannel
 
+type DeviceValue struct {
+	Device     midi.Device
+	GridDevice *midi.Device
+	Enabled    bool
+}
+
+func (d DeviceValue) Get() int {
+	if d.Enabled {
+		return d.Device.ID
+	}
+	return d.GridDevice.ID
+}
+
+func (d DeviceValue) Name() string {
+	if d.Enabled {
+		return d.Device.Name
+	}
+	return ""
+}
+
 // Note represents a midi note.
 type Note struct {
 	midi midi.Midi
 
 	rand *rand.Rand
 
-	Device      midi.Device
+	Device      *DeviceValue
 	Key         *KeyValue
 	Channel     *common.ControlValue[uint8]
 	Velocity    *common.ControlValue[uint8]
@@ -50,7 +70,7 @@ type Note struct {
 }
 
 // NewNote initializes a new Note with default settings and the provided MIDI interface.
-func NewNote(midi midi.Midi, device midi.Device) *Note {
+func NewNote(midi midi.Midi, device *midi.Device) *Note {
 	source := rand.NewSource(time.Now().UnixNano())
 	ccs := make([]*CC, defaultCCNumbers)
 	for i := range ccs {
@@ -62,10 +82,13 @@ func NewNote(midi midi.Midi, device midi.Device) *Note {
 		meta.NewRootCommand(),
 		meta.NewScaleCommand(),
 	}
+	deviceValue := DeviceValue{
+		GridDevice: device,
+	}
 	return &Note{
 		midi:         midi,
 		rand:         rand.New(source),
-		Device:       device,
+		Device:       &deviceValue,
 		Key:          NewKeyValue(defaultKey),
 		Channel:      common.NewControlValue[uint8](lastUsedChannel, 0, maxChannel),
 		Velocity:     common.NewControlValue[uint8](defaultVelocity, 0, maxVelocity),
@@ -131,7 +154,7 @@ func (n *Note) TransposeAndPlay(root theory.Key, scale theory.Scale) {
 	n.Transpose(root, scale)
 	n.Stop()
 	n.midi.NoteOn(
-		n.Device.ID,
+		n.Device.Get(),
 		n.Channel.Computed(),
 		uint8(n.Key.Computed(root, scale)),
 		n.Velocity.Computed(),
@@ -139,7 +162,7 @@ func (n *Note) TransposeAndPlay(root theory.Key, scale theory.Scale) {
 	n.Length.Computed() // Just trigger length computation
 
 	for _, control := range n.Controls {
-		control.Send(n.Device.ID, n.Channel.Last())
+		control.Send(n.Device.Get(), n.Channel.Last())
 	}
 
 	for _, cmd := range n.MetaCommands {
@@ -158,7 +181,7 @@ func (n *Note) Play() {
 
 	n.Stop()
 	n.midi.NoteOn(
-		n.Device.ID,
+		n.Device.Get(),
 		n.Channel.Value(),
 		uint8(n.Key.Value()),
 		n.Velocity.Value(),
@@ -170,14 +193,14 @@ func (n *Note) Play() {
 
 // Silence silences the note channel
 func (n *Note) Silence() {
-	n.midi.Silence(n.Device.ID, n.Channel.Value())
+	n.midi.Silence(n.Device.Get(), n.Channel.Value())
 	n.triggered = false
 	n.pulse = 0
 }
 
 // Stop sends a MIDI Note Off message and resets the triggered state.
 func (n *Note) Stop() {
-	n.midi.NoteOff(n.Device.ID, n.Channel.Last(), uint8(n.Key.Last()))
+	n.midi.NoteOff(n.Device.Get(), n.Channel.Last(), uint8(n.Key.Last()))
 	n.triggered = false
 	n.pulse = 0
 }

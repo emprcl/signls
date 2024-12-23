@@ -47,6 +47,10 @@ type Device struct {
 	Fallback bool
 }
 
+func (d Device) Empty() bool {
+	return d.Name == ""
+}
+
 // midi contains the midi devices state. We use the gomidi package
 // for communicating with available devices.
 type midi struct {
@@ -129,19 +133,23 @@ func (m *midi) start() {
 // NewDevice creates a new device.
 func (m *midi) NewDevice(device, fallback string) Device {
 	id, err := m.findDeviceIndex(device)
-	if err != nil {
-		id, err = m.findDeviceIndex(fallback)
-	}
-	if err != nil {
+	if err == nil {
 		return Device{
-			Name:     m.Devices()[defaultDevice].String(),
-			ID:       defaultDevice,
+			Name: device,
+			ID:   id,
+		}
+	}
+	id, err = m.findDeviceIndex(fallback)
+	if err == nil {
+		return Device{
+			ID:       id,
 			Fallback: true,
 		}
 	}
 	return Device{
-		Name: device,
-		ID:   id,
+		Name:     m.Devices()[defaultDevice].String(),
+		ID:       defaultDevice,
+		Fallback: true,
 	}
 }
 

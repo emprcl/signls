@@ -17,7 +17,7 @@ type DiceEmitter struct {
 	count  int
 }
 
-func NewDiceEmitter(midi midi.Midi, device midi.Device, direction common.Direction) *Emitter {
+func NewDiceEmitter(midi midi.Midi, device *midi.Device, direction common.Direction) *Emitter {
 	source := rand.NewSource(time.Now().UnixNano())
 	return &Emitter{
 		direction: direction,

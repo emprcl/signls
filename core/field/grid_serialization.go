@@ -36,7 +36,7 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 			if a, ok := n.(music.Audible); ok {
 				note = filesystem.NewNote(*a.Note())
 				muted = a.Muted()
-				device = a.Note().Device.Name
+				device = a.Note().Device.Name()
 			}
 
 			fnode := filesystem.Node{
@@ -112,12 +112,11 @@ func (g *Grid) Load(index int, grid filesystem.Grid) {
 
 	for _, n := range grid.Nodes {
 		var newNode common.Node
-		device := g.midi.NewDevice(n.Device, g.device.Name)
 		switch n.Type {
 		case "bang":
-			newNode = node.NewBangEmitter(g.midi, device, common.Direction(n.Direction), true)
+			newNode = node.NewBangEmitter(g.midi, &g.device, common.Direction(n.Direction), true)
 		case "euclid":
-			newNode = node.NewEuclidEmitter(g.midi, device, common.Direction(n.Direction))
+			newNode = node.NewEuclidEmitter(g.midi, &g.device, common.Direction(n.Direction))
 			newNode.(*node.EuclidEmitter).Steps.Set(n.Params["steps"].Value)
 			newNode.(*node.EuclidEmitter).Steps.SetRandomAmount(n.Params["steps"].Amount)
 			newNode.(*node.EuclidEmitter).Triggers.Set(n.Params["triggers"].Value)
@@ -125,23 +124,23 @@ func (g *Grid) Load(index int, grid filesystem.Grid) {
 			newNode.(*node.EuclidEmitter).Offset.Set(n.Params["offset"].Value)
 			newNode.(*node.EuclidEmitter).Offset.SetRandomAmount(n.Params["offset"].Amount)
 		case "pass":
-			newNode = node.NewPassEmitter(g.midi, device, common.Direction(n.Direction))
+			newNode = node.NewPassEmitter(g.midi, &g.device, common.Direction(n.Direction))
 		case "spread":
-			newNode = node.NewSpreadEmitter(g.midi, device, common.Direction(n.Direction))
+			newNode = node.NewSpreadEmitter(g.midi, &g.device, common.Direction(n.Direction))
 		case "cycle":
-			newNode = node.NewCycleEmitter(g.midi, device, common.Direction(n.Direction))
+			newNode = node.NewCycleEmitter(g.midi, &g.device, common.Direction(n.Direction))
 			newNode.(common.Behavioral).Behavior().(*node.CycleEmitter).Repeat().Set(n.Params["repeat"].Value)
 			newNode.(common.Behavioral).Behavior().(*node.CycleEmitter).Repeat().SetRandomAmount(n.Params["repeat"].Amount)
 		case "dice":
-			newNode = node.NewDiceEmitter(g.midi, device, common.Direction(n.Direction))
+			newNode = node.NewDiceEmitter(g.midi, &g.device, common.Direction(n.Direction))
 			newNode.(common.Behavioral).Behavior().(*node.DiceEmitter).Repeat().Set(n.Params["repeat"].Value)
 			newNode.(common.Behavioral).Behavior().(*node.DiceEmitter).Repeat().SetRandomAmount(n.Params["repeat"].Amount)
 		case "toll":
-			newNode = node.NewTollEmitter(g.midi, device, common.Direction(n.Direction))
+			newNode = node.NewTollEmitter(g.midi, &g.device, common.Direction(n.Direction))
 			newNode.(common.Behavioral).Behavior().(*node.TollEmitter).Threshold.Set(n.Params["threshold"].Value)
 			newNode.(common.Behavioral).Behavior().(*node.TollEmitter).Threshold.SetRandomAmount(n.Params["threshold"].Amount)
 		case "zone":
-			newNode = node.NewZoneEmitter(g.midi, device, common.Direction(n.Direction))
+			newNode = node.NewZoneEmitter(g.midi, &g.device, common.Direction(n.Direction))
 		case "hole":
 			newNode = node.NewHoleEmitter(common.Direction(n.Direction), n.X, n.Y, g.Width, g.Height)
 			newNode.(*node.HoleEmitter).DestinationX.Set(n.Params["destinationX"].Value)
@@ -165,6 +164,9 @@ func (g *Grid) Load(index int, grid filesystem.Grid) {
 			a.Note().Length.Set(uint8(n.Note.Length.Value))
 			a.Note().Length.SetRandomAmount(n.Note.Length.Amount)
 			a.Note().Probability = uint8(n.Note.Probability)
+			device := g.midi.NewDevice(n.Device, g.device.Name)
+			a.Note().Device.Device = g.midi.NewDevice(n.Device, g.device.Name)
+			a.Note().Device.Enabled = !device.Empty()
 
 			for i, c := range n.Note.Controls {
 				a.Note().Controls[i].Type = music.ControlType(c.Type)

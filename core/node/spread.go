@@ -8,7 +8,7 @@ import (
 
 type SpreadEmitter struct{}
 
-func NewSpreadEmitter(midi midi.Midi, device midi.Device, direction common.Direction) *Emitter {
+func NewSpreadEmitter(midi midi.Midi, device *midi.Device, direction common.Direction) *Emitter {
 	return &Emitter{
 		direction: direction,
 		note:      music.NewNote(midi, device),

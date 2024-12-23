@@ -8,7 +8,7 @@ import (
 
 type BangEmitter struct{}
 
-func NewBangEmitter(midi midi.Midi, device midi.Device, direction common.Direction, armed bool) *Emitter {
+func NewBangEmitter(midi midi.Midi, device *midi.Device, direction common.Direction, armed bool) *Emitter {
 	return &Emitter{
 		direction: direction,
 		armed:     armed,

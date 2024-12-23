@@ -195,21 +195,21 @@ func (g *Grid) Node(x, y int) common.Node {
 func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	switch symbol {
 	case "b":
-		g.AddNode(node.NewBangEmitter(g.midi, g.device, common.NONE, !g.Playing), x, y)
+		g.AddNode(node.NewBangEmitter(g.midi, &g.device, common.NONE, !g.Playing), x, y)
 	case "s":
-		g.AddNode(node.NewSpreadEmitter(g.midi, g.device, common.NONE), x, y)
+		g.AddNode(node.NewSpreadEmitter(g.midi, &g.device, common.NONE), x, y)
 	case "c":
-		g.AddNode(node.NewCycleEmitter(g.midi, g.device, common.NONE), x, y)
+		g.AddNode(node.NewCycleEmitter(g.midi, &g.device, common.NONE), x, y)
 	case "d":
-		g.AddNode(node.NewDiceEmitter(g.midi, g.device, common.NONE), x, y)
+		g.AddNode(node.NewDiceEmitter(g.midi, &g.device, common.NONE), x, y)
 	case "t":
-		g.AddNode(node.NewTollEmitter(g.midi, g.device, common.NONE), x, y)
+		g.AddNode(node.NewTollEmitter(g.midi, &g.device, common.NONE), x, y)
 	case "e":
-		g.AddNode(node.NewEuclidEmitter(g.midi, g.device, common.NONE), x, y)
+		g.AddNode(node.NewEuclidEmitter(g.midi, &g.device, common.NONE), x, y)
 	case "z":
-		g.AddNode(node.NewZoneEmitter(g.midi, g.device, common.NONE), x, y)
+		g.AddNode(node.NewZoneEmitter(g.midi, &g.device, common.NONE), x, y)
 	case "p":
-		g.AddNode(node.NewPassEmitter(g.midi, g.device, common.NONE), x, y)
+		g.AddNode(node.NewPassEmitter(g.midi, &g.device, common.NONE), x, y)
 	case "h":
 		g.AddNode(node.NewHoleEmitter(common.NONE, x, y, g.Width, g.Height), x, y)
 	}
