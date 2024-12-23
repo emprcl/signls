@@ -18,6 +18,8 @@ func (d Device) Name() string {
 func (d Device) Help() string {
 	if !d.nodes[0].(music.Audible).Note().Device.Enabled {
 		return ""
+	} else if d.nodes[0].(music.Audible).Note().Device.Device.Fallback {
+		return fmt.Sprintf("disconnected: %s", d.nodes[0].(music.Audible).Note().Device.Name())
 	}
 	return d.nodes[0].(music.Audible).Note().Device.Name()
 }
@@ -25,6 +27,8 @@ func (d Device) Help() string {
 func (d Device) Display() string {
 	if !d.nodes[0].(music.Audible).Note().Device.Enabled {
 		return "⨯"
+	} else if d.nodes[0].(music.Audible).Note().Device.Device.Fallback {
+		return "??"
 	}
 	return fmt.Sprintf("%d", d.nodes[0].(music.Audible).Note().Device.Device.ID)
 }
@@ -46,15 +50,11 @@ func (d Device) Down() {
 }
 
 func (d Device) Left() {
-	for _, n := range d.nodes {
-		n.(music.Audible).Note().Device.Enabled = !n.(music.Audible).Note().Device.Enabled
-	}
+	d.SetAlt(0)
 }
 
 func (d Device) Right() {
-	for _, n := range d.nodes {
-		n.(music.Audible).Note().Device.Enabled = !n.(music.Audible).Note().Device.Enabled
-	}
+	d.SetAlt(0)
 }
 
 func (d Device) AltUp() {}
@@ -75,6 +75,14 @@ func (d Device) Set(value int) {
 	}
 }
 
-func (d Device) SetAlt(value int) {}
+func (d Device) SetAlt(value int) {
+	enabled := !d.nodes[0].(music.Audible).Note().Device.Enabled
+	for _, n := range d.nodes {
+		if enabled {
+			n.(music.Audible).Note().Device.Device = d.nodes[0].(music.Audible).Note().Midi().GetDevice(value)
+		}
+		n.(music.Audible).Note().Device.Enabled = enabled
+	}
+}
 
 func (c Device) SetEditValue(input string) {}

@@ -48,7 +48,7 @@ type Device struct {
 }
 
 func (d Device) Enabled() bool {
-	return d.Name != "" && !d.Fallback
+	return d.Name != ""
 }
 
 // midi contains the midi devices state. We use the gomidi package
