@@ -35,6 +35,7 @@ type Note struct {
 
 	rand *rand.Rand
 
+	Device      midi.Device
 	Key         *KeyValue
 	Channel     *common.ControlValue[uint8]
 	Velocity    *common.ControlValue[uint8]
@@ -49,7 +50,7 @@ type Note struct {
 }
 
 // NewNote initializes a new Note with default settings and the provided MIDI interface.
-func NewNote(midi midi.Midi) *Note {
+func NewNote(midi midi.Midi, device midi.Device) *Note {
 	source := rand.NewSource(time.Now().UnixNano())
 	ccs := make([]*CC, defaultCCNumbers)
 	for i := range ccs {
@@ -64,6 +65,7 @@ func NewNote(midi midi.Midi) *Note {
 	return &Note{
 		midi:         midi,
 		rand:         rand.New(source),
+		Device:       device,
 		Key:          NewKeyValue(defaultKey),
 		Channel:      common.NewControlValue[uint8](lastUsedChannel, 0, maxChannel),
 		Velocity:     common.NewControlValue[uint8](defaultVelocity, 0, maxVelocity),
@@ -129,6 +131,7 @@ func (n *Note) TransposeAndPlay(root theory.Key, scale theory.Scale) {
 	n.Transpose(root, scale)
 	n.Stop()
 	n.midi.NoteOn(
+		n.Device.ID,
 		n.Channel.Computed(),
 		uint8(n.Key.Computed(root, scale)),
 		n.Velocity.Computed(),
@@ -136,7 +139,7 @@ func (n *Note) TransposeAndPlay(root theory.Key, scale theory.Scale) {
 	n.Length.Computed() // Just trigger length computation
 
 	for _, control := range n.Controls {
-		control.Send(n.Channel.Last())
+		control.Send(n.Device.ID, n.Channel.Last())
 	}
 
 	for _, cmd := range n.MetaCommands {
@@ -155,6 +158,7 @@ func (n *Note) Play() {
 
 	n.Stop()
 	n.midi.NoteOn(
+		n.Device.ID,
 		n.Channel.Value(),
 		uint8(n.Key.Value()),
 		n.Velocity.Value(),
@@ -166,14 +170,14 @@ func (n *Note) Play() {
 
 // Silence silences the note channel
 func (n *Note) Silence() {
-	n.midi.Silence(n.Channel.Value())
+	n.midi.Silence(n.Device.ID, n.Channel.Value())
 	n.triggered = false
 	n.pulse = 0
 }
 
 // Stop sends a MIDI Note Off message and resets the triggered state.
 func (n *Note) Stop() {
-	n.midi.NoteOff(n.Channel.Last(), uint8(n.Key.Last()))
+	n.midi.NoteOff(n.Device.ID, n.Channel.Last(), uint8(n.Key.Last()))
 	n.triggered = false
 	n.pulse = 0
 }

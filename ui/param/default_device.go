@@ -17,11 +17,11 @@ func (d DefaultDevice) Help() string {
 }
 
 func (d DefaultDevice) Display() string {
-	return d.grid.MidiDevice()
+	return d.grid.MidiDevice().Name
 }
 
 func (d DefaultDevice) Value() int {
-	return d.grid.Midi().ActiveDeviceIndex()
+	return d.grid.MidiDevice().ID
 }
 
 func (d DefaultDevice) AltValue() int {
@@ -29,11 +29,11 @@ func (d DefaultDevice) AltValue() int {
 }
 
 func (d DefaultDevice) Up() {
-	d.grid.Midi().SetActiveDevice(d.Value() + 1)
+	d.grid.SetMidiDevice(d.grid.Midi().GetDevice(d.Value() + 1))
 }
 
 func (d DefaultDevice) Down() {
-	d.grid.Midi().SetActiveDevice(d.Value() - 1)
+	d.grid.SetMidiDevice(d.grid.Midi().GetDevice(d.Value() - 1))
 }
 
 func (d DefaultDevice) Left() {}

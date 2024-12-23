@@ -82,16 +82,16 @@ func (c *CC) SetType(t int) {
 	}
 }
 
-func (c CC) Send(channel uint8) {
+func (c CC) Send(device int, channel uint8) {
 	switch c.Type {
 	case SilentControlType:
 		return
 	case ControlChangeControlType:
-		c.midi.ControlChange(channel, c.Controller, c.Value.Computed())
+		c.midi.ControlChange(device, channel, c.Controller, c.Value.Computed())
 	case AfterTouchControlType:
-		c.midi.AfterTouch(channel, c.Value.Computed())
+		c.midi.AfterTouch(device, channel, c.Value.Computed())
 	case ProgramChangeControlType:
-		c.midi.ProgramChange(channel, c.Value.Computed())
+		c.midi.ProgramChange(device, channel, c.Value.Computed())
 	case PitchBendControlType:
 		value := 0
 		if c.Value.Computed() != defaultPitchBendValue {
@@ -103,7 +103,7 @@ func (c CC) Send(channel uint8) {
 				int(maxPitchBendValue),
 			)
 		}
-		c.midi.Pitchbend(channel, int16(value))
+		c.midi.Pitchbend(device, channel, int16(value))
 	}
 }
 

@@ -8,10 +8,10 @@ import (
 
 type PassEmitter struct{}
 
-func NewPassEmitter(midi midi.Midi, direction common.Direction) *Emitter {
+func NewPassEmitter(midi midi.Midi, device midi.Device, direction common.Direction) *Emitter {
 	return &Emitter{
 		direction: direction,
-		note:      music.NewNote(midi),
+		note:      music.NewNote(midi, device),
 		behavior:  &PassEmitter{},
 	}
 }

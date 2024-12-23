@@ -12,7 +12,7 @@ import (
 )
 
 func NewFromBank(bankIndex int, grid filesystem.Grid, midi midi.Midi) *Grid {
-	newGrid := NewGrid(grid.Width, grid.Height, midi)
+	newGrid := NewGrid(grid.Width, grid.Height, midi, grid.Device)
 	newGrid.Load(bankIndex, grid)
 	return newGrid
 }
@@ -32,9 +32,11 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 
 			note := filesystem.Note{}
 			muted := false
+			device := ""
 			if a, ok := n.(music.Audible); ok {
 				note = filesystem.NewNote(*a.Note())
 				muted = a.Muted()
+				device = a.Note().Device.Name
 			}
 
 			fnode := filesystem.Node{
@@ -44,6 +46,7 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 				Direction: int(n.Direction()),
 				Note:      note,
 				Muted:     muted,
+				Device:    device,
 				Params:    map[string]filesystem.Param{},
 			}
 
@@ -78,6 +81,7 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 		Tempo:         g.Tempo(),
 		Height:        g.Height,
 		Width:         g.Width,
+		Device:        g.device.Name,
 		Key:           uint8(g.Key),
 		Scale:         uint16(g.Scale),
 		SendClock:     g.SendClock,
@@ -87,12 +91,22 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 
 func (g *Grid) Load(index int, grid filesystem.Grid) {
 	g.Reset()
-	g.midi.SilenceAll()
+	g.midi.SilenceAll(g.device.ID)
+
+	// TODO: make a silence all method in grid
+	for y := range g.nodes {
+		for x := range g.nodes[y] {
+			if n, ok := g.nodes[y][x].(music.Audible); ok {
+				g.midi.SilenceAll(n.Note().Device.ID)
+			}
+		}
+	}
 
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
 	g.BankIndex = index
+	g.device = g.midi.NewDevice(grid.Device)
 	g.clock.SetTempo(grid.Tempo)
 	g.Key = theory.Key(grid.Key)
 	g.Scale = theory.Scale(grid.Scale)
@@ -107,11 +121,13 @@ func (g *Grid) Load(index int, grid filesystem.Grid) {
 
 	for _, n := range grid.Nodes {
 		var newNode common.Node
+		// TODO: add fallback to grid device
+		device := g.midi.NewDevice(n.Device)
 		switch n.Type {
 		case "bang":
-			newNode = node.NewBangEmitter(g.midi, common.Direction(n.Direction), true)
+			newNode = node.NewBangEmitter(g.midi, device, common.Direction(n.Direction), true)
 		case "euclid":
-			newNode = node.NewEuclidEmitter(g.midi, common.Direction(n.Direction))
+			newNode = node.NewEuclidEmitter(g.midi, device, common.Direction(n.Direction))
 			newNode.(*node.EuclidEmitter).Steps.Set(n.Params["steps"].Value)
 			newNode.(*node.EuclidEmitter).Steps.SetRandomAmount(n.Params["steps"].Amount)
 			newNode.(*node.EuclidEmitter).Triggers.Set(n.Params["triggers"].Value)
@@ -119,23 +135,23 @@ func (g *Grid) Load(index int, grid filesystem.Grid) {
 			newNode.(*node.EuclidEmitter).Offset.Set(n.Params["offset"].Value)
 			newNode.(*node.EuclidEmitter).Offset.SetRandomAmount(n.Params["offset"].Amount)
 		case "pass":
-			newNode = node.NewPassEmitter(g.midi, common.Direction(n.Direction))
+			newNode = node.NewPassEmitter(g.midi, device, common.Direction(n.Direction))
 		case "spread":
-			newNode = node.NewSpreadEmitter(g.midi, common.Direction(n.Direction))
+			newNode = node.NewSpreadEmitter(g.midi, device, common.Direction(n.Direction))
 		case "cycle":
-			newNode = node.NewCycleEmitter(g.midi, common.Direction(n.Direction))
+			newNode = node.NewCycleEmitter(g.midi, device, common.Direction(n.Direction))
 			newNode.(common.Behavioral).Behavior().(*node.CycleEmitter).Repeat().Set(n.Params["repeat"].Value)
 			newNode.(common.Behavioral).Behavior().(*node.CycleEmitter).Repeat().SetRandomAmount(n.Params["repeat"].Amount)
 		case "dice":
-			newNode = node.NewDiceEmitter(g.midi, common.Direction(n.Direction))
+			newNode = node.NewDiceEmitter(g.midi, device, common.Direction(n.Direction))
 			newNode.(common.Behavioral).Behavior().(*node.DiceEmitter).Repeat().Set(n.Params["repeat"].Value)
 			newNode.(common.Behavioral).Behavior().(*node.DiceEmitter).Repeat().SetRandomAmount(n.Params["repeat"].Amount)
 		case "toll":
-			newNode = node.NewTollEmitter(g.midi, common.Direction(n.Direction))
+			newNode = node.NewTollEmitter(g.midi, device, common.Direction(n.Direction))
 			newNode.(common.Behavioral).Behavior().(*node.TollEmitter).Threshold.Set(n.Params["threshold"].Value)
 			newNode.(common.Behavioral).Behavior().(*node.TollEmitter).Threshold.SetRandomAmount(n.Params["threshold"].Amount)
 		case "zone":
-			newNode = node.NewZoneEmitter(g.midi, common.Direction(n.Direction))
+			newNode = node.NewZoneEmitter(g.midi, device, common.Direction(n.Direction))
 		case "hole":
 			newNode = node.NewHoleEmitter(common.Direction(n.Direction), n.X, n.Y, g.Width, g.Height)
 			newNode.(*node.HoleEmitter).DestinationX.Set(n.Params["destinationX"].Value)

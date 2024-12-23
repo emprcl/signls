@@ -8,10 +8,10 @@ import (
 
 type ZoneEmitter struct{}
 
-func NewZoneEmitter(midi midi.Midi, direction common.Direction) *Emitter {
+func NewZoneEmitter(midi midi.Midi, device midi.Device, direction common.Direction) *Emitter {
 	return &Emitter{
 		direction: direction,
-		note:      music.NewNote(midi),
+		note:      music.NewNote(midi, device),
 		behavior:  &ZoneEmitter{},
 	}
 }

@@ -22,6 +22,7 @@ type Grid struct {
 	mu sync.Mutex
 
 	midi      midi.Midi
+	device    midi.Device
 	clock     *common.Clock
 	nodes     [][]common.Node
 	Height    int
@@ -42,9 +43,11 @@ type Grid struct {
 }
 
 // NewGrid initializes and returns a new Grid with the given dimensions and MIDI interface.
-func NewGrid(width, height int, midi midi.Midi) *Grid {
+func NewGrid(width, height int, midi midi.Midi, device string) *Grid {
+	d := midi.NewDevice(device)
 	grid := &Grid{
 		midi:   midi,
+		device: d,
 		nodes:  make([][]common.Node, height),
 		Height: height,
 		Width:  width,
@@ -60,7 +63,7 @@ func NewGrid(width, height int, midi midi.Midi) *Grid {
 			return
 		}
 		if grid.SendClock {
-			grid.midi.SendClock()
+			grid.midi.SendClock(d.ID)
 		}
 		grid.Update()
 	})
@@ -73,7 +76,7 @@ func (g *Grid) TogglePlay() {
 	g.Playing = !g.Playing
 	if !g.Playing {
 		g.Reset()
-		g.midi.SilenceAll()
+		g.midi.SilenceAll(g.device.ID)
 	}
 
 	if !g.SendTransport {
@@ -81,9 +84,9 @@ func (g *Grid) TogglePlay() {
 	}
 
 	if g.Playing {
-		g.midi.TransportStart()
+		g.midi.TransportStart(g.device.ID)
 	} else {
-		g.midi.TransportStop()
+		g.midi.TransportStop(g.device.ID)
 	}
 }
 
@@ -110,11 +113,13 @@ func (g *Grid) SetScale(scale theory.Scale) {
 }
 
 // MidiDevice returns the name of the currently active MIDI device.
-func (g *Grid) MidiDevice() string {
-	if g.midi.ActiveDevice() == nil {
-		return "no midi device"
-	}
-	return g.midi.ActiveDevice().String()
+func (g *Grid) MidiDevice() midi.Device {
+	return g.device
+}
+
+// SetMidiDevice sets the midi device.
+func (g *Grid) SetMidiDevice(device midi.Device) {
+	g.device = device
 }
 
 // Midi returns the Midi interface.
@@ -190,21 +195,21 @@ func (g *Grid) Node(x, y int) common.Node {
 func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	switch symbol {
 	case "b":
-		g.AddNode(node.NewBangEmitter(g.midi, common.NONE, !g.Playing), x, y)
+		g.AddNode(node.NewBangEmitter(g.midi, g.device, common.NONE, !g.Playing), x, y)
 	case "s":
-		g.AddNode(node.NewSpreadEmitter(g.midi, common.NONE), x, y)
+		g.AddNode(node.NewSpreadEmitter(g.midi, g.device, common.NONE), x, y)
 	case "c":
-		g.AddNode(node.NewCycleEmitter(g.midi, common.NONE), x, y)
+		g.AddNode(node.NewCycleEmitter(g.midi, g.device, common.NONE), x, y)
 	case "d":
-		g.AddNode(node.NewDiceEmitter(g.midi, common.NONE), x, y)
+		g.AddNode(node.NewDiceEmitter(g.midi, g.device, common.NONE), x, y)
 	case "t":
-		g.AddNode(node.NewTollEmitter(g.midi, common.NONE), x, y)
+		g.AddNode(node.NewTollEmitter(g.midi, g.device, common.NONE), x, y)
 	case "e":
-		g.AddNode(node.NewEuclidEmitter(g.midi, common.NONE), x, y)
+		g.AddNode(node.NewEuclidEmitter(g.midi, g.device, common.NONE), x, y)
 	case "z":
-		g.AddNode(node.NewZoneEmitter(g.midi, common.NONE), x, y)
+		g.AddNode(node.NewZoneEmitter(g.midi, g.device, common.NONE), x, y)
 	case "p":
-		g.AddNode(node.NewPassEmitter(g.midi, common.NONE), x, y)
+		g.AddNode(node.NewPassEmitter(g.midi, g.device, common.NONE), x, y)
 	case "h":
 		g.AddNode(node.NewHoleEmitter(common.NONE, x, y, g.Width, g.Height), x, y)
 	}

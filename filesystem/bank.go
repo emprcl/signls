@@ -43,6 +43,8 @@ type Grid struct {
 	Height int `json:"height"`
 	Width  int `json:"width"`
 
+	Device string `json:"device"`
+
 	Key   uint8  `json:"key"`
 	Scale uint16 `json:"scale"`
 
@@ -71,6 +73,7 @@ func (g Grid) IsEmpty() bool {
 type Node struct {
 	X         int    `json:"x"`
 	Y         int    `json:"y"`
+	Device    string `json:"device"`
 	Note      Note   `json:"note"`
 	Type      string `json:"type"`
 	Direction int    `json:"direction"`
