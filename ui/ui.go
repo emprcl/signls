@@ -363,7 +363,7 @@ func (m mainModel) View() string {
 		Render(m.help.View(m.keymap))
 
 	paramHelp := ""
-	if m.mode == EDIT {
+	if m.mode == EDIT || m.mode == CONFIG {
 		paramHelp = m.help.Styles.ShortDesc.
 			MarginLeft(16).
 			Render(m.activeParam().Help())

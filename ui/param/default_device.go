@@ -1,6 +1,7 @@
 package param
 
 import (
+	"fmt"
 	"signls/core/field"
 )
 
@@ -13,12 +14,19 @@ func (d DefaultDevice) Name() string {
 }
 
 func (d DefaultDevice) Help() string {
-	return ""
+	if !d.grid.MidiDevice().Enabled() {
+		return ""
+	} else if d.grid.MidiDevice().Fallback {
+		return fmt.Sprintf("disconnected: %s", d.grid.MidiDevice().Name)
+	}
+	return d.grid.MidiDevice().Name
 }
 
 func (d DefaultDevice) Display() string {
-	// TODO: handle disconnected as well
-	return d.grid.MidiDevice().Name
+	if d.grid.MidiDevice().Fallback {
+		return "??"
+	}
+	return fmt.Sprintf("%d", d.grid.MidiDevice().ID)
 }
 
 func (d DefaultDevice) Value() int {

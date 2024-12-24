@@ -148,7 +148,7 @@ func (m *midi) NewDevice(device, fallback string) Device {
 		}
 	}
 	return Device{
-		Name:     m.Devices()[defaultDevice].String(),
+		Name:     device,
 		ID:       defaultDevice,
 		Fallback: true,
 	}
