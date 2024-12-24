@@ -49,21 +49,21 @@ func (d Device) Down() {
 	d.Set(d.nodes[0].(music.Audible).Note().Device.Get() - 1)
 }
 
-func (d Device) Left() {
-	d.SetAlt(0)
-}
+func (d Device) Left() {}
 
-func (d Device) Right() {
-	d.SetAlt(0)
-}
+func (d Device) Right() {}
 
 func (d Device) AltUp() {}
 
 func (d Device) AltDown() {}
 
-func (d Device) AltLeft() {}
+func (d Device) AltLeft() {
+	d.SetAlt(0)
+}
 
-func (d Device) AltRight() {}
+func (d Device) AltRight() {
+	d.SetAlt(0)
+}
 
 func (d Device) Set(value int) {
 	if !d.nodes[0].(music.Audible).Note().Device.Enabled {
