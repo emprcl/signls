@@ -29,26 +29,6 @@ const (
 
 var lastUsedChannel uint8 = defaultChannel
 
-type DeviceValue struct {
-	Device     midi.Device
-	GridDevice *midi.Device
-	Enabled    bool
-}
-
-func (d DeviceValue) Get() int {
-	if d.Enabled {
-		return d.Device.ID
-	}
-	return d.GridDevice.ID
-}
-
-func (d DeviceValue) Name() string {
-	if d.Enabled {
-		return d.Device.Name
-	}
-	return ""
-}
-
 // Note represents a midi note.
 type Note struct {
 	midi midi.Midi
