@@ -3,8 +3,10 @@
 package midi
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"runtime"
 	"sync"
 
 	gomidi "gitlab.com/gomidi/midi/v2"
@@ -71,16 +73,23 @@ type midi struct {
 // New creates a new midi. It retrieves the connected midi
 // devices and starts a new goroutine for each of them.
 func New() (Midi, error) {
-	virtualDevice, err := drivers.Get().(*rtmidi.Driver).OpenVirtualOut("Signls Default Midi Output")
-	if err != nil {
-		return nil, err
-	}
 	devices := gomidi.GetOutPorts()
-	midi := &midi{
-		devices: append(devices, virtualDevice),
+	var m *midi
+	if runtime.GOOS != "windows" {
+		virtualDevice, err := drivers.Get().(*rtmidi.Driver).OpenVirtualOut("Signls Default Midi Output")
+		if err != nil {
+			return nil, err
+		}
+		devices = append(devices, virtualDevice)
 	}
-	midi.start()
-	return midi, nil
+	if len(devices) == 0 {
+		return nil, errors.New("no midi devices available")
+	}
+	m = &midi{
+		devices: devices,
+	}
+	m.start()
+	return m, nil
 }
 
 // Note retruns the string representation of a note

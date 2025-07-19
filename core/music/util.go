@@ -38,7 +38,7 @@ var noteMap = map[string]int{
 func ConvertNoteToMIDI(note string) (int, error) {
 	re := regexp.MustCompile(`^([A-Ga-g][b]?)(-?\d+)$`)
 	matches := re.FindStringSubmatch(note)
-	if matches == nil || len(matches) < 3 {
+	if len(matches) < 3 {
 		return 0, errors.New("invalid note format")
 	}
 
