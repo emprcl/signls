@@ -2,14 +2,11 @@ package ui
 
 import (
 	"fmt"
-	"time"
-
-	"signls/core/common"
 	"signls/core/field"
-	"signls/core/node"
 	"signls/filesystem"
 	"signls/ui/param"
 	"signls/ui/util"
+	"time"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -62,6 +59,7 @@ type mainModel struct {
 	input         textinput.Model
 	params        [][]param.Param
 	gridParams    []param.Param
+	cells         [][]field.Cell
 	bankClipboard filesystem.Grid
 	mode          mode
 	version       string
@@ -262,11 +260,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if !m.grid.Playing {
 				return m, nil
 			}
-			if _, ok := m.selectedNode().(*node.Emitter); !ok {
-				return m, nil
-			}
-			m.selectedNode().(*node.Emitter).Arm()
-			m.selectedNode().(*node.Emitter).Trig(m.grid.Key, m.grid.Scale, common.NONE, m.grid.Pulse())
+			m.grid.TriggerNode(m.cursorX, m.cursorY)
 			return m, nil
 		case key.Matches(msg, m.keymap.Bank):
 			m.selectedGrid = m.bank.Active
@@ -358,6 +352,11 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m mainModel) View() string {
+	// Take a consistent copy of the grid's display state, then render the grid
+	// without holding any lock. The slow lipgloss render never blocks the clock
+	// goroutine — only the fast Snapshot copy does.
+	m.cells = m.grid.Snapshot()
+
 	help := lipgloss.NewStyle().
 		MarginLeft(2).
 		Render(m.help.View(m.keymap))
@@ -383,9 +382,17 @@ func (m mainModel) View() string {
 		)
 	}
 
+	// The control bar still reads live grid/param state (tempo, pulse, selected
+	// node, params). It's a single row, so render it under a short read lock.
+	var control string
+	m.grid.Read(func() {
+		control = m.renderControl()
+	})
+
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		m.renderGrid(),
+		control,
 		paramHelp,
 		help,
 	)
@@ -444,15 +451,14 @@ func (m mainModel) activeParamPage() []param.Param {
 }
 
 func (m mainModel) renderGrid() string {
-	var lines []string
+	lines := make([]string, 0, m.viewport.Height)
 	for y := m.viewport.offsetY; y < m.viewport.offsetY+m.viewport.Height; y++ {
-		var nodes []string
+		nodes := make([]string, 0, m.viewport.Width)
 		for x := m.viewport.offsetX; x < m.viewport.offsetX+m.viewport.Width; x++ {
-			nodes = append(nodes, m.renderNode(m.grid.Nodes()[y][x], x, y))
+			nodes = append(nodes, m.renderNode(m.cells[y][x], x, y))
 		}
 		lines = append(lines, lipgloss.JoinHorizontal(lipgloss.Left, nodes...))
 	}
-	lines = append(lines, m.renderControl())
 	return lipgloss.JoinVertical(lipgloss.Left, lines...)
 }
 
@@ -515,7 +521,7 @@ func (m mainModel) loadGridFromBank() mainModel {
 	m.bank.Active = m.selectedGrid
 	isPlaying := m.grid.Playing
 	m.grid.Load(m.bank.Active, m.bank.ActiveGrid())
-	m.grid.Playing = isPlaying
+	m.grid.SetPlaying(isPlaying)
 	m.cursorX = 1
 	m.cursorY = 1
 	m.selectionX = 1
@@ -532,7 +538,7 @@ func (m mainModel) handleBankMetaCommand() (mainModel, tea.Cmd) {
 	}
 	m.bank.Active = m.grid.BankIndex
 	m.grid.Load(m.bank.Active, m.bank.ActiveGrid())
-	m.grid.Playing = true
+	m.grid.SetPlaying(true)
 	m.mode = MOVE
 	m.param = 0
 	m.paramPage = 0

@@ -2,11 +2,10 @@ package field
 
 import (
 	"fmt"
-	"testing"
-
 	"signls/core/common"
 	"signls/core/node"
 	"signls/midi"
+	"testing"
 )
 
 var benchmarks = []struct {

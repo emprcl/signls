@@ -2,9 +2,7 @@ package ui
 
 import (
 	"log"
-
-	"signls/core/common"
-	"signls/core/music"
+	"signls/core/field"
 	"signls/core/node"
 	"signls/ui/param"
 	"signls/ui/util"
@@ -41,12 +39,9 @@ func (m mainModel) inSelectionRange(x, y int) bool {
 		y <= m.selectionY
 }
 
-func (m mainModel) renderNode(n common.Node, x, y int) string {
+func (m mainModel) renderNode(c field.Cell, x, y int) string {
 	// render cursor
-	isCursor := false
-	if x == m.cursorX && y == m.cursorY && m.mode != BANK {
-		isCursor = true
-	}
+	isCursor := x == m.cursorX && y == m.cursorY && m.mode != BANK
 
 	isTeleportDestination := false
 	if m.mode == EDIT && len(m.params) > 0 {
@@ -59,15 +54,15 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 
 	// render grid
 	teleportDestinationSymbol := node.HoleDestinationSymbol
-	if n == nil && isCursor {
+	if c.Kind == field.CellEmpty && isCursor {
 		return cursorStyle.Render("  ")
-	} else if n == nil && isTeleportDestination && !m.blink && m.mode != BANK {
+	} else if c.Kind == field.CellEmpty && isTeleportDestination && !m.blink && m.mode != BANK {
 		return cursorStyle.Render(teleportDestinationSymbol)
-	} else if n == nil && isTeleportDestination && (m.blink || m.mode == BANK) {
+	} else if c.Kind == field.CellEmpty && isTeleportDestination && (m.blink || m.mode == BANK) {
 		return teleportDestinationStyle.Render(teleportDestinationSymbol)
-	} else if n == nil && m.inSelectionRange(x, y) && m.mode != BANK {
+	} else if c.Kind == field.CellEmpty && m.inSelectionRange(x, y) && m.mode != BANK {
 		return selectionStyle.Render("..")
-	} else if n == nil {
+	} else if c.Kind == field.CellEmpty {
 		if (x+y)%2 == 0 {
 			return "  "
 		}
@@ -75,14 +70,14 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 	}
 
 	// render node
-	switch t := n.(type) {
-	case common.Movable:
+	switch c.Kind {
+	case field.CellSignal:
 		if isCursor {
 			return cursorStyle.Render("  ")
 		}
 		return activeEmitterStyle.Render("  ")
-	case music.Audible:
-		symbol := util.Normalize(n.Symbol())
+	case field.CellAudible:
+		symbol := util.Normalize(c.Symbol)
 
 		if isCursor && m.mode != EDIT {
 			return cursorStyle.Render(symbol)
@@ -90,37 +85,37 @@ func (m mainModel) renderNode(n common.Node, x, y int) string {
 			return teleportDestinationStyle.Render(teleportDestinationSymbol)
 		} else if isCursor && m.mode == EDIT && m.blink {
 			return cursorStyle.Render(symbol)
-		} else if n.Activated() && t.Muted() {
+		} else if c.Activated && c.Muted {
 			return activeEmitterStyle.Render(symbol)
-		} else if t.Muted() {
+		} else if c.Muted {
 			return mutedEmitterStyle.Render(symbol)
-		} else if n.Activated() {
+		} else if c.Activated {
 			return activeEmitterStyle.
-				Foreground(lipgloss.Color(n.Color())).
+				Foreground(lipgloss.Color(c.Color)).
 				Render(symbol)
 		} else {
 			return emitterStyle.
-				Background(lipgloss.Color(n.Color())).
+				Background(lipgloss.Color(c.Color)).
 				Render(symbol)
 		}
-	case *node.HoleEmitter:
-		symbol := n.Symbol()
+	case field.CellHole:
+		symbol := c.Symbol
 
 		if isCursor && m.mode != EDIT {
 			return cursorStyle.Render(symbol)
 		} else if isCursor && m.mode == EDIT && m.blink {
 			return cursorStyle.Render(symbol)
-		} else if n.Activated() {
+		} else if c.Activated {
 			return activeEmitterStyle.
-				Foreground(lipgloss.Color(n.Color())).
+				Foreground(lipgloss.Color(c.Color)).
 				Render(symbol)
 		} else {
 			return emitterStyle.
-				Background(lipgloss.Color(n.Color())).
+				Background(lipgloss.Color(c.Color)).
 				Render(symbol)
 		}
 	default:
-		log.Fatalf("cannot render node: %+v", t)
+		log.Fatalf("cannot render node kind: %d", c.Kind)
 		return ""
 	}
 }

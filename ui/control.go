@@ -2,7 +2,6 @@ package ui
 
 import (
 	"fmt"
-
 	"signls/core/common"
 	"signls/filesystem"
 	"signls/ui/param"

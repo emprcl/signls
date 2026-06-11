@@ -2,7 +2,6 @@ package theory
 
 import (
 	"math"
-
 	"signls/midi"
 )
 

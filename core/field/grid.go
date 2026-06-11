@@ -1,14 +1,13 @@
 package field
 
 import (
-	"sync"
-
 	"signls/core/common"
 	"signls/core/music"
 	"signls/core/music/meta"
 	"signls/core/node"
 	"signls/core/theory"
 	"signls/midi"
+	"sync"
 )
 
 const (
@@ -18,8 +17,15 @@ const (
 )
 
 // Grid represents the main structure for the grid-based sequencer.
+//
+// The grid is accessed concurrently: the clock goroutine drives Update on
+// every pulse, while the ui goroutine reads node state to render and mutates
+// it in response to user input. All access to the shared state below (nodes,
+// dimensions, pulse, key/scale, playing state, device) must be guarded by mu.
+// Public methods acquire the lock themselves; the ui render path takes a
+// consistent copy with Snapshot and wraps any remaining live reads with Read.
 type Grid struct {
-	mu sync.Mutex
+	mu sync.RWMutex
 
 	midi      midi.Midi
 	device    midi.Device
@@ -59,23 +65,43 @@ func NewGrid(width, height int, midi midi.Midi, device string) *Grid {
 	}
 
 	grid.clock = common.NewClock(defaultTempo, func() {
-		if !grid.Playing {
-			return
-		}
-		if grid.SendClock {
-			grid.midi.SendClock(d.ID)
-		}
 		grid.Update()
 	})
 
 	return grid
 }
 
+// Read runs fn while holding the read lock. The ui uses it to wrap reads that
+// span several grid/node accesses (such as rendering the control bar) so they
+// observe a consistent state without exposing the lock itself. For rendering
+// the grid, prefer Snapshot, which copies the display state and releases the
+// lock immediately.
+func (g *Grid) Read(fn func()) {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+	fn()
+}
+
+// TriggerNode manually arms and triggers the emitter at the given coordinates,
+// if any. Used by the ui to trigger a node from a key press.
+func (g *Grid) TriggerNode(x, y int) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	e, ok := g.nodes[y][x].(*node.Emitter)
+	if !ok {
+		return
+	}
+	e.Arm()
+	e.Trig(g.Key, g.Scale, common.NONE, g.pulse/uint64(common.PulsesPerStep))
+}
+
 // TogglePlay toggles the playing state of the grid.
 func (g *Grid) TogglePlay() {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	g.Playing = !g.Playing
 	if !g.Playing {
-		g.Reset()
+		g.reset()
 		g.midi.SilenceAll()
 	}
 
@@ -90,6 +116,14 @@ func (g *Grid) TogglePlay() {
 	}
 }
 
+// SetPlaying sets the playing state of the grid. Used by the ui when switching
+// banks to preserve the previous playing state.
+func (g *Grid) SetPlaying(playing bool) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.Playing = playing
+}
+
 // SetTempo sets the tempo of the grid.
 func (g *Grid) SetTempo(tempo float64) {
 	g.clock.SetTempo(tempo)
@@ -102,14 +136,18 @@ func (g *Grid) Tempo() float64 {
 
 // SetKey changes the root key of the grid and transposes all notes accordingly.
 func (g *Grid) SetKey(key theory.Key) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	g.Key = key
-	g.Transpose()
+	g.transpose()
 }
 
 // SetScale changes the scale of the grid and transposes all notes accordingly.
 func (g *Grid) SetScale(scale theory.Scale) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	g.Scale = scale
-	g.Transpose()
+	g.transpose()
 }
 
 // MidiDevice returns the name of the currently active MIDI device.
@@ -119,6 +157,8 @@ func (g *Grid) MidiDevice() midi.Device {
 
 // SetMidiDevice sets the midi device.
 func (g *Grid) SetMidiDevice(device midi.Device) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	g.device = device
 }
 
@@ -142,6 +182,8 @@ func (g *Grid) QuarterNote() bool {
 
 // CopyOrCut copies or cuts a selection of nodes from the grid to the clipboard.
 func (g *Grid) CopyOrCut(startX, startY, endX, endY int, cut bool) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	nodes := make([][]common.Node, endY-startY+1)
 	for i := range nodes {
 		nodes[i] = make([]common.Node, endX-startX+1)
@@ -167,6 +209,8 @@ func (g *Grid) CopyOrCut(startX, startY, endX, endY int, cut bool) {
 
 // Paste pastes nodes from the clipboard into the grid at the specified location.
 func (g *Grid) Paste(startX, startY, endX, endY int) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	if len(g.clipboard) == 0 {
 		return
 	}
@@ -193,30 +237,40 @@ func (g *Grid) Node(x, y int) common.Node {
 
 // AddNodeFromSymbol adds a node to the grid based on a given symbol.
 func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	switch symbol {
 	case "b":
-		g.AddNode(node.NewBangEmitter(g.midi, &g.device, common.NONE, !g.Playing), x, y)
+		g.addNode(node.NewBangEmitter(g.midi, &g.device, common.NONE, !g.Playing), x, y)
 	case "s":
-		g.AddNode(node.NewSpreadEmitter(g.midi, &g.device, common.NONE), x, y)
+		g.addNode(node.NewSpreadEmitter(g.midi, &g.device, common.NONE), x, y)
 	case "c":
-		g.AddNode(node.NewCycleEmitter(g.midi, &g.device, common.NONE), x, y)
+		g.addNode(node.NewCycleEmitter(g.midi, &g.device, common.NONE), x, y)
 	case "d":
-		g.AddNode(node.NewDiceEmitter(g.midi, &g.device, common.NONE), x, y)
+		g.addNode(node.NewDiceEmitter(g.midi, &g.device, common.NONE), x, y)
 	case "t":
-		g.AddNode(node.NewTollEmitter(g.midi, &g.device, common.NONE), x, y)
+		g.addNode(node.NewTollEmitter(g.midi, &g.device, common.NONE), x, y)
 	case "e":
-		g.AddNode(node.NewEuclidEmitter(g.midi, &g.device, common.NONE), x, y)
+		g.addNode(node.NewEuclidEmitter(g.midi, &g.device, common.NONE), x, y)
 	case "z":
-		g.AddNode(node.NewZoneEmitter(g.midi, &g.device, common.NONE), x, y)
+		g.addNode(node.NewZoneEmitter(g.midi, &g.device, common.NONE), x, y)
 	case "p":
-		g.AddNode(node.NewPassEmitter(g.midi, &g.device, common.NONE), x, y)
+		g.addNode(node.NewPassEmitter(g.midi, &g.device, common.NONE), x, y)
 	case "h":
-		g.AddNode(node.NewHoleEmitter(common.NONE, x, y, g.Width, g.Height), x, y)
+		g.addNode(node.NewHoleEmitter(common.NONE, x, y, g.Width, g.Height), x, y)
 	}
 }
 
 // AddNode adds a node to the grid at the specified coordinates.
 func (g *Grid) AddNode(e common.Node, x, y int) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.addNode(e, x, y)
+}
+
+// addNode adds a node to the grid at the specified coordinates. The caller must
+// hold the lock.
+func (g *Grid) addNode(e common.Node, x, y int) {
 	destinationNode, isDestBehavior := g.nodes[y][x].(common.Behavioral)
 	newNode, isNewBehavior := e.(common.Behavioral)
 	if isDestBehavior && isNewBehavior {
@@ -228,6 +282,8 @@ func (g *Grid) AddNode(e common.Node, x, y int) {
 
 // RemoveNodes removes nodes from a specified region of the grid.
 func (g *Grid) RemoveNodes(startX, startY, endX, endY int) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	for y := startY; y <= endY; y++ {
 		for x := startX; x <= endX; x++ {
 			g.nodes[y][x] = nil
@@ -237,6 +293,8 @@ func (g *Grid) RemoveNodes(startX, startY, endX, endY int) {
 
 // ToggleNodeMutes toggles the mute state for all nodes in a specified region.
 func (g *Grid) ToggleNodeMutes(startX, startY, endX, endY int) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	for y := startY; y <= endY; y++ {
 		for x := startX; x <= endX; x++ {
 			if _, ok := g.nodes[y][x].(music.Audible); !ok {
@@ -249,6 +307,8 @@ func (g *Grid) ToggleNodeMutes(startX, startY, endX, endY int) {
 
 // SetAllNodeMutes sets the mute state for all nodes in the grid.
 func (g *Grid) SetAllNodeMutes(mute bool) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
 			if _, ok := g.nodes[y][x].(music.Audible); !ok {
@@ -260,11 +320,18 @@ func (g *Grid) SetAllNodeMutes(mute bool) {
 }
 
 // Update advances the grid by one step, moving signals and triggering emitters.
+// It is called by the clock goroutine on every pulse.
 func (g *Grid) Update() {
 	g.mu.Lock()
 	defer g.mu.Unlock()
+	if !g.Playing {
+		return
+	}
+	if g.SendClock {
+		g.midi.SendClock(g.device.ID)
+	}
 	if g.pulse%uint64(common.PulsesPerStep) != 0 {
-		g.Tick()
+		g.tick()
 		return
 	}
 	for y := g.Height - 1; y >= 0; y-- {
@@ -291,8 +358,9 @@ func (g *Grid) Update() {
 	g.pulse++
 }
 
-// Tick updates all active notes within the grid on every pulse.
-func (g *Grid) Tick() {
+// tick updates all active notes within the grid on every pulse. The caller
+// must hold the lock.
+func (g *Grid) tick() {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
 			if n, ok := g.nodes[y][x].(common.Tickable); ok {
@@ -305,6 +373,14 @@ func (g *Grid) Tick() {
 
 // Transpose transposes all notes in the grid to match the current key and scale.
 func (g *Grid) Transpose() {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.transpose()
+}
+
+// transpose transposes all notes in the grid to match the current key and
+// scale. The caller must hold the lock.
+func (g *Grid) transpose() {
 	for y := 0; y < g.Height; y++ {
 		for x := 0; x < g.Width; x++ {
 			if n, ok := g.nodes[y][x].(music.Audible); ok {
@@ -318,6 +394,12 @@ func (g *Grid) Transpose() {
 func (g *Grid) Reset() {
 	g.mu.Lock()
 	defer g.mu.Unlock()
+	g.reset()
+}
+
+// reset stops playback and resets the grid to its initial state. The caller
+// must hold the lock.
+func (g *Grid) reset() {
 	g.Playing = false
 	g.pulse = 0
 	for y := 0; y < g.Height; y++ {
@@ -457,6 +539,14 @@ func (g *Grid) Teleport(t *node.HoleEmitter, m common.Node, x, y int) {
 
 // Resize changes the size of the grid and preserves existing nodes within the new dimensions.
 func (g *Grid) Resize(newWidth, newHeight int) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.resize(newWidth, newHeight)
+}
+
+// resize changes the size of the grid and preserves existing nodes within the
+// new dimensions. The caller must hold the lock.
+func (g *Grid) resize(newWidth, newHeight int) {
 	newNodes := make([][]common.Node, newHeight)
 	for i := range newNodes {
 		newNodes[i] = make([]common.Node, newWidth)

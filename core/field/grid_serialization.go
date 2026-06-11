@@ -2,7 +2,6 @@ package field
 
 import (
 	"log"
-
 	"signls/core/common"
 	"signls/core/music"
 	"signls/core/node"
@@ -103,7 +102,7 @@ func (g *Grid) Load(index int, grid filesystem.Grid) {
 	g.Scale = theory.Scale(grid.Scale)
 	g.SendClock = grid.SendClock
 	g.SendTransport = grid.SendTransport
-	g.Resize(grid.Width, grid.Height)
+	g.resize(grid.Width, grid.Height)
 
 	g.nodes = make([][]common.Node, g.Height)
 	for i := range g.nodes {

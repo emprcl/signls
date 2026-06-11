@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
-
 	"signls/core/field"
 	"signls/filesystem"
 	"signls/midi"
 	"signls/ui"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

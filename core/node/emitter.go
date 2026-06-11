@@ -2,11 +2,10 @@ package node
 
 import (
 	"fmt"
-	"unicode/utf8"
-
 	"signls/core/common"
 	"signls/core/music"
 	"signls/core/theory"
+	"unicode/utf8"
 )
 
 type Emitter struct {

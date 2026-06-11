@@ -3,11 +3,10 @@ package node
 import (
 	"math"
 	"math/rand"
-	"time"
-
 	"signls/core/common"
 	"signls/core/music"
 	"signls/midi"
+	"time"
 )
 
 type DiceEmitter struct {

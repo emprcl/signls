@@ -3,12 +3,11 @@ package music
 import (
 	"fmt"
 	"math/rand"
-	"time"
-
 	"signls/core/common"
 	"signls/core/music/meta"
 	"signls/core/theory"
 	"signls/midi"
+	"time"
 )
 
 // Constants defining default values for note properties and their limits.

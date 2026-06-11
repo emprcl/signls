@@ -3,12 +3,10 @@ package param
 import (
 	"fmt"
 	"math"
-	"strconv"
-
 	"signls/core/common"
 	"signls/core/node"
-
 	"signls/ui/util"
+	"strconv"
 )
 
 type Repeat struct {

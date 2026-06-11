@@ -2,7 +2,6 @@ package meta
 
 import (
 	"fmt"
-
 	"signls/core/common"
 )
 
