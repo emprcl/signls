@@ -84,12 +84,14 @@ func (m mainModel) renderControl() string {
 }
 
 func (m mainModel) bankSelection() string {
+	grids := m.bank.AllGrids()
+	active := m.bank.ActiveIndex()
 	banks := make([]string, maxGrids)
-	for i, g := range m.bank.Grids[:maxGrids] {
+	for i, g := range grids[:maxGrids] {
 		label := bankGridLabel(i, g)
 		if i == m.selectedGrid {
 			banks[i] = cursorStyle.MarginRight(1).Render(label)
-		} else if i == m.bank.Active {
+		} else if i == active {
 			banks[i] = activeBankStyle.Render(label)
 		} else if (i < gridsPerLine && i%2 == 0) || (i >= gridsPerLine && i%2 == 1) {
 			banks[i] = bankStyle.Render(label)
@@ -114,7 +116,7 @@ func (m mainModel) bankSelection() string {
 		lipgloss.Left,
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			activeBankStyle.MarginRight(9).Render(bankGridLabel(m.bank.Active, m.bank.ActiveGrid())),
+			activeBankStyle.MarginRight(9).Render(bankGridLabel(active, m.bank.ActiveGrid())),
 			cellStyle.Render(m.modeName()),
 		),
 		pane,
@@ -145,7 +147,7 @@ func (m mainModel) gridInfo() string {
 			lipgloss.Left,
 			fmt.Sprintf(
 				"%s%s",
-				activeBankStyle.Render(bankGridLabel(m.bank.Active, m.bank.ActiveGrid())),
+				activeBankStyle.Render(bankGridLabel(m.bank.ActiveIndex(), m.bank.ActiveGrid())),
 				m.bank.Filename(),
 			),
 		),
@@ -211,10 +213,6 @@ func (m mainModel) modeName() string {
 	default:
 		return "move"
 	}
-}
-
-func (m mainModel) selectedNode() common.Node {
-	return m.grid.Nodes()[m.cursorY][m.cursorX]
 }
 
 func (m mainModel) selectedEmitters() []common.Node {

@@ -31,11 +31,11 @@ func (s Scale) AltValue() int {
 }
 
 func (s Scale) Up() {
-	s.Set(s.scaleIndex() + 1)
+	s.grid.ShiftScale(1)
 }
 
 func (s Scale) Down() {
-	s.Set(s.scaleIndex() - 1)
+	s.grid.ShiftScale(-1)
 }
 
 func (s Scale) Left() {}
@@ -60,14 +60,5 @@ func (s Scale) Set(value int) {
 }
 
 func (s Scale) SetAlt(value int) {}
-
-func (s Scale) scaleIndex() int {
-	for i := 0; i < len(s.scales); i++ {
-		if s.grid.Scale == s.scales[i] {
-			return i
-		}
-	}
-	return 0
-}
 
 func (s Scale) SetEditValue(input string) {}

@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"signls/core/common"
 	"signls/core/field"
-	"signls/core/node"
 	"signls/filesystem"
 	"signls/ui/param"
 	"signls/ui/util"
@@ -62,6 +60,8 @@ type mainModel struct {
 	input         textinput.Model
 	params        [][]param.Param
 	gridParams    []param.Param
+	cells         [][]field.Cell
+	saver         *saver
 	bankClipboard filesystem.Grid
 	mode          mode
 	version       string
@@ -90,6 +90,7 @@ func New(config filesystem.Configuration, grid *field.Grid, bank *filesystem.Ban
 		help:       help.New(),
 		input:      ti,
 		gridParams: param.NewParamsForGrid(grid),
+		saver:      newSaver(saveDebounce, func() { grid.Save(bank) }),
 		cursorX:    1,
 		cursorY:    1,
 		selectionX: 1,
@@ -119,6 +120,13 @@ func save(m mainModel) tea.Cmd {
 	}
 }
 
+// requestSave schedules a debounced save instead of writing on every edit, so a
+// burst of edits coalesces into a single disk write. The write happens on the
+// saver's timer goroutine.
+func (m mainModel) requestSave() {
+	m.saver.request()
+}
+
 func (m mainModel) Init() tea.Cmd {
 	return tea.Batch(tea.EnterAltScreen, tick(), blink())
 }
@@ -143,7 +151,9 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch {
 			case key.Matches(msg, m.keymap.EditNode):
 				m.input.Blur()
-				m.activeParam().SetEditValue(m.input.Value())
+				m.grid.Write(func() {
+					m.activeParam().SetEditValue(m.input.Value())
+				})
 				return m, nil
 			case key.Matches(msg, m.keymap.Cancel, m.keymap.EditInput):
 				m.input.Blur()
@@ -193,7 +203,8 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			dir := m.keymap.Direction(msg)
 			if m.mode == EDIT || m.mode == CONFIG {
 				m.handleParamAltEdit(dir)
-				return m, save(m)
+				m.requestSave()
+				return m, nil
 			}
 			m.selectionX, m.selectionY = moveCursor(
 				dir, 1, m.selectionX, m.selectionY,
@@ -204,11 +215,15 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keymap.EditUp, m.keymap.EditRight, m.keymap.EditDown, m.keymap.EditLeft):
 			dir := m.keymap.Direction(msg)
 			if m.mode == MOVE {
-				param.NewDirection(m.selectedEmitters()).SetFromKeyString(dir)
-				return m, save(m)
+				m.grid.Write(func() {
+					param.NewDirection(m.selectedEmitters()).SetFromKeyString(dir)
+				})
+				m.requestSave()
+				return m, nil
 			}
 			m.handleParamEdit(dir)
-			return m, save(m)
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.AddBang, m.keymap.AddSpread, m.keymap.AddCycle, m.keymap.AddDice, m.keymap.AddToll, m.keymap.AddEuclid, m.keymap.AddZone, m.keymap.AddPass, m.keymap.AddHole):
 			m.grid.AddNodeFromSymbol(m.keymap.EmitterSymbol(msg), m.cursorX, m.cursorY)
 			newParams := param.NewParamsForNodes(m.grid, m.selectedEmitters())
@@ -219,14 +234,17 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.param = 0
 			}
 			m.params = newParams
-			return m, save(m)
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.MuteNode):
 			m.grid.ToggleNodeMutes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
-			return m, save(m)
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.MuteAllNode):
 			m.grid.SetAllNodeMutes(!m.mute)
 			m.mute = !m.mute
-			return m, save(m)
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.RemoveNode):
 			if m.mode == BANK {
 				m.bank.ClearGrid(m.selectedGrid)
@@ -234,7 +252,8 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.mode = MOVE
 			m.grid.RemoveNodes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
-			return m, save(m)
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.EditNode):
 			if m.mode == BANK {
 				m.mode = MOVE
@@ -262,14 +281,10 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if !m.grid.Playing {
 				return m, nil
 			}
-			if _, ok := m.selectedNode().(*node.Emitter); !ok {
-				return m, nil
-			}
-			m.selectedNode().(*node.Emitter).Arm()
-			m.selectedNode().(*node.Emitter).Trig(m.grid.Key, m.grid.Scale, common.NONE, m.grid.Pulse())
+			m.grid.TriggerNode(m.cursorX, m.cursorY)
 			return m, nil
 		case key.Matches(msg, m.keymap.Bank):
-			m.selectedGrid = m.bank.Active
+			m.selectedGrid = m.bank.ActiveIndex()
 			m.mode = m.toggleMode(BANK)
 			return m, nil
 		case key.Matches(msg, m.keymap.RootNoteUp):
@@ -277,31 +292,37 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			param.Get("root", m.gridParams).Up()
-			return m, save(m)
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.RootNoteDown):
 			if m.mode == EDIT {
 				return m, nil
 			}
 			param.Get("root", m.gridParams).Down()
-			return m, save(m)
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.ScaleUp):
 			if m.mode == EDIT {
 				return m, nil
 			}
 			param.Get("scale", m.gridParams).Up()
-			return m, save(m)
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.ScaleDown):
 			if m.mode == EDIT {
 				return m, nil
 			}
 			param.Get("scale", m.gridParams).Down()
-			return m, save(m)
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.TempoUp):
 			m.grid.SetTempo(m.grid.Tempo() + 1)
-			return m, save(m)
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.TempoDown):
 			m.grid.SetTempo(m.grid.Tempo() - 1)
-			return m, save(m)
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.Configuration):
 			m.mode = m.toggleMode(CONFIG)
 			m.params = param.NewParamsForMidi(m.grid)
@@ -310,16 +331,16 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, m.keymap.Copy):
 			if m.mode == BANK {
-				m.bankClipboard = m.bank.Grids[m.selectedGrid]
+				m.bankClipboard = m.bank.GridAt(m.selectedGrid)
 				return m, nil
 			}
 			m.grid.CopyOrCut(m.cursorX, m.cursorY, m.selectionX, m.selectionY, false)
 			return m, nil
 		case key.Matches(msg, m.keymap.Cut):
 			if m.mode == BANK {
-				m.bankClipboard = m.bank.Grids[m.selectedGrid]
+				m.bankClipboard = m.bank.GridAt(m.selectedGrid)
 				m.bank.ClearGrid(m.selectedGrid)
-				if m.bank.Active == m.selectedGrid {
+				if m.bank.ActiveIndex() == m.selectedGrid {
 					return m.loadGridFromBank(), tea.WindowSize()
 				}
 				return m, tea.WindowSize()
@@ -328,11 +349,12 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, m.keymap.Paste):
 			if m.mode == BANK {
-				m.bank.Grids[m.selectedGrid] = m.bankClipboard
+				m.bank.SetGrid(m.selectedGrid, m.bankClipboard)
 			}
 			m.grid.Paste(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
-			return m, save(m)
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.Cancel):
 			m.mode = MOVE
 			m.selectionX = m.cursorX
@@ -344,12 +366,16 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.selectionX, m.selectionY = m.cursorX, m.cursorY
 			m.grid.Resize(m.viewport.Width, m.viewport.Height)
 			m.viewport.Update(m.cursorX, m.cursorY, m.grid.Width, m.grid.Height)
-			return m, save(m)
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.Help):
 			m.help.ShowAll = !m.help.ShowAll
 			return m, tea.ClearScreen
 		case key.Matches(msg, m.keymap.Quit):
 			m.grid.Reset()
+			// Cancel any pending debounced save; the final save below is
+			// synchronous so the latest state is persisted before quitting.
+			m.saver.stop()
 			return m, tea.Sequence(save(m), tea.Quit)
 		}
 	}
@@ -358,6 +384,11 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m mainModel) View() string {
+	// Take a consistent copy of the grid's display state, then render the grid
+	// without holding any lock. The slow lipgloss render never blocks the clock
+	// goroutine — only the fast Snapshot copy does.
+	m.cells = m.grid.Snapshot()
+
 	help := lipgloss.NewStyle().
 		MarginLeft(2).
 		Render(m.help.View(m.keymap))
@@ -383,9 +414,17 @@ func (m mainModel) View() string {
 		)
 	}
 
+	// The control bar still reads live grid/param state (tempo, pulse, selected
+	// node, params). It's a single row, so render it under a short read lock.
+	var control string
+	m.grid.Read(func() {
+		control = m.renderControl()
+	})
+
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		m.renderGrid(),
+		control,
 		paramHelp,
 		help,
 	)
@@ -396,26 +435,31 @@ func (m mainModel) handleParamEdit(dir string) {
 		return
 	}
 
-	switch dir {
-	case "up":
-		m.activeParam().Up()
-	case "down":
-		m.activeParam().Down()
-	case "left":
-		m.activeParam().Left()
-		return // no preview for alt param
-	case "right":
-		m.activeParam().Right()
-		return // no preview for alt param
+	edit := func() {
+		switch dir {
+		case "up":
+			m.activeParam().Up()
+		case "down":
+			m.activeParam().Down()
+		case "left":
+			m.activeParam().Left()
+		case "right":
+			m.activeParam().Right()
+		}
+
+		// Preview only for up/down (not the alt left/right edits), and only
+		// while stopped. The note copy happens here under the same lock.
+		if dir == "up" || dir == "down" {
+			if p, ok := m.activeParam().(*param.Key); ok && !m.grid.Playing {
+				p.Preview()
+			}
+		}
 	}
 
-	switch p := m.activeParam().(type) {
-	case *param.Key:
-		if m.grid.Playing {
-			return
-		}
-		p.Preview()
-	}
+	// In EDIT mode the params mutate node state directly, so take the write
+	// lock. In CONFIG mode they mutate grid state through locking Grid methods,
+	// so run them directly to avoid a re-entrant lock.
+	m.editParam(edit)
 }
 
 func (m mainModel) handleParamAltEdit(dir string) {
@@ -423,16 +467,29 @@ func (m mainModel) handleParamAltEdit(dir string) {
 		return
 	}
 
-	switch dir {
-	case "up":
-		m.activeParam().AltUp()
-	case "down":
-		m.activeParam().AltDown()
-	case "left":
-		m.activeParam().AltLeft()
-	case "right":
-		m.activeParam().AltRight()
+	m.editParam(func() {
+		switch dir {
+		case "up":
+			m.activeParam().AltUp()
+		case "down":
+			m.activeParam().AltDown()
+		case "left":
+			m.activeParam().AltLeft()
+		case "right":
+			m.activeParam().AltRight()
+		}
+	})
+}
+
+// editParam runs a parameter mutation, holding the grid write lock when the
+// active params mutate node state directly (EDIT mode). CONFIG-mode params
+// serialize themselves through locking Grid methods, so they run unwrapped.
+func (m mainModel) editParam(fn func()) {
+	if m.mode == EDIT {
+		m.grid.Write(fn)
+		return
 	}
+	fn()
 }
 
 func (m mainModel) activeParam() param.Param {
@@ -444,15 +501,14 @@ func (m mainModel) activeParamPage() []param.Param {
 }
 
 func (m mainModel) renderGrid() string {
-	var lines []string
+	lines := make([]string, 0, m.viewport.Height)
 	for y := m.viewport.offsetY; y < m.viewport.offsetY+m.viewport.Height; y++ {
-		var nodes []string
+		nodes := make([]string, 0, m.viewport.Width)
 		for x := m.viewport.offsetX; x < m.viewport.offsetX+m.viewport.Width; x++ {
-			nodes = append(nodes, m.renderNode(m.grid.Nodes()[y][x], x, y))
+			nodes = append(nodes, m.renderNode(m.cells[y][x], x, y))
 		}
 		lines = append(lines, lipgloss.JoinHorizontal(lipgloss.Left, nodes...))
 	}
-	lines = append(lines, m.renderControl())
 	return lipgloss.JoinVertical(lipgloss.Left, lines...)
 }
 
@@ -512,10 +568,10 @@ func (m *mainModel) moveBankGrid(dir string) {
 }
 
 func (m mainModel) loadGridFromBank() mainModel {
-	m.bank.Active = m.selectedGrid
+	m.bank.SetActive(m.selectedGrid)
 	isPlaying := m.grid.Playing
-	m.grid.Load(m.bank.Active, m.bank.ActiveGrid())
-	m.grid.Playing = isPlaying
+	m.grid.Load(m.selectedGrid, m.bank.ActiveGrid())
+	m.grid.SetPlaying(isPlaying)
 	m.cursorX = 1
 	m.cursorY = 1
 	m.selectionX = 1
@@ -527,12 +583,16 @@ func (m mainModel) loadGridFromBank() mainModel {
 }
 
 func (m mainModel) handleBankMetaCommand() (mainModel, tea.Cmd) {
-	if m.grid.BankIndex == m.bank.Active {
+	// BankIndex is written by the clock goroutine (meta commands), so read it
+	// under the lock.
+	var bankIndex int
+	m.grid.Read(func() { bankIndex = m.grid.BankIndex })
+	if bankIndex == m.bank.ActiveIndex() {
 		return m, tick()
 	}
-	m.bank.Active = m.grid.BankIndex
-	m.grid.Load(m.bank.Active, m.bank.ActiveGrid())
-	m.grid.Playing = true
+	m.bank.SetActive(bankIndex)
+	m.grid.Load(bankIndex, m.bank.ActiveGrid())
+	m.grid.SetPlaying(true)
 	m.mode = MOVE
 	m.param = 0
 	m.paramPage = 0

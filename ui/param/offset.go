@@ -6,7 +6,6 @@ import (
 
 	"signls/core/common"
 	"signls/core/node"
-
 	"signls/ui/util"
 )
 

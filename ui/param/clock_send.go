@@ -32,11 +32,11 @@ func (c ClockSend) AltValue() int {
 }
 
 func (c ClockSend) Up() {
-	c.grid.SendClock = true
+	c.grid.SetSendClock(true)
 }
 
 func (c ClockSend) Down() {
-	c.grid.SendClock = false
+	c.grid.SetSendClock(false)
 }
 
 func (c ClockSend) Left() {}

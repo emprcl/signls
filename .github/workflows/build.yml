@@ -11,108 +11,84 @@ permissions:
   contents: write
 
 jobs:
+  # signls needs cgo for gomidi's rtmidi driver, so each platform is built on a
+  # matching native runner. GoReleaser only compiles the targets selected by the
+  # GR_TARGET env var (see .goreleaser.yaml).
   build:
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-13, windows-2022]
+        include:
+          - target: linux-amd64
+            os: ubuntu-latest
+          - target: linux-arm64
+            os: ubuntu-24.04-arm
+          - target: darwin
+            os: macos-latest
     runs-on: ${{ matrix.os }}
-    env:
-      CGO_ENABLED: 1
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Alsa headers
-        run: sudo apt-get install libasound2-dev
-        if: startsWith(matrix.os, 'ubuntu')
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # full history & tags for version/changelog
 
       - name: Install Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
-          go-version: 1.23
+          go-version: "1.23"
 
-      - name: Release version number
-        run: echo '${{ github.ref_name}}' > VERSION
-        if: ${{ github.ref_type == 'tag' }}
-
-      - name: Development version number
-        run: echo 'dev-${{ github.sha}}' > VERSION
-        if: ${{ github.ref_type == 'branch' }}
-
-      - name: Build linux|mac
-        run: go build -o bin/signls && chmod +x bin/signls
-        if: ${{ !startsWith(matrix.os, 'windows') }}
-
-      - name: Build windows
-        run: go build -ldflags "-linkmode 'external' -extldflags '-static'" -o bin/signls.exe
-        if: startsWith(matrix.os, 'windows')
-
-      - name: Tar.gz linux|mac files
-        run: tar -zcvf signls_${{ github.ref_name }}_${{ runner.os}}.tar.gz LICENSE -C bin signls
-        if: ${{ !startsWith(matrix.os, 'windows') }}
-
-      - name: Zip windows files
-        shell: pwsh
+      - name: Install ALSA headers
+        if: startsWith(matrix.target, 'linux')
         run: |
-          Compress-Archive bin\signls.exe signls_${{ github.ref_name }}_${{ runner.os}}.zip
-        if: ${{ startsWith(matrix.os, 'windows') }}
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev
 
-      - name: Upload linux|mac artifact
-        uses: actions/upload-artifact@v4
+      - name: Install Windows cross toolchain (mingw-w64)
+        if: matrix.target == 'linux-amd64'
+        run: sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64
+
+      - name: Run GoReleaser (release on tags, snapshot otherwise)
+        uses: goreleaser/goreleaser-action@v7
         with:
-          name: signls_${{ github.sha }}_${{ runner.os}}
-          path: signls_${{ github.ref_name }}_${{ runner.os}}.tar.gz
-          if-no-files-found: error
-        if: ${{ !startsWith(matrix.os, 'windows') }}
+          version: "~> v2"
+          args: >-
+            ${{ startsWith(github.ref, 'refs/tags/v')
+              && 'release --clean'
+              || 'release --snapshot --clean' }}
+        env:
+          GR_TARGET: ${{ matrix.target }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload windows artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v7
         with:
-          name: signls_${{ github.sha }}_${{ runner.os}}
-          path: signls_${{ github.ref_name }}_${{ runner.os}}.zip
+          name: dist-${{ matrix.target }}
+          path: |
+            dist/*.tar.gz
+            dist/*.zip
+            dist/checksums_*.txt
           if-no-files-found: error
-        if: ${{ startsWith(matrix.os, 'windows') }}
 
+  # On tags, collect every runner's archives and publish a single release.
   release:
     needs: build
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4.1.7
+      - name: Download all dist artifacts
+        uses: actions/download-artifact@v8
         with:
-          name: signls_${{ github.sha }}_macOS
+          path: dist
+          pattern: dist-*
+          merge-multiple: true
 
-      - uses: actions/download-artifact@v4.1.7
-        with:
-          name: signls_${{ github.sha }}_Linux
+      - name: Combine checksums
+        run: cat dist/checksums_*.txt > dist/checksums.txt
 
-      - uses: actions/download-artifact@v4.1.7
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v3
         with:
-          name: signls_${{ github.sha }}_Windows
-
-      - name: Create release
-        uses: softprops/action-gh-release@v1
-        with:
+          generate_release_notes: true
           files: |
-            signls_*.tar.gz
-            signls_*.zip
-
-  # itchio-release:
-  #   needs: release
-  #   if: startsWith(github.ref, 'refs/tags/v')
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       os: [Linux, macOS, Windows]
-  #   env:
-  #     itchio_project: "emprcl/signls"
-  #   steps:
-  #     - uses: actions/download-artifact@v4.1.7
-  #       with:
-  #         name: signls_${{ github.sha }}_${{ matrix.os }}
-  #     - uses: robpc/itchio-upload-action@v1
-  #       with:
-  #         path: signls_${{ github.sha }}_${{ matrix.os }}
-  #         project: ${{ env.itchio_project }}
-  #         channel: ${{ matrix.os }}
-  #         version: ${{ github.ref_name}}
-  #         api-key: ${{ secrets.ITCHIO_API_KEY }}
+            dist/*.tar.gz
+            dist/*.zip
+            dist/checksums.txt

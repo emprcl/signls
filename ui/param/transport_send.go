@@ -32,11 +32,11 @@ func (t TransportSend) AltValue() int {
 }
 
 func (t TransportSend) Up() {
-	t.grid.SendTransport = true
+	t.grid.SetSendTransport(true)
 }
 
 func (t TransportSend) Down() {
-	t.grid.SendTransport = false
+	t.grid.SetSendTransport(false)
 }
 
 func (t TransportSend) Left() {}

@@ -15,12 +15,16 @@ jobs:
     name: checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: 1.23
-      - uses: actions/checkout@v4
+      - name: Install ALSA headers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev
+      - uses: actions/checkout@v6
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v9
         with:
           args: -c .golangci.yml
           only-new-issues: true

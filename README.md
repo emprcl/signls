@@ -16,6 +16,18 @@ _Feel free to [open an issue](https://github.com/emprcl/signls/issues/new)._
 
 ## Installation
 
+### Supported platforms
+
+Prebuilt binaries are available for the following platforms:
+
+| OS      | Architectures                        |
+| ------- | ------------------------------------ |
+| Linux   | x86-64 (amd64), arm64                |
+| macOS   | Intel (amd64), Apple Silicon (arm64) |
+| Windows | x86-64 (amd64)                       |
+
+> _The Linux arm64 build covers the 64-bit Raspberry Pi OS (Raspberry Pi 3 and later)._
+
 [Download the last release](https://github.com/emprcl/signls/releases) for your platform.
 
 Then:
@@ -61,6 +73,17 @@ make GOLANG_OS=linux GOLANG_ARCH=arm64 build
 
 Hit `?` to see all keybindings. `esc` to quit.
 
+### Files location
+
+Signls stores its `config.json` and bank files in your user config directory:
+
+| OS | Location |
+| --- | --- |
+| Linux / macOS | `~/.config/emprcl/signls/` (or `$XDG_CONFIG_HOME/emprcl/signls/`) |
+| Windows | `%AppData%\emprcl\signls\` |
+
+You can override either with an explicit path using the `--config` and `--bank` flags.
+
 Some companion apps that receive MIDI for testing Signls:
  - [Webmidi synths](https://synth.playtronica.com/)
  - [Enfer](https://neauoire.github.io/Enfer/) ([github](https://github.com/neauoire/Enfer)) _*works only on linux*_
@@ -68,7 +91,7 @@ Some companion apps that receive MIDI for testing Signls:
 
 ### Keyboard mapping
 
-Keys mapping is fully customizable. After running signls for the first time, a `config.json` is created.
+Keys mapping is fully customizable. After running signls for the first time, a `config.json` is created in your [config directory](#files-location).
 You can edit all the keys inside it.
 
 You can select one of the default keyboard layouts available:
@@ -114,8 +137,8 @@ For qwerty keyboards, here's the default mapping:
 
 ### Bank management
 
-Each time you start Signls, a json file (default: `default.json`) containing 32 grid slots is loaded.
-For selecting a different file, use the `--bank` flag:
+Each time you start Signls, a json file (default: `default.json`, in your [config directory](#files-location)) containing 32 grid slots is loaded.
+For selecting a different file, use the `--bank` flag (relative or absolute path):
 ```sh
 ./signls --bank my-grids.json
 ```
