@@ -1,7 +1,6 @@
 package main
 
 import (
-	_ "embed"
 	"flag"
 	"fmt"
 	"log"
@@ -10,24 +9,24 @@ import (
 	"signls/filesystem"
 	"signls/midi"
 	"signls/ui"
-	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-//go:embed VERSION
-var AppVersion string
+// version is set at build time via -ldflags "-X main.version=...". It defaults
+// to "dev" for local builds.
+var version = "dev"
 
 func main() {
 	configFile := flag.String("config", "", "config file to load or create (default: <user config dir>/signls/config.json)")
 	bankFile := flag.String("bank", "", "bank file to store grids (default: <user config dir>/signls/default.json)")
 	keyboard := flag.String("keyboard", "", "keyboard layout (qwerty, qwerty-mac, azerty, azerty-mac)")
-	version := flag.Bool("version", false, "print current version")
+	showVersion := flag.Bool("version", false, "print current version")
 	debug := flag.Bool("debug", false, "enable debug mode")
 	flag.Parse()
 
-	if *version {
-		fmt.Print(AppVersion)
+	if *showVersion {
+		fmt.Println(version)
 		os.Exit(0)
 	}
 
@@ -42,7 +41,7 @@ func main() {
 		bankPath = filesystem.DefaultPath("default.json")
 	}
 
-	config := filesystem.NewConfiguration(configPath, strings.TrimSuffix(AppVersion, "\n"), *keyboard)
+	config := filesystem.NewConfiguration(configPath, version, *keyboard)
 
 	midi, err := midi.New()
 	if err != nil {

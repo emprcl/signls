@@ -1,0 +1,94 @@
+version: 2
+
+project_name: signls
+
+before:
+  hooks:
+    - go mod download
+
+# signls needs cgo: gomidi's rtmidi driver wraps C/C++ (ALSA on Linux, CoreMIDI
+# on macOS, WinMM on Windows), so unlike a pure-Go project it can't be
+# cross-compiled from a single runner. Each build below is gated by the
+# GR_TARGET env var so a given CI runner only compiles the targets its toolchain
+# supports (see .github/workflows/build.yml); the runners' dist outputs are then
+# collected and published together as one GitHub release.
+builds:
+  # Built natively on the linux-amd64 runner.
+  - id: linux-amd64
+    binary: signls
+    main: .
+    flags: [-trimpath]
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+    env:
+      - CGO_ENABLED=1
+    goos: [linux]
+    goarch: [amd64]
+    skip: '{{ ne (index .Env "GR_TARGET") "linux-amd64" }}'
+
+  # Built natively on the linux-arm64 runner (covers 64-bit Raspberry Pi OS).
+  - id: linux-arm64
+    binary: signls
+    main: .
+    flags: [-trimpath]
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+    env:
+      - CGO_ENABLED=1
+    goos: [linux]
+    goarch: [arm64]
+    skip: '{{ ne (index .Env "GR_TARGET") "linux-arm64" }}'
+
+  # Cross-compiled from the linux-amd64 runner with the mingw-w64 toolchain.
+  - id: windows-amd64
+    binary: signls
+    main: .
+    flags: [-trimpath]
+    ldflags:
+      - -s -w -X main.version={{ .Version }} -extldflags=-static
+    env:
+      - CGO_ENABLED=1
+      - CC=x86_64-w64-mingw32-gcc
+      - CXX=x86_64-w64-mingw32-g++
+    goos: [windows]
+    goarch: [amd64]
+    skip: '{{ ne (index .Env "GR_TARGET") "linux-amd64" }}'
+
+  # Both arches built on the macOS runner (native clang cross-compiles them).
+  - id: darwin
+    binary: signls
+    main: .
+    flags: [-trimpath]
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+    env:
+      - CGO_ENABLED=1
+    goos: [darwin]
+    goarch: [amd64, arm64]
+    skip: '{{ ne (index .Env "GR_TARGET") "darwin" }}'
+
+archives:
+  - id: signls
+    # e.g. signls_1.2.3_linux_arm64.tar.gz, signls_1.2.3_windows_amd64.zip
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  # Each runner writes its own checksum file; the release workflow concatenates
+  # them into a single checksums.txt.
+  name_template: 'checksums_{{ index .Env "GR_TARGET" }}.txt'
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+release:
+  # The GitHub release is assembled by the workflow once every runner's archives
+  # are collected, so goreleaser itself must not publish.
+  disable: true

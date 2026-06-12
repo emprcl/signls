@@ -16,6 +16,18 @@ _Feel free to [open an issue](https://github.com/emprcl/signls/issues/new)._
 
 ## Installation
 
+### Supported platforms
+
+Prebuilt binaries are available for the following platforms:
+
+| OS      | Architectures                        |
+| ------- | ------------------------------------ |
+| Linux   | x86-64 (amd64), arm64                |
+| macOS   | Intel (amd64), Apple Silicon (arm64) |
+| Windows | x86-64 (amd64)                       |
+
+> _The Linux arm64 build covers the 64-bit Raspberry Pi OS (Raspberry Pi 3 and later)._
+
 [Download the last release](https://github.com/emprcl/signls/releases) for your platform.
 
 Then:
