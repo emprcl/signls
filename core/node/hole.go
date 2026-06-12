@@ -83,7 +83,7 @@ func (e *HoleEmitter) Reset() {
 }
 
 func (s *HoleEmitter) Symbol() string {
-	return "H⬢"
+	return "H◆"
 }
 
 func (s *HoleEmitter) Name() string {

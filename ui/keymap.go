@@ -123,11 +123,21 @@ func (k keyMap) EmitterSymbol(msg tea.KeyPressMsg) string {
 	}
 }
 
+// normalizeKey maps v1-style key names to their bubbletea v2 equivalents.
+// Notably the space bar is reported as "space" in v2 rather than " ", so
+// configs (and defaults) that store " " still bind correctly.
+func normalizeKey(k string) string {
+	if k == " " {
+		return "space"
+	}
+	return k
+}
+
 // newKeyMap returns the default key mapping.
 func newKeyMap(keys filesystem.KeyMap) keyMap {
 	return keyMap{
 		Play: key.NewBinding(
-			key.WithKeys(keys.Play),
+			key.WithKeys(normalizeKey(keys.Play)),
 			key.WithHelp("space", "toggle play"),
 		),
 		Up: key.NewBinding(
