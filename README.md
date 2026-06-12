@@ -28,6 +28,17 @@ Prebuilt binaries are available for the following platforms:
 
 > _The Linux arm64 build covers the 64-bit Raspberry Pi OS (Raspberry Pi 3 and later)._
 
+### Quick-install
+
+On **Linux** or **macOS**, you can install the latest release with this script:
+```sh
+curl -sSL empr.cl/get/signls | bash
+```
+
+The script downloads the right binary for your system, installs it to `~/.local/bin` and adds it to your `PATH`.
+
+### Manual installation
+
 [Download the last release](https://github.com/emprcl/signls/releases) for your platform.
 
 Then:
