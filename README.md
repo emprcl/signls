@@ -8,8 +8,6 @@ Signls (_pronounced signals_) is a non-linear, generative midi sequencer designe
 
 It takes inspiration from [Orca](https://100r.co/site/orca.html) and [Nodal](https://nodalmusic.com/).
 
-**_Signls is still in development, but it is expected to be relatively stable._**
-
 _Feel free to [open an issue](https://github.com/emprcl/signls/issues/new)._
 
 ![signls screenshot](/docs/screenshot.png)
