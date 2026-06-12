@@ -19,8 +19,8 @@ import (
 var AppVersion string
 
 func main() {
-	configFile := flag.String("config", "config.json", "config file to load or create")
-	bankFile := flag.String("bank", "default.json", "bank file to store grids")
+	configFile := flag.String("config", "", "config file to load or create (default: <user config dir>/signls/config.json)")
+	bankFile := flag.String("bank", "", "bank file to store grids (default: <user config dir>/signls/default.json)")
 	keyboard := flag.String("keyboard", "", "keyboard layout (qwerty, qwerty-mac, azerty, azerty-mac)")
 	version := flag.Bool("version", false, "print current version")
 	debug := flag.Bool("debug", false, "enable debug mode")
@@ -31,7 +31,18 @@ func main() {
 		os.Exit(0)
 	}
 
-	config := filesystem.NewConfiguration(*configFile, strings.TrimSuffix(AppVersion, "\n"), *keyboard)
+	// Default config and bank files live in the per-user config directory; an
+	// explicit -config/-bank path is honored as given.
+	configPath := *configFile
+	if configPath == "" {
+		configPath = filesystem.DefaultPath("config.json")
+	}
+	bankPath := *bankFile
+	if bankPath == "" {
+		bankPath = filesystem.DefaultPath("default.json")
+	}
+
+	config := filesystem.NewConfiguration(configPath, strings.TrimSuffix(AppVersion, "\n"), *keyboard)
 
 	midi, err := midi.New()
 	if err != nil {
@@ -47,7 +58,7 @@ func main() {
 		defer f.Close()
 	}
 
-	bank := filesystem.New(*bankFile)
+	bank := filesystem.New(bankPath)
 	grid := field.NewFromBank(bank.Active, bank.ActiveGrid(), midi)
 
 	p := tea.NewProgram(ui.New(config, grid, bank))
