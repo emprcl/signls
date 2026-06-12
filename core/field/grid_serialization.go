@@ -17,6 +17,19 @@ func NewFromBank(bankIndex int, grid filesystem.Grid, midi midi.Midi) *Grid {
 }
 
 func (g *Grid) Save(bank *filesystem.Bank) {
+	// Save runs in a background command goroutine, so read the grid and node
+	// state under the read lock to build the serializable snapshot, then write
+	// to disk (below) without holding the lock.
+	var fsGrid filesystem.Grid
+	g.Read(func() {
+		fsGrid = g.snapshotForSave()
+	})
+	bank.Save(fsGrid)
+}
+
+// snapshotForSave builds the serializable representation of the grid. The
+// caller must hold the lock.
+func (g *Grid) snapshotForSave() filesystem.Grid {
 	nodes := []filesystem.Node{}
 
 	for y := range g.nodes {
@@ -75,7 +88,7 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 		}
 	}
 
-	bank.Save(filesystem.Grid{
+	return filesystem.Grid{
 		Nodes:         nodes,
 		Tempo:         g.Tempo(),
 		Height:        g.Height,
@@ -85,7 +98,7 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 		Scale:         uint16(g.Scale),
 		SendClock:     g.SendClock,
 		SendTransport: g.SendTransport,
-	})
+	}
 }
 
 func (g *Grid) Load(index int, grid filesystem.Grid) {

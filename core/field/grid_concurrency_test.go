@@ -1,9 +1,11 @@
 package field
 
 import (
+	"path/filepath"
 	"signls/core/common"
 	"signls/core/music"
 	"signls/core/node"
+	"signls/filesystem"
 	"signls/midi"
 	"sync"
 	"testing"
@@ -25,6 +27,7 @@ func TestGridConcurrentAccess(t *testing.T) {
 	grid.TogglePlay()
 
 	const iterations = 2000
+	const numGrids = 32 // matches filesystem bank size
 	var wg sync.WaitGroup
 
 	// Clock goroutine: advance the grid on every pulse.
@@ -70,6 +73,32 @@ func TestGridConcurrentAccess(t *testing.T) {
 			grid.RemoveNodes(1, 1, 1, 1)
 			grid.ShiftKey(1)
 			grid.ShiftScale(1)
+		}
+	}()
+
+	// Save goroutine: persist the grid the way the save() command does — reading
+	// all node state to build the serializable snapshot, concurrent with the
+	// clock. Writes go to a throwaway bank file in a temp dir.
+	bank := filesystem.New(filepath.Join(t.TempDir(), "bank.json"))
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := 0; i < iterations/10; i++ {
+			grid.Save(bank)
+		}
+	}()
+
+	// Bank goroutine: touch the bank the way the ui does (select, copy, clear,
+	// render), concurrent with the save goroutine writing it.
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := 0; i < iterations; i++ {
+			bank.SetActive(i % numGrids)
+			_ = bank.ActiveIndex()
+			_ = bank.GridAt(i % numGrids)
+			_ = bank.AllGrids()
+			bank.ClearGrid((i + 1) % numGrids)
 		}
 	}()
 

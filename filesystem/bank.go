@@ -184,8 +184,47 @@ func (b *Bank) ActiveGrid() Grid {
 	return b.Grids[b.Active]
 }
 
+// ActiveIndex returns the index of the active grid.
+func (b *Bank) ActiveIndex() int {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.Active
+}
+
+// SetActive sets the index of the active grid.
+func (b *Bank) SetActive(nb int) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	b.Active = nb
+}
+
+// GridAt returns the grid at the given index.
+func (b *Bank) GridAt(nb int) Grid {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.Grids[nb]
+}
+
+// SetGrid stores a grid at the given index.
+func (b *Bank) SetGrid(nb int, grid Grid) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	b.Grids[nb] = grid
+}
+
+// AllGrids returns a copy of the bank's grids, safe to read without the lock.
+func (b *Bank) AllGrids() []Grid {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	grids := make([]Grid, len(b.Grids))
+	copy(grids, b.Grids)
+	return grids
+}
+
 // ClearGrid clears a given grid.
 func (b *Bank) ClearGrid(nb int) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
 	b.Grids[nb] = NewGrid()
 }
 
