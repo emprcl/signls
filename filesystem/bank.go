@@ -231,7 +231,7 @@ func (b *Bank) ClearGrid(nb int) {
 
 // Filename returns the bank filename.
 func (b *Bank) Filename() string {
-	return strings.TrimSuffix(b.filename, filepath.Ext(b.filename))
+	return strings.TrimSuffix(filepath.Base(b.filename), filepath.Ext(b.filename))
 }
 
 // Save saves a grid to the active slot and writes.
