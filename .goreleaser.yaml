@@ -19,9 +19,10 @@ builds:
     main: .
     flags: [-trimpath]
     ldflags:
-      - -s -w -X main.version={{ .Version }} -extldflags='-static-libstdc++ -static-libgcc'
+      - -s -w -X main.version={{ .Version }}
     env:
       - CGO_ENABLED=1
+      - CGO_LDFLAGS=-static-libstdc++ -static-libgcc
     goos: [linux]
     goarch: [amd64]
     skip: '{{ ne (index .Env "GR_TARGET") "linux-amd64" }}'
@@ -32,9 +33,10 @@ builds:
     main: .
     flags: [-trimpath]
     ldflags:
-      - -s -w -X main.version={{ .Version }} -extldflags='-static-libstdc++ -static-libgcc'
+      - -s -w -X main.version={{ .Version }}
     env:
       - CGO_ENABLED=1
+      - CGO_LDFLAGS=-static-libstdc++ -static-libgcc
     goos: [linux]
     goarch: [arm64]
     skip: '{{ ne (index .Env "GR_TARGET") "linux-arm64" }}'
