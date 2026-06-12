@@ -2,10 +2,11 @@ package param
 
 import (
 	"fmt"
-	"signls/core/common"
-	"signls/core/node"
 	"strconv"
 	"strings"
+
+	"signls/core/common"
+	"signls/core/node"
 )
 
 type Destination struct {

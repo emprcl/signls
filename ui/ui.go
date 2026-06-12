@@ -2,11 +2,12 @@ package ui
 
 import (
 	"fmt"
+	"time"
+
 	"signls/core/field"
 	"signls/filesystem"
 	"signls/ui/param"
 	"signls/ui/util"
-	"time"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -120,11 +121,10 @@ func save(m mainModel) tea.Cmd {
 }
 
 // requestSave schedules a debounced save instead of writing on every edit, so a
-// burst of edits coalesces into a single disk write. It returns no command; the
-// write happens on the saver's timer goroutine.
-func (m mainModel) requestSave() tea.Cmd {
+// burst of edits coalesces into a single disk write. The write happens on the
+// saver's timer goroutine.
+func (m mainModel) requestSave() {
 	m.saver.request()
-	return nil
 }
 
 func (m mainModel) Init() tea.Cmd {
@@ -203,7 +203,8 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			dir := m.keymap.Direction(msg)
 			if m.mode == EDIT || m.mode == CONFIG {
 				m.handleParamAltEdit(dir)
-				return m, m.requestSave()
+				m.requestSave()
+				return m, nil
 			}
 			m.selectionX, m.selectionY = moveCursor(
 				dir, 1, m.selectionX, m.selectionY,
@@ -217,10 +218,12 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.grid.Write(func() {
 					param.NewDirection(m.selectedEmitters()).SetFromKeyString(dir)
 				})
-				return m, m.requestSave()
+				m.requestSave()
+				return m, nil
 			}
 			m.handleParamEdit(dir)
-			return m, m.requestSave()
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.AddBang, m.keymap.AddSpread, m.keymap.AddCycle, m.keymap.AddDice, m.keymap.AddToll, m.keymap.AddEuclid, m.keymap.AddZone, m.keymap.AddPass, m.keymap.AddHole):
 			m.grid.AddNodeFromSymbol(m.keymap.EmitterSymbol(msg), m.cursorX, m.cursorY)
 			newParams := param.NewParamsForNodes(m.grid, m.selectedEmitters())
@@ -231,14 +234,17 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.param = 0
 			}
 			m.params = newParams
-			return m, m.requestSave()
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.MuteNode):
 			m.grid.ToggleNodeMutes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
-			return m, m.requestSave()
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.MuteAllNode):
 			m.grid.SetAllNodeMutes(!m.mute)
 			m.mute = !m.mute
-			return m, m.requestSave()
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.RemoveNode):
 			if m.mode == BANK {
 				m.bank.ClearGrid(m.selectedGrid)
@@ -246,7 +252,8 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.mode = MOVE
 			m.grid.RemoveNodes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
-			return m, m.requestSave()
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.EditNode):
 			if m.mode == BANK {
 				m.mode = MOVE
@@ -285,31 +292,37 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			param.Get("root", m.gridParams).Up()
-			return m, m.requestSave()
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.RootNoteDown):
 			if m.mode == EDIT {
 				return m, nil
 			}
 			param.Get("root", m.gridParams).Down()
-			return m, m.requestSave()
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.ScaleUp):
 			if m.mode == EDIT {
 				return m, nil
 			}
 			param.Get("scale", m.gridParams).Up()
-			return m, m.requestSave()
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.ScaleDown):
 			if m.mode == EDIT {
 				return m, nil
 			}
 			param.Get("scale", m.gridParams).Down()
-			return m, m.requestSave()
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.TempoUp):
 			m.grid.SetTempo(m.grid.Tempo() + 1)
-			return m, m.requestSave()
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.TempoDown):
 			m.grid.SetTempo(m.grid.Tempo() - 1)
-			return m, m.requestSave()
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.Configuration):
 			m.mode = m.toggleMode(CONFIG)
 			m.params = param.NewParamsForMidi(m.grid)
@@ -340,7 +353,8 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.grid.Paste(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
-			return m, m.requestSave()
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.Cancel):
 			m.mode = MOVE
 			m.selectionX = m.cursorX
@@ -352,7 +366,8 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.selectionX, m.selectionY = m.cursorX, m.cursorY
 			m.grid.Resize(m.viewport.Width, m.viewport.Height)
 			m.viewport.Update(m.cursorX, m.cursorY, m.grid.Width, m.grid.Height)
-			return m, m.requestSave()
+			m.requestSave()
+			return m, nil
 		case key.Matches(msg, m.keymap.Help):
 			m.help.ShowAll = !m.help.ShowAll
 			return m, tea.ClearScreen

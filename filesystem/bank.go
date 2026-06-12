@@ -9,12 +9,13 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
+	"sync"
+
 	"signls/core/common"
 	"signls/core/music"
 	"signls/core/music/meta"
 	"signls/core/theory"
-	"strings"
-	"sync"
 )
 
 const (

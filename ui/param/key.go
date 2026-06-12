@@ -2,11 +2,12 @@ package param
 
 import (
 	"fmt"
+	"time"
+
 	"signls/core/common"
 	"signls/core/music"
 	"signls/core/theory"
 	"signls/ui/util"
-	"time"
 )
 
 type KeyMode uint8

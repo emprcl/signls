@@ -9,11 +9,9 @@ import (
 
 // redirectConfigDir points the config base at a temp dir via XDG_CONFIG_HOME,
 // which configBase honors on every platform.
-func redirectConfigDir(t *testing.T) string {
+func redirectConfigDir(t *testing.T) {
 	t.Helper()
-	dir := t.TempDir()
-	t.Setenv("XDG_CONFIG_HOME", dir)
-	return dir
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 }
 
 func TestAppDirCreatesUnderConfigDir(t *testing.T) {

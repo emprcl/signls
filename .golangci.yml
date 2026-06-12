@@ -23,7 +23,7 @@ formatters:
     - gofumpt
   settings:
     gofumpt:
-      module-path: runal
+      module-path: signls
   exclusions:
     generated: lax
     paths:

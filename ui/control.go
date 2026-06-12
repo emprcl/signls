@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+
 	"signls/core/common"
 	"signls/filesystem"
 	"signls/ui/param"
@@ -212,10 +213,6 @@ func (m mainModel) modeName() string {
 	default:
 		return "move"
 	}
-}
-
-func (m mainModel) selectedNode() common.Node {
-	return m.grid.Nodes()[m.cursorY][m.cursorX]
 }
 
 func (m mainModel) selectedEmitters() []common.Node {

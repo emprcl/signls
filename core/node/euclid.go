@@ -2,6 +2,7 @@ package node
 
 import (
 	"fmt"
+
 	"signls/core/common"
 	"signls/core/music"
 	"signls/core/theory"

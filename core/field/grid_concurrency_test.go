@@ -2,13 +2,14 @@ package field
 
 import (
 	"path/filepath"
+	"sync"
+	"testing"
+
 	"signls/core/common"
 	"signls/core/music"
 	"signls/core/node"
 	"signls/filesystem"
 	"signls/midi"
-	"sync"
-	"testing"
 )
 
 // TestGridConcurrentAccess exercises the grid the way the running app does: the

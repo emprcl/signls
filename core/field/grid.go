@@ -1,13 +1,14 @@
 package field
 
 import (
+	"sync"
+
 	"signls/core/common"
 	"signls/core/music"
 	"signls/core/music/meta"
 	"signls/core/node"
 	"signls/core/theory"
 	"signls/midi"
-	"sync"
 )
 
 const (

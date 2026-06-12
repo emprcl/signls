@@ -2,12 +2,13 @@ package param
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+
 	"signls/core/common"
 	"signls/core/music"
 	"signls/midi"
 	"signls/ui/util"
-	"strconv"
-	"strings"
 )
 
 type CC struct {

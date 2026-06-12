@@ -3,9 +3,10 @@ package music
 import (
 	"math"
 	"math/rand"
+	"time"
+
 	"signls/core/theory"
 	"signls/midi"
-	"time"
 )
 
 const (
