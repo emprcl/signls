@@ -141,7 +141,9 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch {
 			case key.Matches(msg, m.keymap.EditNode):
 				m.input.Blur()
-				m.activeParam().SetEditValue(m.input.Value())
+				m.grid.Write(func() {
+					m.activeParam().SetEditValue(m.input.Value())
+				})
 				return m, nil
 			case key.Matches(msg, m.keymap.Cancel, m.keymap.EditInput):
 				m.input.Blur()
@@ -202,7 +204,9 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keymap.EditUp, m.keymap.EditRight, m.keymap.EditDown, m.keymap.EditLeft):
 			dir := m.keymap.Direction(msg)
 			if m.mode == MOVE {
-				param.NewDirection(m.selectedEmitters()).SetFromKeyString(dir)
+				m.grid.Write(func() {
+					param.NewDirection(m.selectedEmitters()).SetFromKeyString(dir)
+				})
 				return m, save(m)
 			}
 			m.handleParamEdit(dir)
@@ -403,26 +407,31 @@ func (m mainModel) handleParamEdit(dir string) {
 		return
 	}
 
-	switch dir {
-	case "up":
-		m.activeParam().Up()
-	case "down":
-		m.activeParam().Down()
-	case "left":
-		m.activeParam().Left()
-		return // no preview for alt param
-	case "right":
-		m.activeParam().Right()
-		return // no preview for alt param
+	edit := func() {
+		switch dir {
+		case "up":
+			m.activeParam().Up()
+		case "down":
+			m.activeParam().Down()
+		case "left":
+			m.activeParam().Left()
+		case "right":
+			m.activeParam().Right()
+		}
+
+		// Preview only for up/down (not the alt left/right edits), and only
+		// while stopped. The note copy happens here under the same lock.
+		if dir == "up" || dir == "down" {
+			if p, ok := m.activeParam().(*param.Key); ok && !m.grid.Playing {
+				p.Preview()
+			}
+		}
 	}
 
-	switch p := m.activeParam().(type) {
-	case *param.Key:
-		if m.grid.Playing {
-			return
-		}
-		p.Preview()
-	}
+	// In EDIT mode the params mutate node state directly, so take the write
+	// lock. In CONFIG mode they mutate grid state through locking Grid methods,
+	// so run them directly to avoid a re-entrant lock.
+	m.editParam(edit)
 }
 
 func (m mainModel) handleParamAltEdit(dir string) {
@@ -430,16 +439,29 @@ func (m mainModel) handleParamAltEdit(dir string) {
 		return
 	}
 
-	switch dir {
-	case "up":
-		m.activeParam().AltUp()
-	case "down":
-		m.activeParam().AltDown()
-	case "left":
-		m.activeParam().AltLeft()
-	case "right":
-		m.activeParam().AltRight()
+	m.editParam(func() {
+		switch dir {
+		case "up":
+			m.activeParam().AltUp()
+		case "down":
+			m.activeParam().AltDown()
+		case "left":
+			m.activeParam().AltLeft()
+		case "right":
+			m.activeParam().AltRight()
+		}
+	})
+}
+
+// editParam runs a parameter mutation, holding the grid write lock when the
+// active params mutate node state directly (EDIT mode). CONFIG-mode params
+// serialize themselves through locking Grid methods, so they run unwrapped.
+func (m mainModel) editParam(fn func()) {
+	if m.mode == EDIT {
+		m.grid.Write(fn)
+		return
 	}
+	fn()
 }
 
 func (m mainModel) activeParam() param.Param {

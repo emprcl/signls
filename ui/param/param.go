@@ -37,6 +37,17 @@ func NewParamsForNodes(grid *field.Grid, nodes []common.Node) [][]Param {
 		return [][]Param{}
 	}
 
+	// Building the parameter list reads node and grid state (key/scale, silent
+	// flags, ...) that the clock goroutine mutates while triggering, so take the
+	// read lock for the duration.
+	var params [][]Param
+	grid.Read(func() {
+		params = newParamsForNodes(grid, nodes)
+	})
+	return params
+}
+
+func newParamsForNodes(grid *field.Grid, nodes []common.Node) [][]Param {
 	if isHomogeneousNode[*node.HoleEmitter](nodes) {
 		return [][]Param{
 			{

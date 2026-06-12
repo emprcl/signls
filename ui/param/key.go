@@ -120,8 +120,10 @@ func (k *Key) SetAlt(value int) {
 }
 
 func (k *Key) Preview() {
+	// Copy the note synchronously so it happens under the caller's lock; the
+	// goroutine then plays the copy without touching shared node state.
+	n := *k.nodes[0].(music.Audible).Note()
 	go func() {
-		n := *k.nodes[0].(music.Audible).Note()
 		n.Play()
 		time.Sleep(300 * time.Millisecond)
 		n.Silence()

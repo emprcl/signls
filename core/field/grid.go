@@ -14,6 +14,8 @@ const (
 	defaultTempo                = 120.
 	defaultRootKey theory.Key   = 60
 	defaultScale   theory.Scale = theory.CHROMATIC
+
+	maxKey int = 127
 )
 
 // Grid represents the main structure for the grid-based sequencer.
@@ -72,13 +74,24 @@ func NewGrid(width, height int, midi midi.Midi, device string) *Grid {
 }
 
 // Read runs fn while holding the read lock. The ui uses it to wrap reads that
-// span several grid/node accesses (such as rendering the control bar) so they
-// observe a consistent state without exposing the lock itself. For rendering
-// the grid, prefer Snapshot, which copies the display state and releases the
-// lock immediately.
+// span several grid/node accesses (such as rendering the control bar or
+// building the parameter list) so they observe a consistent state without
+// exposing the lock itself. For rendering the grid, prefer Snapshot, which
+// copies the display state and releases the lock immediately.
 func (g *Grid) Read(fn func()) {
 	g.mu.RLock()
 	defer g.mu.RUnlock()
+	fn()
+}
+
+// Write runs fn while holding the write lock. The ui uses it to wrap mutations
+// that don't go through a dedicated Grid method — chiefly editing the
+// parameters of the selected nodes, which writes node state the clock goroutine
+// reads while triggering. fn must not call a Grid method that locks, or it will
+// deadlock.
+func (g *Grid) Write(fn func()) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	fn()
 }
 
@@ -150,6 +163,43 @@ func (g *Grid) SetScale(scale theory.Scale) {
 	g.transpose()
 }
 
+// ShiftKey changes the root key by delta (clamped to the midi range) and
+// transposes all notes accordingly. The read and write happen under a single
+// lock so it can't race with the clock goroutine mutating the key.
+func (g *Grid) ShiftKey(delta int) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	v := int(g.Key) + delta
+	if v < 0 || v > maxKey {
+		return
+	}
+	g.Key = theory.Key(v)
+	g.transpose()
+}
+
+// ShiftScale cycles the scale by delta (wrapping around) and transposes all
+// notes accordingly. The read and write happen under a single lock so it can't
+// race with the clock goroutine mutating the scale.
+func (g *Grid) ShiftScale(delta int) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	scales := theory.AllScales()
+	idx := delta
+	for i, s := range scales {
+		if s == g.Scale {
+			idx = i + delta
+			break
+		}
+	}
+	if idx < 0 {
+		idx = len(scales) - 1
+	} else if idx >= len(scales) {
+		idx = 0
+	}
+	g.Scale = scales[idx]
+	g.transpose()
+}
+
 // MidiDevice returns the name of the currently active MIDI device.
 func (g *Grid) MidiDevice() midi.Device {
 	return g.device
@@ -160,6 +210,20 @@ func (g *Grid) SetMidiDevice(device midi.Device) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	g.device = device
+}
+
+// SetSendClock sets whether the grid sends midi clock to its device.
+func (g *Grid) SetSendClock(send bool) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.SendClock = send
+}
+
+// SetSendTransport sets whether the grid sends midi transport messages.
+func (g *Grid) SetSendTransport(send bool) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.SendTransport = send
 }
 
 // Midi returns the Midi interface.

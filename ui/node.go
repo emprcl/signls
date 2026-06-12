@@ -32,6 +32,13 @@ var (
 				Foreground(lipgloss.AdaptiveColor{Light: "15", Dark: "0"})
 )
 
+// gridBlankCell caches the rendered empty grid cell. On a sparse grid this is
+// by far the most common cell, and its output is constant. It is computed
+// lazily on first render (rather than at init) so lipgloss has already detected
+// the terminal background for its adaptive color. renderNode runs only on the
+// bubbletea (View) goroutine, so the lazy write needs no synchronization.
+var gridBlankCell string
+
 func (m mainModel) inSelectionRange(x, y int) bool {
 	return x >= m.cursorX &&
 		x <= m.selectionX &&
@@ -66,7 +73,10 @@ func (m mainModel) renderNode(c field.Cell, x, y int) string {
 		if (x+y)%2 == 0 {
 			return "  "
 		}
-		return gridStyle.Render("  ")
+		if gridBlankCell == "" {
+			gridBlankCell = gridStyle.Render("  ")
+		}
+		return gridBlankCell
 	}
 
 	// render node

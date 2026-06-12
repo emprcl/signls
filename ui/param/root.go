@@ -34,11 +34,11 @@ func (r Root) AltValue() int {
 }
 
 func (r Root) Up() {
-	r.Set(r.Value() + 1)
+	r.grid.ShiftKey(1)
 }
 
 func (r Root) Down() {
-	r.Set(r.Value() - 1)
+	r.grid.ShiftKey(-1)
 }
 
 func (r Root) Left() {}

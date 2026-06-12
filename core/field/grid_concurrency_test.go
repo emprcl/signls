@@ -2,6 +2,7 @@ package field
 
 import (
 	"signls/core/common"
+	"signls/core/music"
 	"signls/core/node"
 	"signls/midi"
 	"sync"
@@ -67,6 +68,28 @@ func TestGridConcurrentAccess(t *testing.T) {
 			grid.AddNodeFromSymbol("s", 1, 1)
 			grid.TriggerNode(1, 1)
 			grid.RemoveNodes(1, 1, 1, 1)
+			grid.ShiftKey(1)
+			grid.ShiftScale(1)
+		}
+	}()
+
+	// Param goroutine: edit a node's parameters the way the ui does — mutating
+	// node state under Write, and reading it back under Read (as the parameter
+	// list is built). This races with the clock's Trig without the locks.
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := 0; i < iterations; i++ {
+			grid.Write(func() {
+				if a, ok := grid.Node(7, 7).(music.Audible); ok {
+					a.Note().SetVelocity(uint8(i % 128))
+				}
+			})
+			grid.Read(func() {
+				if a, ok := grid.Node(7, 7).(music.Audible); ok {
+					_ = a.Note().Velocity.Value()
+				}
+			})
 		}
 	}()
 
