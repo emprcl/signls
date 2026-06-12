@@ -8,7 +8,7 @@ import (
 	"signls/ui/param"
 	"signls/ui/util"
 
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
 )
 
 const (

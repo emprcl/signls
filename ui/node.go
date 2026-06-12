@@ -8,12 +8,13 @@ import (
 	"signls/ui/param"
 	"signls/ui/util"
 
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
+	"charm.land/lipgloss/v2/compat"
 )
 
 var (
 	gridStyle = lipgloss.NewStyle().
-			Background(lipgloss.AdaptiveColor{Light: "254", Dark: "234"})
+			Background(compat.AdaptiveColor{Light: lipgloss.Color("254"), Dark: lipgloss.Color("234")})
 	cursorStyle = lipgloss.NewStyle().
 			Background(lipgloss.Color("190")).
 			Foreground(lipgloss.Color("0"))
@@ -29,8 +30,8 @@ var (
 				Background(lipgloss.Color("247")).
 				Foreground(lipgloss.Color("236"))
 	activeEmitterStyle = lipgloss.NewStyle().
-				Background(lipgloss.AdaptiveColor{Light: "0", Dark: "15"}).
-				Foreground(lipgloss.AdaptiveColor{Light: "15", Dark: "0"})
+				Background(compat.AdaptiveColor{Light: lipgloss.Color("0"), Dark: lipgloss.Color("15")}).
+				Foreground(compat.AdaptiveColor{Light: lipgloss.Color("15"), Dark: lipgloss.Color("0")})
 )
 
 // gridBlankCell caches the rendered empty grid cell. On a sparse grid this is

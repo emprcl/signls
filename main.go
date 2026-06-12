@@ -11,7 +11,7 @@ import (
 	"signls/midi"
 	"signls/ui"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 )
 
 // version is set at build time via -ldflags "-X main.version=...". It defaults

@@ -9,11 +9,11 @@ import (
 	"signls/ui/param"
 	"signls/ui/util"
 
-	"github.com/charmbracelet/bubbles/help"
-	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/textinput"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/bubbles/v2/help"
+	"charm.land/bubbles/v2/key"
+	"charm.land/bubbles/v2/textinput"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 )
 
 const (
@@ -81,8 +81,13 @@ type mainModel struct {
 func New(config filesystem.Configuration, grid *field.Grid, bank *filesystem.Bank) tea.Model {
 	ti := textinput.New()
 	ti.CharLimit = 10
-	ti.Width = 12
-	ti.Cursor.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("190"))
+	ti.SetWidth(12)
+	// In bubbles v2 the input draws its own cursor; keep it inline (virtual) so
+	// it renders within the control bar layout, and color it like the v1 cursor.
+	ti.SetVirtualCursor(true)
+	styles := ti.Styles()
+	styles.Cursor.Color = lipgloss.Color("190")
+	ti.SetStyles(styles)
 	model := mainModel{
 		bank:       bank,
 		grid:       grid,
@@ -113,6 +118,14 @@ func blink() tea.Cmd {
 	})
 }
 
+// requestWindowSize asks bubbletea to re-send the current window size. In v2
+// tea.RequestWindowSize is a Msg, so it must be wrapped in a Cmd.
+func requestWindowSize() tea.Cmd {
+	return func() tea.Msg {
+		return tea.RequestWindowSize()
+	}
+}
+
 func save(m mainModel) tea.Cmd {
 	return func() tea.Msg {
 		m.grid.Save(m.bank)
@@ -128,7 +141,7 @@ func (m mainModel) requestSave() {
 }
 
 func (m mainModel) Init() tea.Cmd {
-	return tea.Batch(tea.EnterAltScreen, tick(), blink())
+	return tea.Batch(tick(), blink())
 }
 
 func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -142,10 +155,9 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case blinkMsg:
 		m.blink = !m.blink
-		m.input.Cursor.Blink = !m.input.Cursor.Blink
 		return m, blink()
 
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		if m.input.Focused() {
 			var cmd tea.Cmd
 			switch {
@@ -248,7 +260,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keymap.RemoveNode):
 			if m.mode == BANK {
 				m.bank.ClearGrid(m.selectedGrid)
-				return m.loadGridFromBank(), tea.WindowSize()
+				return m.loadGridFromBank(), requestWindowSize()
 			}
 			m.mode = MOVE
 			m.grid.RemoveNodes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
@@ -257,7 +269,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keymap.EditNode):
 			if m.mode == BANK {
 				m.mode = MOVE
-				return m.loadGridFromBank(), tea.WindowSize()
+				return m.loadGridFromBank(), requestWindowSize()
 			}
 			if m.mode == CONFIG {
 				m.mode = MOVE
@@ -341,9 +353,9 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.bankClipboard = m.bank.GridAt(m.selectedGrid)
 				m.bank.ClearGrid(m.selectedGrid)
 				if m.bank.ActiveIndex() == m.selectedGrid {
-					return m.loadGridFromBank(), tea.WindowSize()
+					return m.loadGridFromBank(), requestWindowSize()
 				}
-				return m, tea.WindowSize()
+				return m, requestWindowSize()
 			}
 			m.grid.CopyOrCut(m.cursorX, m.cursorY, m.selectionX, m.selectionY, true)
 			return m, nil
@@ -383,7 +395,15 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m mainModel) View() string {
+// view wraps rendered content in a tea.View. In bubbletea v2 the alt screen is
+// declared on the View rather than toggled with a command in Init.
+func (m mainModel) view(content string) tea.View {
+	v := tea.NewView(content)
+	v.AltScreen = true
+	return v
+}
+
+func (m mainModel) View() tea.View {
 	// Take a consistent copy of the grid's display state, then render the grid
 	// without holding any lock. The slow lipgloss render never blocks the clock
 	// goroutine — only the fast Snapshot copy does.
@@ -401,7 +421,7 @@ func (m mainModel) View() string {
 	}
 
 	if m.help.ShowAll {
-		return lipgloss.JoinVertical(
+		return m.view(lipgloss.JoinVertical(
 			lipgloss.Left,
 			lipgloss.NewStyle().
 				MarginTop(1).
@@ -411,7 +431,7 @@ func (m mainModel) View() string {
 				MarginTop(1).
 				Height(m.viewport.Height+controlsHeight-1).
 				Render(help),
-		)
+		))
 	}
 
 	// The control bar still reads live grid/param state (tempo, pulse, selected
@@ -421,13 +441,13 @@ func (m mainModel) View() string {
 		control = m.renderControl()
 	})
 
-	return lipgloss.JoinVertical(
+	return m.view(lipgloss.JoinVertical(
 		lipgloss.Left,
 		m.renderGrid(),
 		control,
 		paramHelp,
 		help,
-	)
+	))
 }
 
 func (m mainModel) handleParamEdit(dir string) {
@@ -596,11 +616,11 @@ func (m mainModel) handleBankMetaCommand() (mainModel, tea.Cmd) {
 	m.mode = MOVE
 	m.param = 0
 	m.paramPage = 0
-	return m.windowResize(m.viewport.Width, m.viewport.Height), tea.Batch(tea.WindowSize(), tick())
+	return m.windowResize(m.viewport.Width, m.viewport.Height), tea.Batch(requestWindowSize(), tick())
 }
 
 func (m mainModel) windowResize(width, height int) mainModel {
-	m.help.Width = width
+	m.help.SetWidth(width)
 	m.viewport.Width = width / 2
 	m.viewport.Height = height - controlsHeight - 1
 	if m.viewport.Width > m.grid.Width || m.viewport.Height > m.grid.Height {

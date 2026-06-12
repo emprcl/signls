@@ -3,8 +3,8 @@ package ui
 import (
 	"signls/filesystem"
 
-	"github.com/charmbracelet/bubbles/key"
-	tea "github.com/charmbracelet/bubbletea"
+	"charm.land/bubbles/v2/key"
+	tea "charm.land/bubbletea/v2"
 )
 
 type keyMap struct {
@@ -82,7 +82,7 @@ func (k keyMap) FullHelp() [][]key.Binding {
 }
 
 // Direction returns the direction for a given key msg.
-func (k keyMap) Direction(msg tea.KeyMsg) string {
+func (k keyMap) Direction(msg tea.KeyPressMsg) string {
 	switch {
 	case key.Matches(msg, k.Up, k.SelectionUp, k.EditUp):
 		return "up"
@@ -98,7 +98,7 @@ func (k keyMap) Direction(msg tea.KeyMsg) string {
 }
 
 // EmitterSymbol returns the emitter symbol from a key msg.
-func (k keyMap) EmitterSymbol(msg tea.KeyMsg) string {
+func (k keyMap) EmitterSymbol(msg tea.KeyPressMsg) string {
 	switch {
 	case key.Matches(msg, k.AddBang):
 		return "b"
