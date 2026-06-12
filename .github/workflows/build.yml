@@ -20,11 +20,11 @@ jobs:
       matrix:
         include:
           - target: linux-amd64
-            os: ubuntu-latest
+            os: ubuntu-22.04
           - target: linux-arm64
-            os: ubuntu-24.04-arm
+            os: ubuntu-22.04-arm
           - target: darwin
-            os: macos-latest
+            os: macos-13
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6

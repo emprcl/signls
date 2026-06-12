@@ -19,7 +19,7 @@ builds:
     main: .
     flags: [-trimpath]
     ldflags:
-      - -s -w -X main.version={{ .Version }}
+      - -s -w -X main.version={{ .Version }} -extldflags='-static-libstdc++ -static-libgcc'
     env:
       - CGO_ENABLED=1
     goos: [linux]
@@ -32,7 +32,7 @@ builds:
     main: .
     flags: [-trimpath]
     ldflags:
-      - -s -w -X main.version={{ .Version }}
+      - -s -w -X main.version={{ .Version }} -extldflags='-static-libstdc++ -static-libgcc'
     env:
       - CGO_ENABLED=1
     goos: [linux]
