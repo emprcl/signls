@@ -35,6 +35,14 @@ curl -sSL empr.cl/get/signls | bash
 
 The script downloads the right binary for your system, installs it to `~/.local/bin` and adds it to your `PATH`.
 
+### Homebrew (macOS & Linux)
+
+```sh
+brew tap emprcl/tap
+brew trust emprcl/tap
+brew install signls
+```
+
 ### Manual installation
 
 [Download the last release](https://github.com/emprcl/signls/releases) for your platform.

@@ -74,6 +74,8 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v6 # for .github/scripts/update-homebrew-tap.sh
+
       - name: Download all dist artifacts
         uses: actions/download-artifact@v8
         with:
@@ -92,3 +94,12 @@ jobs:
             dist/*.tar.gz
             dist/*.zip
             dist/checksums.txt
+
+      # goreleaser's brews pipe can't run here (the release is assembled by hand
+      # across runners), so generate the formula from the published archives and
+      # push it to emprcl/homebrew-tap.
+      - name: Update Homebrew tap
+        run: .github/scripts/update-homebrew-tap.sh
+        env:
+          VERSION: ${{ github.ref_name }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
