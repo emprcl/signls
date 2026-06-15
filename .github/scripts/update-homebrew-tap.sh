@@ -94,11 +94,11 @@ cd tap
 git config user.name "goreleaserbot"
 git config user.email "bot@goreleaser.com"
 
-if git diff --quiet; then
+git add signls.rb
+if git diff --cached --quiet; then
   echo "signls.rb already up to date for v${VERSION}; nothing to push."
   exit 0
 fi
 
-git add signls.rb
 git commit -m "Brew formula update for signls version v${VERSION}"
 git push
