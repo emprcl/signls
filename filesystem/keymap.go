@@ -133,15 +133,20 @@ func NewDefaultAzertyMacKeyMap() KeyMap {
 		Down:  "down",
 		Left:  "left",
 
-		SelectionUp:    "shift+up",
-		SelectionRight: "shift+right",
-		SelectionDown:  "shift+down",
-		SelectionLeft:  "shift+left",
+		// On Mac, primary parameter edits (and emitter direction) get the
+		// easier shift+arrows; selection / alt-parameter edits move to
+		// alt+shift+arrows. macOS reserves ctrl+arrows (Mission Control /
+		// Spaces / App Exposé) and terminals like iTerm2 pre-bind alt+left/right
+		// to word navigation, so plain ctrl/alt arrows are avoided here.
+		SelectionUp:    "alt+shift+up",
+		SelectionRight: "alt+shift+right",
+		SelectionDown:  "alt+shift+down",
+		SelectionLeft:  "alt+shift+left",
 
-		EditUp:    "ctrl+up",
-		EditRight: "ctrl+right",
-		EditDown:  "ctrl+down",
-		EditLeft:  "ctrl+left",
+		EditUp:    "shift+up",
+		EditRight: "shift+right",
+		EditDown:  "shift+down",
+		EditLeft:  "shift+left",
 
 		EditInput: ":",
 
@@ -175,8 +180,10 @@ func NewDefaultAzertyMacKeyMap() KeyMap {
 		TempoUp:      "-",
 		TempoDown:    ")",
 
-		Configuration:   "f2",
-		FitGridToWindow: "f10",
+		// macOS maps the function-key row to media keys by default, so f2/f10
+		// never reach the app; use mnemonic letters instead.
+		Configuration:   "c",
+		FitGridToWindow: "f",
 
 		Cancel: "esc",
 
@@ -258,15 +265,20 @@ func NewDefaultQwertyMacKeyMap() KeyMap {
 		Down:  "down",
 		Left:  "left",
 
-		SelectionUp:    "shift+up",
-		SelectionRight: "shift+right",
-		SelectionDown:  "shift+down",
-		SelectionLeft:  "shift+left",
+		// On Mac, primary parameter edits (and emitter direction) get the
+		// easier shift+arrows; selection / alt-parameter edits move to
+		// alt+shift+arrows. macOS reserves ctrl+arrows (Mission Control /
+		// Spaces / App Exposé) and terminals like iTerm2 pre-bind alt+left/right
+		// to word navigation, so plain ctrl/alt arrows are avoided here.
+		SelectionUp:    "alt+shift+up",
+		SelectionRight: "alt+shift+right",
+		SelectionDown:  "alt+shift+down",
+		SelectionLeft:  "alt+shift+left",
 
-		EditUp:    "ctrl+up",
-		EditRight: "ctrl+right",
-		EditDown:  "ctrl+down",
-		EditLeft:  "ctrl+left",
+		EditUp:    "shift+up",
+		EditRight: "shift+right",
+		EditDown:  "shift+down",
+		EditLeft:  "shift+left",
 
 		EditInput: ".",
 
@@ -300,8 +312,10 @@ func NewDefaultQwertyMacKeyMap() KeyMap {
 		TempoUp:      "=",
 		TempoDown:    "-",
 
-		Configuration:   "f2",
-		FitGridToWindow: "f10",
+		// macOS maps the function-key row to media keys by default, so f2/f10
+		// never reach the app; use mnemonic letters instead.
+		Configuration:   "c",
+		FitGridToWindow: "f",
 
 		Cancel: "esc",
 
