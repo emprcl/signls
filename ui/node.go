@@ -7,39 +7,18 @@ import (
 	"signls/core/node"
 	"signls/ui/param"
 	"signls/ui/util"
-
-	"charm.land/lipgloss/v2"
-	"charm.land/lipgloss/v2/compat"
 )
 
+// gridBlankCell and gridBlankCellAlt cache the two rendered empty grid cells
+// (the alternating checkerboard positions). On a sparse grid these are by far
+// the most common cells, and their output is constant. They are computed lazily
+// on first render (rather than at init) so lipgloss has already detected the
+// terminal background for its adaptive colors. renderNode runs only on the
+// bubbletea (View) goroutine, so the lazy writes need no synchronization.
 var (
-	gridStyle = lipgloss.NewStyle().
-			Background(compat.AdaptiveColor{Light: lipgloss.Color("254"), Dark: lipgloss.Color("234")})
-	cursorStyle = lipgloss.NewStyle().
-			Background(lipgloss.Color("190")).
-			Foreground(lipgloss.Color("0"))
-	teleportDestinationStyle = lipgloss.NewStyle().
-					Background(lipgloss.Color("160")).
-					Foreground(lipgloss.Color("15"))
-	selectionStyle = lipgloss.NewStyle().
-			Background(lipgloss.Color("238")).
-			Foreground(lipgloss.Color("244"))
-	emitterStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("15"))
-	mutedEmitterStyle = lipgloss.NewStyle().
-				Background(lipgloss.Color("247")).
-				Foreground(lipgloss.Color("236"))
-	activeEmitterStyle = lipgloss.NewStyle().
-				Background(compat.AdaptiveColor{Light: lipgloss.Color("0"), Dark: lipgloss.Color("15")}).
-				Foreground(compat.AdaptiveColor{Light: lipgloss.Color("15"), Dark: lipgloss.Color("0")})
+	gridBlankCell    string
+	gridBlankCellAlt string
 )
-
-// gridBlankCell caches the rendered empty grid cell. On a sparse grid this is
-// by far the most common cell, and its output is constant. It is computed
-// lazily on first render (rather than at init) so lipgloss has already detected
-// the terminal background for its adaptive color. renderNode runs only on the
-// bubbletea (View) goroutine, so the lazy write needs no synchronization.
-var gridBlankCell string
 
 func (m mainModel) inSelectionRange(x, y int) bool {
 	return x >= m.cursorX &&
@@ -64,19 +43,27 @@ func (m mainModel) renderNode(c field.Cell, x, y int) string {
 	// render grid
 	teleportDestinationSymbol := node.HoleDestinationSymbol
 	if c.Kind == field.CellEmpty && isCursor {
-		return cursorStyle.Render("  ")
+		return m.styles.cursor.Render("  ")
 	} else if c.Kind == field.CellEmpty && isTeleportDestination && !m.blink && m.mode != BANK {
-		return cursorStyle.Render(teleportDestinationSymbol)
+		return m.styles.cursor.Render(teleportDestinationSymbol)
 	} else if c.Kind == field.CellEmpty && isTeleportDestination && (m.blink || m.mode == BANK) {
-		return teleportDestinationStyle.Render(teleportDestinationSymbol)
+		return m.styles.holeDestination.Render(teleportDestinationSymbol)
 	} else if c.Kind == field.CellEmpty && m.inSelectionRange(x, y) && m.mode != BANK {
-		return selectionStyle.Render("..")
+		return m.styles.selection.Render("..")
 	} else if c.Kind == field.CellEmpty {
 		if (x+y)%2 == 0 {
-			return "  "
+			// The alternating cells: their own background when the theme sets
+			// one, otherwise the bare terminal background.
+			if !m.styles.gridAltSet {
+				return "  "
+			}
+			if gridBlankCellAlt == "" {
+				gridBlankCellAlt = m.styles.gridAlt.Render("  ")
+			}
+			return gridBlankCellAlt
 		}
 		if gridBlankCell == "" {
-			gridBlankCell = gridStyle.Render("  ")
+			gridBlankCell = m.styles.grid.Render("  ")
 		}
 		return gridBlankCell
 	}
@@ -85,45 +72,45 @@ func (m mainModel) renderNode(c field.Cell, x, y int) string {
 	switch c.Kind {
 	case field.CellSignal:
 		if isCursor {
-			return cursorStyle.Render("  ")
+			return m.styles.cursor.Render("  ")
 		}
-		return activeEmitterStyle.Render("  ")
+		return m.styles.activeEmitter.Render("  ")
 	case field.CellAudible:
 		symbol := util.Normalize(c.Symbol)
 
 		if isCursor && m.mode != EDIT {
-			return cursorStyle.Render(symbol)
+			return m.styles.cursor.Render(symbol)
 		} else if isTeleportDestination && m.mode == EDIT && m.blink {
-			return teleportDestinationStyle.Render(teleportDestinationSymbol)
+			return m.styles.holeDestination.Render(teleportDestinationSymbol)
 		} else if isCursor && m.mode == EDIT && m.blink {
-			return cursorStyle.Render(symbol)
+			return m.styles.cursor.Render(symbol)
 		} else if c.Activated && c.Muted {
-			return activeEmitterStyle.Render(symbol)
+			return m.styles.activeEmitter.Render(symbol)
 		} else if c.Muted {
-			return mutedEmitterStyle.Render(symbol)
+			return m.styles.mutedEmitter.Render(symbol)
 		} else if c.Activated {
-			return activeEmitterStyle.
-				Foreground(lipgloss.Color(c.Color)).
+			return m.styles.activeEmitter.
+				Foreground(m.styles.nodeColor(c.ColorKey)).
 				Render(symbol)
 		} else {
-			return emitterStyle.
-				Background(lipgloss.Color(c.Color)).
+			return m.styles.emitter.
+				Background(m.styles.nodeColor(c.ColorKey)).
 				Render(symbol)
 		}
 	case field.CellHole:
 		symbol := c.Symbol
 
 		if isCursor && m.mode != EDIT {
-			return cursorStyle.Render(symbol)
+			return m.styles.cursor.Render(symbol)
 		} else if isCursor && m.mode == EDIT && m.blink {
-			return cursorStyle.Render(symbol)
+			return m.styles.cursor.Render(symbol)
 		} else if c.Activated {
-			return activeEmitterStyle.
-				Foreground(lipgloss.Color(c.Color)).
+			return m.styles.activeEmitter.
+				Foreground(m.styles.nodeColor(c.ColorKey)).
 				Render(symbol)
 		} else {
-			return emitterStyle.
-				Background(lipgloss.Color(c.Color)).
+			return m.styles.emitter.
+				Background(m.styles.nodeColor(c.ColorKey)).
 				Render(symbol)
 		}
 	default:

@@ -176,10 +176,6 @@ func (e *EuclidEmitter) Name() string {
 	return "euclid"
 }
 
-func (e *EuclidEmitter) Color() string {
-	return "162"
-}
-
 func (e *EuclidEmitter) Reset() {
 	e.pulse = 0
 	e.ticks = 0

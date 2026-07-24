@@ -230,7 +230,7 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		),
 		AddHole: key.NewBinding(
 			key.WithKeys(keys.AddHole),
-			key.WithHelp(keys.AddHole, "add pass emitter"),
+			key.WithHelp(keys.AddHole, "add hole emitter"),
 		),
 		Copy: key.NewBinding(
 			key.WithKeys(keys.Copy),

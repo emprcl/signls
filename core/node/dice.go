@@ -72,8 +72,4 @@ func (e *DiceEmitter) Name() string {
 	return "dice"
 }
 
-func (e *DiceEmitter) Color() string {
-	return "33"
-}
-
 func (e *DiceEmitter) Reset() {}

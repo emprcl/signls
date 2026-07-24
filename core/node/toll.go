@@ -60,10 +60,6 @@ func (e *TollEmitter) Name() string {
 	return "toll"
 }
 
-func (e *TollEmitter) Color() string {
-	return "39"
-}
-
 func (e *TollEmitter) Reset() {
 	e.count = 0
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"signls/core/field"
 	"signls/filesystem"
@@ -22,6 +23,7 @@ func main() {
 	configFile := flag.String("config", "", "config file to load or create (default: <user config dir>/signls/config.json)")
 	bankFile := flag.String("bank", "", "bank file to store grids (default: <user config dir>/signls/default.json)")
 	keyboard := flag.String("keyboard", "", "keyboard layout (qwerty, qwerty-mac, azerty, azerty-mac)")
+	theme := flag.String("theme", "", fmt.Sprintf("color theme to set (%s)", strings.Join(filesystem.ThemeNames(), ", ")))
 	showVersion := flag.Bool("version", false, "print current version")
 	debug := flag.Bool("debug", false, "enable debug mode")
 	flag.Parse()
@@ -42,7 +44,7 @@ func main() {
 		bankPath = filesystem.DefaultPath("default.json")
 	}
 
-	config := filesystem.NewConfiguration(configPath, version, *keyboard)
+	config := filesystem.NewConfiguration(configPath, version, *keyboard, *theme)
 
 	midi, err := midi.New()
 	if err != nil {

@@ -10,15 +10,19 @@ import (
 
 // Configuration represents a configuration loaded from a json file.
 type Configuration struct {
-	KeyMap   KeyMap `json:"keymap"`
+	KeyMap   KeyMap      `json:"keymap"`
+	Theme    ThemeConfig `json:"theme"`
 	version  string
 	filename string
 }
 
-// NewConfiguration returns a new default configuration.
-func NewConfiguration(filename, version, keyboard string) Configuration {
+// NewConfiguration returns a new default configuration. A non-empty keyboard or
+// theme overrides whatever the loaded config file specifies and is persisted
+// back to disk.
+func NewConfiguration(filename, version, keyboard, theme string) Configuration {
 	config := Configuration{
 		KeyMap:   NewDefaultQwertyKeyMap(),
+		Theme:    ThemeConfig{Name: DefaultThemeName},
 		version:  version,
 		filename: filename,
 	}
@@ -34,9 +38,28 @@ func NewConfiguration(filename, version, keyboard string) Configuration {
 			config.KeyMap = NewDefaultAzertyMacKeyMap()
 		}
 	}
+
+	// The -theme flag selects a preset by name, leaving any user palette
+	// overrides in place (they still merge over the new preset).
+	if theme != "" && HasTheme(theme) {
+		config.Theme.Name = theme
+	}
+
+	// Keep the theme name discoverable in the saved config when the file omits
+	// it (e.g. configs written before themes existed).
+	if config.Theme.Name == "" {
+		config.Theme.Name = DefaultThemeName
+	}
+
 	config.Save()
 
 	return config
+}
+
+// Palette returns the fully resolved color palette for the configured theme,
+// with any user overrides applied on top of the selected preset.
+func (c Configuration) Palette() Palette {
+	return c.Theme.Resolve()
 }
 
 // Version returns the version number.

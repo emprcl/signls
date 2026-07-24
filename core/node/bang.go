@@ -41,8 +41,4 @@ func (e *BangEmitter) Name() string {
 	return "bang"
 }
 
-func (e *BangEmitter) Color() string {
-	return "165"
-}
-
 func (e *BangEmitter) Reset() {}
