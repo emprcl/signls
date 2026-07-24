@@ -62,7 +62,8 @@ func (c *Color) UnmarshalJSON(data []byte) error {
 // (e.g. "bang", "dice") to the color used for that node type. The "hole" entry
 // also colors the teleport-destination marker, so both share a single color.
 type Palette struct {
-	Cursor Color `json:"cursor"`
+	Cursor           Color `json:"cursor"`
+	CursorForeground Color `json:"cursorForeground"`
 	// GridBackground colors one set of the alternating empty grid cells, and
 	// GridBackgroundAlt the other. Leave GridBackgroundAlt unset to let those
 	// cells fall through to the terminal background (the original look).
@@ -106,6 +107,7 @@ func (p Palette) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(struct {
 		Cursor                  *Color           `json:"cursor,omitempty"`
+		CursorForeground        *Color           `json:"cursorForeground,omitempty"`
 		GridBackground          *Color           `json:"gridBackground,omitempty"`
 		GridBackgroundAlt       *Color           `json:"gridBackgroundAlt,omitempty"`
 		SelectionBackground     *Color           `json:"selectionBackground,omitempty"`
@@ -123,6 +125,7 @@ func (p Palette) MarshalJSON() ([]byte, error) {
 		Nodes                   map[string]Color `json:"nodes,omitempty"`
 	}{
 		Cursor:                  opt(p.Cursor),
+		CursorForeground:        opt(p.CursorForeground),
 		GridBackground:          opt(p.GridBackground),
 		GridBackgroundAlt:       opt(p.GridBackgroundAlt),
 		SelectionBackground:     opt(p.SelectionBackground),
@@ -157,6 +160,7 @@ func (p Palette) merge(o Palette) Palette {
 		}
 	}
 	set(&p.Cursor, o.Cursor)
+	set(&p.CursorForeground, o.CursorForeground)
 	set(&p.GridBackground, o.GridBackground)
 	set(&p.GridBackgroundAlt, o.GridBackgroundAlt)
 	set(&p.SelectionBackground, o.SelectionBackground)
@@ -234,7 +238,7 @@ func presets() map[string]Palette {
 	return map[string]Palette{
 		DefaultThemeName: defaultPalette(),
 		"mono":           monoPalette(),
-		"neon":           neonPalette(),
+		"pink":           pinkPalette(),
 	}
 }
 
@@ -242,6 +246,7 @@ func presets() map[string]Palette {
 func defaultPalette() Palette {
 	return Palette{
 		Cursor:                  solid("190"),
+		CursorForeground:        solid("0"),
 		GridBackground:          adaptive("254", "234"),
 		SelectionBackground:     solid("238"),
 		SelectionForeground:     solid("244"),
@@ -270,75 +275,90 @@ func defaultPalette() Palette {
 	}
 }
 
-// monoPalette is a restrained grayscale theme with a single amber accent.
-//
-// Node colors are used both as cell backgrounds (with a bright symbol on top)
-// and, when a node fires, as the symbol color on a light highlight. They are
-// therefore kept in the dark-gray band (234-244): bright symbols read clearly
-// on them, and they read clearly on the light active-cell highlight. Both
-// terminal backgrounds are covered because every emitter cell paints its own
-// background rather than relying on the terminal's.
+// monoPalette is a strict two-color theme: full black and full white, nothing
+// in between. The grid is a black canvas; idle nodes are thin white glyphs on
+// it; anything highlighted — the cursor, a firing node, a muted node, a
+// selection — inverts to a solid white block. Node types share one color
+// (black), so they are told apart by their glyph, not their color.
 func monoPalette() Palette {
+	const (
+		black = "#000000"
+		white = "#ffffff"
+	)
 	return Palette{
-		Cursor:                  solid("223"),
-		GridBackground:          adaptive("253", "235"),
-		GridBackgroundAlt:       adaptive("255", "233"),
-		SelectionBackground:     solid("240"),
-		SelectionForeground:     solid("253"),
-		EmitterForeground:       solid("231"),
-		ActiveEmitterBackground: solid("252"),
-		ActiveEmitterForeground: solid("235"),
-		MutedEmitterBackground:  solid("240"),
-		MutedEmitterForeground:  solid("250"),
-		ActiveCell:              solid("223"),
-		BankForeground:          solid("233"),
-		BankEven:                solid("245"),
-		BankOdd:                 solid("250"),
-		BankActive:              solid("223"),
+		Cursor:                  solid(white),
+		CursorForeground:        solid(black),
+		GridBackground:          solid(black),
+		GridBackgroundAlt:       solid(black),
+		SelectionBackground:     solid(white),
+		SelectionForeground:     solid(black),
+		EmitterForeground:       solid(white),
+		ActiveEmitterBackground: solid(white),
+		ActiveEmitterForeground: solid(black),
+		MutedEmitterBackground:  solid(white),
+		MutedEmitterForeground:  solid(black),
+		ActiveCell:              solid(white),
+		// Bank cells are the canvas color so the white-block selector (the
+		// cursor) stands out against them instead of blending in.
+		BankForeground: solid(white),
+		BankEven:       solid(black),
+		BankOdd:        solid(black),
+		BankActive:     solid(black),
 		Nodes: map[string]Color{
-			"signal": solid("231"),
-			"bang":   solid("244"),
-			"dice":   solid("242"),
-			"cycle":  solid("240"),
-			"euclid": solid("238"),
-			"pass":   solid("236"),
-			"hole":   solid("243"),
-			"spread": solid("241"),
-			"zone":   solid("239"),
-			"toll":   solid("237"),
+			"signal": solid(black),
+			"bang":   solid(black),
+			"dice":   solid(black),
+			"cycle":  solid(black),
+			"euclid": solid(black),
+			"pass":   solid(black),
+			"hole":   solid(black),
+			"spread": solid(black),
+			"zone":   solid(black),
+			"toll":   solid(black),
 		},
 	}
 }
 
-// neonPalette is a vivid, high-contrast theme tuned for dark terminals.
-func neonPalette() Palette {
+// pinkPalette is a strict two-color theme: white and a deep pink, nothing else.
+// It mirrors mono's structure with pink as the canvas — a pink grid, white
+// glyphs for idle nodes, and white-block inversions for highlights (cursor,
+// firing/muted nodes, selection). The pink is deep enough that white reads
+// clearly on it and it reads clearly on the white highlights.
+func pinkPalette() Palette {
+	const (
+		pink  = "#c2185b"
+		white = "#ffffff"
+	)
 	return Palette{
-		Cursor:                  solid("201"),
-		GridBackground:          adaptive("237", "234"),
-		GridBackgroundAlt:       adaptive("236", "232"),
-		SelectionBackground:     solid("54"),
-		SelectionForeground:     solid("213"),
-		EmitterForeground:       solid("231"),
-		ActiveEmitterBackground: adaptive("57", "51"),
-		ActiveEmitterForeground: adaptive("231", "16"),
-		MutedEmitterBackground:  solid("238"),
-		MutedEmitterForeground:  solid("244"),
-		ActiveCell:              solid("201"),
-		BankForeground:          solid("16"),
-		BankEven:                solid("51"),
-		BankOdd:                 solid("45"),
-		BankActive:              solid("231"),
+		Cursor:                  solid(white),
+		CursorForeground:        solid(pink),
+		GridBackground:          solid(pink),
+		GridBackgroundAlt:       solid(pink),
+		SelectionBackground:     solid(white),
+		SelectionForeground:     solid(pink),
+		EmitterForeground:       solid(white),
+		ActiveEmitterBackground: solid(white),
+		ActiveEmitterForeground: solid(pink),
+		MutedEmitterBackground:  solid(white),
+		MutedEmitterForeground:  solid(pink),
+		ActiveCell:              solid(white),
+		// Bank cells are the canvas color so the white-block selector (the
+		// cursor) stands out against them instead of blending in.
+		BankForeground: solid(white),
+		BankEven:       solid(pink),
+		BankOdd:        solid(pink),
+		BankActive:     solid(pink),
 		Nodes: map[string]Color{
-			"signal": solid("231"),
-			"bang":   solid("201"),
-			"dice":   solid("51"),
-			"cycle":  solid("141"),
-			"euclid": solid("213"),
-			"pass":   solid("48"),
-			"hole":   solid("196"),
-			"spread": solid("99"),
-			"zone":   solid("205"),
-			"toll":   solid("39"),
+			"signal": solid(pink),
+			"bang":   solid(pink),
+			"dice":   solid(pink),
+			"cycle":  solid(pink),
+			"euclid": solid(pink),
+			"pass":   solid(pink),
+			"hole":   solid(pink),
+			"spread": solid(pink),
+			"zone":   solid(pink),
+			"toll":   solid(pink),
 		},
 	}
 }

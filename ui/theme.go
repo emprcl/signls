@@ -74,7 +74,7 @@ func newStyles(p filesystem.Palette) styles {
 		gridAltSet: !p.GridBackgroundAlt.IsZero(),
 		cursor: lipgloss.NewStyle().
 			Background(toColor(p.Cursor)).
-			Foreground(lipgloss.Color("0")),
+			Foreground(toColor(p.CursorForeground)),
 		holeDestination: lipgloss.NewStyle().
 			Background(holeColor).
 			Foreground(toColor(p.EmitterForeground)),
