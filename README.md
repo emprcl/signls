@@ -152,6 +152,59 @@ For qwerty keyboards, here's the default mapping:
  - `?` **show help**
  - `ctrl`+`q` **quit**
 
+### macOS keyboard mapping
+
+macOS and some terminals reserve a few keys the default layout uses — `ctrl`+arrows (Mission Control / Spaces), `alt`+`←`/`→` (word navigation), and the `f2`/`f10` function-key row. Here's the `qwerty-mac` mapping (the `azerty-mac` layout applies the same remaps over the azerty symbols):
+
+ - `space` **play** or **stop**
+ - `tab` **show bank**
+ - `1` ... `9` **add nodes**
+ - `↑` `↓` `←` `→` **move cursor**
+ - `alt`+`shift`+`↑` `↓` `←` `→` **multiple selection (or modify alt parameter mode in edit mode)**
+ - `shift`+`↑` `↓` `←` `→` **modify selected node direction (modify parameter or alt parameter value)**
+ - `.` **text edit mode for selected parameter**
+ - `backspace` **remove selected nodes (or grid in bank)**
+ - `enter` **edit selected nodes**
+ - `m` **toggle selected nodes mute**
+ - `M` **mute/unmute all selected nodes**
+ - `/` **trigger selected node**
+ - `-` `=` **modify tempo**
+ - `'` `;` **modify root note**
+ - `"` `:` **modify scale**
+ - `ctrl`+`c` `x` `v`  **copy, cut, paste selection**
+ - `escape` **exit parameter edit or bank selection**
+ - `c` **edit midi configuration**
+ - `f` **fit grid to window**
+ - `?` **show help**
+ - `ctrl`+`q` **quit**
+
+### Themes
+
+Signls ships with a few color themes. Pick one with the `--theme` flag (your choice is saved to `config.json`):
+
+```sh
+./signls --theme default
+./signls --theme mono   # black & white
+./signls --theme pink   # white & pink
+```
+
+You can also customize the colors: add a `palette` block under `theme` in your `config.json` and override only the keys you care about — anything you leave out falls back to the selected preset.
+
+```json
+{
+  "theme": {
+    "name": "default",
+    "palette": {
+      "cursor": "205",
+      "gridBackground": { "light": "255", "dark": "232" },
+      "nodes": { "bang": "9", "dice": "12" }
+    }
+  }
+}
+```
+
+Color values are ANSI codes (`"0"`–`"255"`) or hex strings (`"#ff0088"`). Use a `{ "light": ..., "dark": ... }` object for a color that should adapt to the terminal background. See the [user manual](https://empr.cl/signls/) for the full list of palette keys.
+
 ### Bank management
 
 Each time you start Signls, a json file (default: `default.json`, in your [config directory](#files-location)) containing 32 grid slots is loaded.
