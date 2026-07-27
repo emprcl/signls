@@ -43,6 +43,9 @@ type keyMap struct {
 	Cut   key.Binding
 	Paste key.Binding
 
+	Undo key.Binding
+	Redo key.Binding
+
 	EditNode    key.Binding
 	RemoveNode  key.Binding
 	TriggerNode key.Binding
@@ -77,7 +80,7 @@ func (k keyMap) ShortHelp() []key.Binding {
 func (k keyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
 		{k.Bank, k.AddBang, k.AddEuclid, k.AddPass, k.AddSpread, k.AddCycle, k.AddDice, k.AddToll, k.AddZone, k.AddHole, k.RootNoteUp, k.RootNoteDown, k.ScaleUp, k.ScaleDown, k.Cancel, k.Configuration, k.FitGridToWindow, k.Help, k.Quit},
-		{k.Play, k.EditNode, k.RemoveNode, k.TriggerNode, k.MuteNode, k.MuteAllNode, k.Copy, k.Cut, k.Paste, k.Up, k.Right, k.Down, k.Left, k.SelectionUp, k.SelectionRight, k.SelectionDown, k.SelectionLeft, k.EditUp, k.EditDown, k.EditRight, k.EditLeft, k.EditInput},
+		{k.Play, k.EditNode, k.RemoveNode, k.TriggerNode, k.MuteNode, k.MuteAllNode, k.Copy, k.Cut, k.Paste, k.Undo, k.Redo, k.Up, k.Right, k.Down, k.Left, k.SelectionUp, k.SelectionRight, k.SelectionDown, k.SelectionLeft, k.EditUp, k.EditDown, k.EditRight, k.EditLeft, k.EditInput},
 	}
 }
 
@@ -243,6 +246,14 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		Paste: key.NewBinding(
 			key.WithKeys(keys.Paste),
 			key.WithHelp(keys.Paste, "paste node | bank"),
+		),
+		Undo: key.NewBinding(
+			key.WithKeys(keys.Undo),
+			key.WithHelp(keys.Undo, "undo"),
+		),
+		Redo: key.NewBinding(
+			key.WithKeys(keys.Redo),
+			key.WithHelp(keys.Redo, "redo"),
 		),
 		EditNode: key.NewBinding(
 			key.WithKeys(keys.EditNode),

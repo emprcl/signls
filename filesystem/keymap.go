@@ -37,6 +37,9 @@ type KeyMap struct {
 	Cut   string `json:"cut"`
 	Paste string `json:"paste"`
 
+	Undo string `json:"undo"`
+	Redo string `json:"redo"`
+
 	EditNode    string `json:"edit_node"`
 	RemoveNode  string `json:"remove_node"`
 	TriggerNode string `json:"trigger_node"`
@@ -97,6 +100,9 @@ func NewDefaultAzertyKeyMap() KeyMap {
 		Copy:  "ctrl+c",
 		Cut:   "ctrl+x",
 		Paste: "ctrl+v",
+
+		Undo: "ctrl+z",
+		Redo: "ctrl+y",
 
 		EditNode:    "enter",
 		RemoveNode:  "backspace",
@@ -161,6 +167,9 @@ func NewDefaultAzertyMacKeyMap() KeyMap {
 		Cut:   "ctrl+x",
 		Paste: "ctrl+v",
 
+		Undo: "ctrl+z",
+		Redo: "ctrl+y",
+
 		EditNode:    "enter",
 		RemoveNode:  "backspace",
 		TriggerNode: "=",
@@ -222,6 +231,9 @@ func NewDefaultQwertyKeyMap() KeyMap {
 		Copy:  "ctrl+c",
 		Cut:   "ctrl+x",
 		Paste: "ctrl+v",
+
+		Undo: "ctrl+z",
+		Redo: "ctrl+y",
 
 		EditNode:    "enter",
 		RemoveNode:  "backspace",
@@ -285,6 +297,9 @@ func NewDefaultQwertyMacKeyMap() KeyMap {
 		Copy:  "ctrl+c",
 		Cut:   "ctrl+x",
 		Paste: "ctrl+v",
+
+		Undo: "ctrl+z",
+		Redo: "ctrl+y",
 
 		EditNode:    "enter",
 		RemoveNode:  "backspace",

@@ -17,6 +17,33 @@ func NewFromBank(bankIndex int, grid filesystem.Grid, midi midi.Midi) *Grid {
 	return newGrid
 }
 
+// Serialize returns the serializable representation of the grid, taken under the
+// read lock. Unlike Save it doesn't touch the bank or write to disk; the ui uses
+// it to snapshot editable state for the undo/redo history. Transient playback
+// state (moving signals, pulse) is intentionally excluded by snapshotForSave.
+func (g *Grid) Serialize() filesystem.Grid {
+	var fsGrid filesystem.Grid
+	g.Read(func() {
+		fsGrid = g.snapshotForSave()
+	})
+	return fsGrid
+}
+
+// Restore loads a previously serialized grid back into the live grid, preserving
+// the current bank slot and playing state. The ui uses it to apply an undo/redo
+// step without switching banks or stopping the transport (Load otherwise resets
+// the playing state via reset).
+func (g *Grid) Restore(fsGrid filesystem.Grid) {
+	var playing bool
+	var index int
+	g.Read(func() {
+		playing = g.Playing
+		index = g.BankIndex
+	})
+	g.Load(index, fsGrid)
+	g.SetPlaying(playing)
+}
+
 func (g *Grid) Save(bank *filesystem.Bank) {
 	// Save runs in a background command goroutine, so read the grid and node
 	// state under the read lock to build the serializable snapshot, then write

@@ -62,6 +62,7 @@ type mainModel struct {
 	gridParams    []param.Param
 	cells         [][]field.Cell
 	saver         *saver
+	history       *history
 	bankClipboard filesystem.Grid
 	mode          mode
 	version       string
@@ -96,6 +97,7 @@ func New(config filesystem.Configuration, grid *field.Grid, bank *filesystem.Ban
 		input:      ti,
 		gridParams: param.NewParamsForGrid(grid),
 		saver:      newSaver(saveDebounce, func() { grid.Save(bank) }),
+		history:    newHistory(grid.Serialize()),
 		cursorX:    1,
 		cursorY:    1,
 		selectionX: 1,
@@ -140,6 +142,44 @@ func (m mainModel) requestSave() {
 	m.saver.request()
 }
 
+// commit records the current grid state onto the undo history and schedules a
+// save. It replaces requestSave at every mutating key handler, so each committed
+// edit is undoable. Identical (no-op) states are ignored by history.push.
+func (m mainModel) commit() {
+	m.history.push(m.grid.Serialize())
+	m.requestSave()
+}
+
+// applyRestore applies an undo/redo state to the live grid and refreshes the
+// derived ui state (grid dimensions, cursor bounds, parameter list). It persists
+// the result but records no new history entry — restoring isn't a new edit.
+func (m *mainModel) applyRestore(state filesystem.Grid) {
+	m.grid.Restore(state)
+	// The restored grid may have different dimensions (e.g. undoing a resize),
+	// so clamp the cursor/selection and viewport the same way a bank load does.
+	*m = m.windowResize(m.viewport.Width, m.viewport.Height)
+	m.refreshParams()
+	m.requestSave()
+}
+
+// refreshParams rebuilds the parameter list for the current selection and keeps
+// the parameter page/index within bounds. Used after mutations that replace node
+// state (undo/redo).
+func (m *mainModel) refreshParams() {
+	m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
+	if len(m.params) == 0 {
+		m.paramPage = 0
+		m.param = 0
+		return
+	}
+	if m.paramPage >= len(m.params) {
+		m.paramPage = 0
+	}
+	if m.param >= len(m.params[m.paramPage]) {
+		m.param = 0
+	}
+}
+
 func (m mainModel) Init() tea.Cmd {
 	return tea.Batch(tick(), blink())
 }
@@ -166,6 +206,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.grid.Write(func() {
 					m.activeParam().SetEditValue(m.input.Value())
 				})
+				m.commit()
 				return m, nil
 			case key.Matches(msg, m.keymap.Cancel, m.keymap.EditInput):
 				m.input.Blur()
@@ -215,7 +256,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			dir := m.keymap.Direction(msg)
 			if m.mode == EDIT || m.mode == CONFIG {
 				m.handleParamAltEdit(dir)
-				m.requestSave()
+				m.commit()
 				return m, nil
 			}
 			m.selectionX, m.selectionY = moveCursor(
@@ -230,11 +271,11 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.grid.Write(func() {
 					param.NewDirection(m.selectedEmitters()).SetFromKeyString(dir)
 				})
-				m.requestSave()
+				m.commit()
 				return m, nil
 			}
 			m.handleParamEdit(dir)
-			m.requestSave()
+			m.commit()
 			return m, nil
 		case key.Matches(msg, m.keymap.AddBang, m.keymap.AddSpread, m.keymap.AddCycle, m.keymap.AddDice, m.keymap.AddToll, m.keymap.AddEuclid, m.keymap.AddZone, m.keymap.AddPass, m.keymap.AddHole):
 			m.grid.AddNodeFromSymbol(m.keymap.EmitterSymbol(msg), m.cursorX, m.cursorY)
@@ -246,16 +287,16 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.param = 0
 			}
 			m.params = newParams
-			m.requestSave()
+			m.commit()
 			return m, nil
 		case key.Matches(msg, m.keymap.MuteNode):
 			m.grid.ToggleNodeMutes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
-			m.requestSave()
+			m.commit()
 			return m, nil
 		case key.Matches(msg, m.keymap.MuteAllNode):
 			m.grid.SetAllNodeMutes(!m.mute)
 			m.mute = !m.mute
-			m.requestSave()
+			m.commit()
 			return m, nil
 		case key.Matches(msg, m.keymap.RemoveNode):
 			if m.mode == BANK {
@@ -264,7 +305,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.mode = MOVE
 			m.grid.RemoveNodes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
-			m.requestSave()
+			m.commit()
 			return m, nil
 		case key.Matches(msg, m.keymap.EditNode):
 			if m.mode == BANK {
@@ -304,36 +345,36 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			param.Get("root", m.gridParams).Up()
-			m.requestSave()
+			m.commit()
 			return m, nil
 		case key.Matches(msg, m.keymap.RootNoteDown):
 			if m.mode == EDIT {
 				return m, nil
 			}
 			param.Get("root", m.gridParams).Down()
-			m.requestSave()
+			m.commit()
 			return m, nil
 		case key.Matches(msg, m.keymap.ScaleUp):
 			if m.mode == EDIT {
 				return m, nil
 			}
 			param.Get("scale", m.gridParams).Up()
-			m.requestSave()
+			m.commit()
 			return m, nil
 		case key.Matches(msg, m.keymap.ScaleDown):
 			if m.mode == EDIT {
 				return m, nil
 			}
 			param.Get("scale", m.gridParams).Down()
-			m.requestSave()
+			m.commit()
 			return m, nil
 		case key.Matches(msg, m.keymap.TempoUp):
 			m.grid.SetTempo(m.grid.Tempo() + 1)
-			m.requestSave()
+			m.commit()
 			return m, nil
 		case key.Matches(msg, m.keymap.TempoDown):
 			m.grid.SetTempo(m.grid.Tempo() - 1)
-			m.requestSave()
+			m.commit()
 			return m, nil
 		case key.Matches(msg, m.keymap.Configuration):
 			m.mode = m.toggleMode(CONFIG)
@@ -358,6 +399,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, requestWindowSize()
 			}
 			m.grid.CopyOrCut(m.cursorX, m.cursorY, m.selectionX, m.selectionY, true)
+			m.commit()
 			return m, nil
 		case key.Matches(msg, m.keymap.Paste):
 			if m.mode == BANK {
@@ -365,7 +407,17 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.grid.Paste(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
-			m.requestSave()
+			m.commit()
+			return m, nil
+		case key.Matches(msg, m.keymap.Undo):
+			if state, ok := m.history.undo(); ok {
+				m.applyRestore(state)
+			}
+			return m, nil
+		case key.Matches(msg, m.keymap.Redo):
+			if state, ok := m.history.redo(); ok {
+				m.applyRestore(state)
+			}
 			return m, nil
 		case key.Matches(msg, m.keymap.Cancel):
 			m.mode = MOVE
@@ -378,7 +430,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.selectionX, m.selectionY = m.cursorX, m.cursorY
 			m.grid.Resize(m.viewport.Width, m.viewport.Height)
 			m.viewport.Update(m.cursorX, m.cursorY, m.grid.Width, m.grid.Height)
-			m.requestSave()
+			m.commit()
 			return m, nil
 		case key.Matches(msg, m.keymap.Help):
 			m.help.ShowAll = !m.help.ShowAll
@@ -592,6 +644,8 @@ func (m mainModel) loadGridFromBank() mainModel {
 	isPlaying := m.grid.Playing
 	m.grid.Load(m.selectedGrid, m.bank.ActiveGrid())
 	m.grid.SetPlaying(isPlaying)
+	// A different grid is a fresh, independent editing timeline.
+	m.history.reset(m.grid.Serialize())
 	m.cursorX = 1
 	m.cursorY = 1
 	m.selectionX = 1
@@ -613,6 +667,7 @@ func (m mainModel) handleBankMetaCommand() (mainModel, tea.Cmd) {
 	m.bank.SetActive(bankIndex)
 	m.grid.Load(bankIndex, m.bank.ActiveGrid())
 	m.grid.SetPlaying(true)
+	m.history.reset(m.grid.Serialize())
 	m.mode = MOVE
 	m.param = 0
 	m.paramPage = 0
