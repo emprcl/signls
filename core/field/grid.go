@@ -384,6 +384,29 @@ func (g *Grid) SetAllNodeMutes(mute bool) {
 	}
 }
 
+// AllNodesMuted reports whether every audible node on the grid is muted. A grid
+// with no audible nodes is not muted. The ui uses it to re-derive its mute-all
+// toggle after restoring a document, which changes mutes behind the toggle's
+// back.
+func (g *Grid) AllNodesMuted() bool {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+	audible := false
+	for y := 0; y < g.Height; y++ {
+		for x := 0; x < g.Width; x++ {
+			a, ok := g.nodes[y][x].(music.Audible)
+			if !ok {
+				continue
+			}
+			audible = true
+			if !a.Muted() {
+				return false
+			}
+		}
+	}
+	return audible
+}
+
 // Update advances the grid by one step, moving signals and triggering emitters.
 // It is called by the clock goroutine on every pulse.
 func (g *Grid) Update() {

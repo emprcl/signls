@@ -38,6 +38,20 @@ func (s *saver) request() {
 	s.timer.Reset(s.interval)
 }
 
+// flush runs a pending save right now instead of waiting out the debounce. Used
+// before switching bank slots: the save writes the live grid into whichever slot
+// is active when it fires, so a pending one must land before the active slot
+// changes or the edit that scheduled it is written to the wrong slot — that is,
+// lost.
+func (s *saver) flush() {
+	s.mu.Lock()
+	pending := s.timer != nil && s.timer.Stop()
+	s.mu.Unlock()
+	if pending {
+		s.save()
+	}
+}
+
 // stop cancels any pending save. Used on quit, where the final save is done
 // synchronously instead.
 func (s *saver) stop() {

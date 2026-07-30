@@ -242,6 +242,15 @@ func (b *Bank) Save(grid Grid) {
 	b.Write()
 }
 
+// Persist writes the bank to disk as it stands. Unlike Save it doesn't touch the
+// active slot; used after a change made straight to a slot (clearing, pasting),
+// where there is no live grid state to serialize.
+func (b *Bank) Persist() {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	b.Write()
+}
+
 // Write serializes the Bank and writes it to a file.
 func (b *Bank) Write() {
 	content, err := json.MarshalIndent(b, "", "  ")

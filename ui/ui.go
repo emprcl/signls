@@ -62,7 +62,7 @@ type mainModel struct {
 	gridParams    []param.Param
 	cells         [][]field.Cell
 	saver         *saver
-	history       *history
+	histories     map[int]*history
 	bankClipboard filesystem.Grid
 	mode          mode
 	version       string
@@ -97,7 +97,10 @@ func New(config filesystem.Configuration, grid *field.Grid, bank *filesystem.Ban
 		input:      ti,
 		gridParams: param.NewParamsForGrid(grid),
 		saver:      newSaver(saveDebounce, func() { grid.Save(bank) }),
-		history:    newHistory(grid.Serialize()),
+		histories:  map[int]*history{bank.ActiveIndex(): newHistory(grid.Serialize())},
+		// The mute-all toggle holds the intent of the next press, so it has to
+		// start out agreeing with the grid that was loaded.
+		mute:       grid.AllNodesMuted(),
 		cursorX:    1,
 		cursorY:    1,
 		selectionX: 1,
@@ -142,29 +145,179 @@ func (m mainModel) requestSave() {
 	m.saver.request()
 }
 
-// commit records the current grid state onto the undo history and schedules a
+// historyFor returns the undo timeline of a bank slot, creating it on first use.
+// Every slot has its own timeline, so switching banks — including a switch a bank
+// meta command performs mid-playback — leaves the user's undo stack intact.
+func (m mainModel) historyFor(slot int) *history {
+	if h, ok := m.histories[slot]; ok {
+		return h
+	}
+	// The active slot's document lives in the grid; every other slot's lives in
+	// the bank.
+	doc := m.bank.GridAt(slot)
+	if slot == m.bank.ActiveIndex() {
+		doc = m.grid.Serialize()
+	}
+	h := newHistory(doc)
+	m.histories[slot] = h
+	return h
+}
+
+// currentHistory returns the timeline of the grid that is currently loaded.
+func (m mainModel) currentHistory() *history {
+	return m.historyFor(m.bank.ActiveIndex())
+}
+
+// commit records the current grid document onto the undo timeline and schedules a
 // save. It replaces requestSave at every mutating key handler, so each committed
 // edit is undoable. Identical (no-op) states are ignored by history.push.
-func (m mainModel) commit() {
-	m.history.push(m.grid.Serialize())
+//
+// gesture labels the edit: consecutive commits sharing a gesture fold into a
+// single undo step, so a held key costs one step rather than one per repeat. Pass
+// gestureNone for discrete actions.
+func (m mainModel) commit(gesture string) {
+	m.commitEdit(gesture, musicalEdit{})
+}
+
+// commitEdit is commit with an explicit record of the grid-level musical fields
+// the action changed. See musicalEdit.
+func (m mainModel) commitEdit(gesture string, edit musicalEdit) {
+	m.currentHistory().push(state{
+		doc:        m.grid.Serialize(),
+		edit:       edit,
+		gesture:    gesture,
+		cursorX:    m.cursorX,
+		cursorY:    m.cursorY,
+		selectionX: m.selectionX,
+		selectionY: m.selectionY,
+	})
 	m.requestSave()
 }
 
-// applyRestore applies an undo/redo state to the live grid and refreshes the
-// derived ui state (grid dimensions, cursor bounds, parameter list). It persists
-// the result but records no new history entry — restoring isn't a new edit.
-func (m *mainModel) applyRestore(state filesystem.Grid) {
-	m.grid.Restore(state)
-	// The restored grid may have different dimensions (e.g. undoing a resize),
-	// so clamp the cursor/selection and viewport the same way a bank load does.
+// editMusical runs a change to the grid-level musical state (root key, scale) and
+// commits it as a before/after pair rather than as part of the document snapshot.
+// Meta commands write the same fields from the clock goroutine, so a
+// snapshot-based undo would revert changes the user never made.
+func (m mainModel) editMusical(gesture string, fields touch, edit func()) {
+	before := m.readMusical()
+	edit()
+	m.commitEdit(gesture, musicalEdit{
+		fields: fields,
+		before: before,
+		after:  m.readMusical(),
+	})
+}
+
+// editTempo sets the tempo and commits it the same way editMusical does. The new
+// value is passed in rather than read back: SetTempo hands the tempo to the clock
+// goroutine, which may not have applied it yet.
+func (m mainModel) editTempo(tempo float64) {
+	before := m.readMusical()
+	m.grid.SetTempo(tempo)
+	after := before
+	after.tempo = tempo
+	m.commitEdit(gestureTempo, musicalEdit{
+		fields: touchTempo,
+		before: before,
+		after:  after,
+	})
+}
+
+// readMusical reads the grid-level musical state under the read lock.
+func (m mainModel) readMusical() musical {
+	var mu musical
+	m.grid.Read(func() {
+		mu.key = m.grid.Key
+		mu.scale = m.grid.Scale
+	})
+	mu.tempo = m.grid.Tempo()
+	return mu
+}
+
+// applyStep applies an undo/redo step: the document goes back into the live grid
+// without disturbing playback, the user's musical changes are replayed, and the
+// cursor returns to the change so the user can see what moved. It persists the
+// result but records no new history entry — stepping the timeline isn't an edit.
+func (m *mainModel) applyStep(s step) {
+	m.grid.RestoreNodes(s.doc)
+	if s.fields&touchKey != 0 {
+		m.grid.SetKey(s.musical.key)
+	}
+	if s.fields&touchScale != 0 {
+		m.grid.SetScale(s.musical.scale)
+	}
+	if s.fields&touchTempo != 0 {
+		m.grid.SetTempo(s.musical.tempo)
+	}
+	m.cursorX, m.cursorY = s.cursorX, s.cursorY
+	m.selectionX, m.selectionY = s.selectionX, s.selectionY
+	// The restored document may have different dimensions (e.g. undoing a
+	// resize), so re-fit it to the window and clamp the cursor/selection and
+	// viewport the same way a bank load does.
 	*m = m.windowResize(m.viewport.Width, m.viewport.Height)
 	m.refreshParams()
+	// SetAllNodeMutes is driven by m.mute, which the restore just changed behind
+	// its back.
+	m.mute = m.grid.AllNodesMuted()
 	m.requestSave()
+}
+
+// applyHistory steps the timeline of whichever document the user is pointing at:
+// the live grid, or the selected slot when browsing the bank.
+func (m mainModel) applyHistory(move func(*history) (step, bool)) mainModel {
+	slot := m.bank.ActiveIndex()
+	if m.mode == BANK {
+		slot = m.selectedGrid
+	}
+	s, ok := move(m.historyFor(slot))
+	if !ok {
+		return m
+	}
+	if slot == m.bank.ActiveIndex() {
+		m.applyStep(s)
+		return m
+	}
+	// An inactive slot isn't loaded, so its document goes straight back into the
+	// bank rather than through the live grid.
+	m.bank.SetGrid(slot, s.doc)
+	m.bank.Persist()
+	return m
+}
+
+// editBankSlot runs a whole-slot change (clearing, overwriting) and records it on
+// that slot's timeline, so the most destructive actions in the app are undoable
+// too. The timeline is created before the change runs, so its baseline is the
+// document as it stood beforehand.
+func (m mainModel) editBankSlot(slot int, edit func()) {
+	// A pending save writes the live grid into the active slot when it fires,
+	// which would clobber a change made straight to the bank. Get it out of the
+	// way first, and persist the bank directly rather than scheduling another one.
+	m.saver.flush()
+	h := m.historyFor(slot)
+	edit()
+	h.push(state{doc: m.bank.GridAt(slot)})
+	m.bank.Persist()
+}
+
+// paramGesture labels a parameter edit by mode, selection and parameter, so
+// repeats on the same parameter coalesce into one undo step while moving to
+// another parameter or another selection starts a new one.
+func (m mainModel) paramGesture() string {
+	if m.paramPage >= len(m.params) || m.param >= len(m.params[m.paramPage]) {
+		return gestureNone
+	}
+	return fmt.Sprintf("param:%d:%d:%d:%d:%d:%s",
+		m.mode, m.cursorX, m.cursorY, m.selectionX, m.selectionY, m.activeParam().Name())
+}
+
+// directionGesture labels a node direction edit by the selection it applies to.
+func (m mainModel) directionGesture() string {
+	return fmt.Sprintf("direction:%d:%d:%d:%d", m.cursorX, m.cursorY, m.selectionX, m.selectionY)
 }
 
 // refreshParams rebuilds the parameter list for the current selection and keeps
-// the parameter page/index within bounds. Used after mutations that replace node
-// state (undo/redo).
+// the parameter page/index within bounds. Used after mutations that add or
+// replace node state (adding, pasting, undo/redo).
 func (m *mainModel) refreshParams() {
 	m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
 	if len(m.params) == 0 {
@@ -206,7 +359,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.grid.Write(func() {
 					m.activeParam().SetEditValue(m.input.Value())
 				})
-				m.commit()
+				m.commit(gestureNone)
 				return m, nil
 			case key.Matches(msg, m.keymap.Cancel, m.keymap.EditInput):
 				m.input.Blur()
@@ -256,7 +409,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			dir := m.keymap.Direction(msg)
 			if m.mode == EDIT || m.mode == CONFIG {
 				m.handleParamAltEdit(dir)
-				m.commit()
+				m.commit(m.paramGesture())
 				return m, nil
 			}
 			m.selectionX, m.selectionY = moveCursor(
@@ -271,41 +424,35 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.grid.Write(func() {
 					param.NewDirection(m.selectedEmitters()).SetFromKeyString(dir)
 				})
-				m.commit()
+				m.commit(m.directionGesture())
 				return m, nil
 			}
 			m.handleParamEdit(dir)
-			m.commit()
+			m.commit(m.paramGesture())
 			return m, nil
 		case key.Matches(msg, m.keymap.AddBang, m.keymap.AddSpread, m.keymap.AddCycle, m.keymap.AddDice, m.keymap.AddToll, m.keymap.AddEuclid, m.keymap.AddZone, m.keymap.AddPass, m.keymap.AddHole):
 			m.grid.AddNodeFromSymbol(m.keymap.EmitterSymbol(msg), m.cursorX, m.cursorY)
-			newParams := param.NewParamsForNodes(m.grid, m.selectedEmitters())
-			if len(newParams) < m.paramPage+1 {
-				m.paramPage = 0
-			}
-			if len(newParams[m.paramPage]) < m.param+1 {
-				m.param = 0
-			}
-			m.params = newParams
-			m.commit()
+			m.refreshParams()
+			m.commit(gestureNone)
 			return m, nil
 		case key.Matches(msg, m.keymap.MuteNode):
 			m.grid.ToggleNodeMutes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
-			m.commit()
+			m.commit(gestureNone)
 			return m, nil
 		case key.Matches(msg, m.keymap.MuteAllNode):
 			m.grid.SetAllNodeMutes(!m.mute)
 			m.mute = !m.mute
-			m.commit()
+			m.commit(gestureNone)
 			return m, nil
 		case key.Matches(msg, m.keymap.RemoveNode):
 			if m.mode == BANK {
-				m.bank.ClearGrid(m.selectedGrid)
+				slot := m.selectedGrid
+				m.editBankSlot(slot, func() { m.bank.ClearGrid(slot) })
 				return m.loadGridFromBank(), requestWindowSize()
 			}
 			m.mode = MOVE
 			m.grid.RemoveNodes(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
-			m.commit()
+			m.commit(gestureNone)
 			return m, nil
 		case key.Matches(msg, m.keymap.EditNode):
 			if m.mode == BANK {
@@ -344,37 +491,31 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.mode == EDIT {
 				return m, nil
 			}
-			param.Get("root", m.gridParams).Up()
-			m.commit()
+			m.editMusical(gestureRoot, touchKey, param.Get("root", m.gridParams).Up)
 			return m, nil
 		case key.Matches(msg, m.keymap.RootNoteDown):
 			if m.mode == EDIT {
 				return m, nil
 			}
-			param.Get("root", m.gridParams).Down()
-			m.commit()
+			m.editMusical(gestureRoot, touchKey, param.Get("root", m.gridParams).Down)
 			return m, nil
 		case key.Matches(msg, m.keymap.ScaleUp):
 			if m.mode == EDIT {
 				return m, nil
 			}
-			param.Get("scale", m.gridParams).Up()
-			m.commit()
+			m.editMusical(gestureScale, touchScale, param.Get("scale", m.gridParams).Up)
 			return m, nil
 		case key.Matches(msg, m.keymap.ScaleDown):
 			if m.mode == EDIT {
 				return m, nil
 			}
-			param.Get("scale", m.gridParams).Down()
-			m.commit()
+			m.editMusical(gestureScale, touchScale, param.Get("scale", m.gridParams).Down)
 			return m, nil
 		case key.Matches(msg, m.keymap.TempoUp):
-			m.grid.SetTempo(m.grid.Tempo() + 1)
-			m.commit()
+			m.editTempo(m.grid.Tempo() + 1)
 			return m, nil
 		case key.Matches(msg, m.keymap.TempoDown):
-			m.grid.SetTempo(m.grid.Tempo() - 1)
-			m.commit()
+			m.editTempo(m.grid.Tempo() - 1)
 			return m, nil
 		case key.Matches(msg, m.keymap.Configuration):
 			m.mode = m.toggleMode(CONFIG)
@@ -391,34 +532,34 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, m.keymap.Cut):
 			if m.mode == BANK {
-				m.bankClipboard = m.bank.GridAt(m.selectedGrid)
-				m.bank.ClearGrid(m.selectedGrid)
-				if m.bank.ActiveIndex() == m.selectedGrid {
+				slot := m.selectedGrid
+				m.bankClipboard = m.bank.GridAt(slot)
+				m.editBankSlot(slot, func() { m.bank.ClearGrid(slot) })
+				if m.bank.ActiveIndex() == slot {
 					return m.loadGridFromBank(), requestWindowSize()
 				}
 				return m, requestWindowSize()
 			}
 			m.grid.CopyOrCut(m.cursorX, m.cursorY, m.selectionX, m.selectionY, true)
-			m.commit()
+			m.commit(gestureNone)
 			return m, nil
 		case key.Matches(msg, m.keymap.Paste):
 			if m.mode == BANK {
-				m.bank.SetGrid(m.selectedGrid, m.bankClipboard)
+				slot := m.selectedGrid
+				m.editBankSlot(slot, func() { m.bank.SetGrid(slot, m.bankClipboard) })
+				if m.bank.ActiveIndex() == slot {
+					return m.loadGridFromBank(), requestWindowSize()
+				}
+				return m, requestWindowSize()
 			}
 			m.grid.Paste(m.cursorX, m.cursorY, m.selectionX, m.selectionY)
-			m.params = param.NewParamsForNodes(m.grid, m.selectedEmitters())
-			m.commit()
+			m.refreshParams()
+			m.commit(gestureNone)
 			return m, nil
 		case key.Matches(msg, m.keymap.Undo):
-			if state, ok := m.history.undo(); ok {
-				m.applyRestore(state)
-			}
-			return m, nil
+			return m.applyHistory((*history).undo), nil
 		case key.Matches(msg, m.keymap.Redo):
-			if state, ok := m.history.redo(); ok {
-				m.applyRestore(state)
-			}
-			return m, nil
+			return m.applyHistory((*history).redo), nil
 		case key.Matches(msg, m.keymap.Cancel):
 			m.mode = MOVE
 			m.selectionX = m.cursorX
@@ -430,7 +571,7 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.selectionX, m.selectionY = m.cursorX, m.cursorY
 			m.grid.Resize(m.viewport.Width, m.viewport.Height)
 			m.viewport.Update(m.cursorX, m.cursorY, m.grid.Width, m.grid.Height)
-			m.commit()
+			m.commit(gestureNone)
 			return m, nil
 		case key.Matches(msg, m.keymap.Help):
 			m.help.ShowAll = !m.help.ShowAll
@@ -640,12 +781,15 @@ func (m *mainModel) moveBankGrid(dir string) {
 }
 
 func (m mainModel) loadGridFromBank() mainModel {
+	// A pending save writes the live grid into whichever slot is active when it
+	// fires, so it has to land before the active slot changes — otherwise the
+	// edit that scheduled it is written to the wrong slot and lost.
+	m.saver.flush()
 	m.bank.SetActive(m.selectedGrid)
 	isPlaying := m.grid.Playing
 	m.grid.Load(m.selectedGrid, m.bank.ActiveGrid())
 	m.grid.SetPlaying(isPlaying)
-	// A different grid is a fresh, independent editing timeline.
-	m.history.reset(m.grid.Serialize())
+	m.mute = m.grid.AllNodesMuted()
 	m.cursorX = 1
 	m.cursorY = 1
 	m.selectionX = 1
@@ -664,10 +808,15 @@ func (m mainModel) handleBankMetaCommand() (mainModel, tea.Cmd) {
 	if bankIndex == m.bank.ActiveIndex() {
 		return m, tick()
 	}
+	// Same as loadGridFromBank: flush before the active slot changes so a pending
+	// save lands on the slot it belongs to. Each slot keeps its own timeline, so a
+	// bank switch the sequencer performs on its own doesn't destroy the user's
+	// undo stack.
+	m.saver.flush()
 	m.bank.SetActive(bankIndex)
 	m.grid.Load(bankIndex, m.bank.ActiveGrid())
 	m.grid.SetPlaying(true)
-	m.history.reset(m.grid.Serialize())
+	m.mute = m.grid.AllNodesMuted()
 	m.mode = MOVE
 	m.param = 0
 	m.paramPage = 0
@@ -680,6 +829,12 @@ func (m mainModel) windowResize(width, height int) mainModel {
 	m.viewport.Height = height - controlsHeight - 1
 	if m.viewport.Width > m.grid.Width || m.viewport.Height > m.grid.Height {
 		m.grid.Resize(m.viewport.Width, m.viewport.Height)
+		// Growing the grid to fill the window is not a user edit, but it does
+		// change the document. Rebase the current timeline entry onto it so the
+		// live grid and that entry stay in sync: otherwise the next commit would
+		// diff against a size the grid isn't in, and undoing a resize would be
+		// undone again by the window on the way back.
+		m.currentHistory().rebase(m.grid.Serialize())
 	}
 	m.viewport.Update(m.cursorX, m.cursorY, m.grid.Width, m.grid.Height)
 	if m.cursorX > m.grid.Width-1 {
