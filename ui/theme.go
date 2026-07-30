@@ -43,8 +43,12 @@ type styles struct {
 }
 
 // toColor turns a palette Color into a lipgloss color, using an adaptive color
-// only when the light and dark variants differ.
-func toColor(c filesystem.Color) color.Color {
+// only when the light and dark variants differ. A color the palette does not
+// set renders unstyled, falling through to the terminal's own colors.
+func toColor(c *filesystem.Color) color.Color {
+	if c == nil {
+		return lipgloss.Color("")
+	}
 	if c.Light == c.Dark || c.Dark == "" {
 		return lipgloss.Color(c.Light)
 	}
@@ -71,7 +75,7 @@ func newStyles(p filesystem.Palette) styles {
 			Background(toColor(p.GridBackground)),
 		gridAlt: lipgloss.NewStyle().
 			Background(toColor(p.GridBackgroundAlt)),
-		gridAltSet: !p.GridBackgroundAlt.IsZero(),
+		gridAltSet: p.GridBackgroundAlt != nil,
 		cursor: lipgloss.NewStyle().
 			Background(toColor(p.Cursor)).
 			Foreground(toColor(p.CursorForeground)),
@@ -102,7 +106,7 @@ func newStyles(p filesystem.Palette) styles {
 		activeBank: lipgloss.NewStyle().
 			MarginRight(1).
 			Background(toColor(p.BankActive)).
-			Foreground(toColor(p.BankForeground)),
+			Foreground(toColor(p.BankActiveForeground)),
 		inputCursor: toColor(p.Cursor),
 		nodes:       nodes,
 	}
