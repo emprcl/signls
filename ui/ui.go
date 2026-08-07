@@ -67,6 +67,8 @@ type mainModel struct {
 	bankClipboard filesystem.Grid
 	mode          mode
 	version       string
+	termWidth     int
+	termHeight    int
 	cursorX       int
 	cursorY       int
 	selectionX    int
@@ -258,7 +260,7 @@ func (m *mainModel) applyStep(s step) {
 	// The restored document may have different dimensions (e.g. undoing a
 	// resize), so re-fit it to the window and clamp the cursor/selection and
 	// viewport the same way a bank load does.
-	*m = m.windowResize(m.viewport.Width, m.viewport.Height)
+	*m = m.windowResize(m.termWidth, m.termHeight)
 	m.refreshParams()
 	// SetAllNodeMutes is driven by m.mute, which the restore just changed behind
 	// its back.
@@ -801,7 +803,7 @@ func (m mainModel) loadGridFromBank() mainModel {
 	m.mode = MOVE
 	m.param = 0
 	m.paramPage = 0
-	return m.windowResize(m.viewport.Width, m.viewport.Height)
+	return m.windowResize(m.termWidth, m.termHeight)
 }
 
 func (m mainModel) handleBankMetaCommand() (mainModel, tea.Cmd) {
@@ -824,10 +826,17 @@ func (m mainModel) handleBankMetaCommand() (mainModel, tea.Cmd) {
 	m.mode = MOVE
 	m.param = 0
 	m.paramPage = 0
-	return m.windowResize(m.viewport.Width, m.viewport.Height), tea.Batch(requestWindowSize(), tick())
+	return m.windowResize(m.termWidth, m.termHeight), tea.Batch(requestWindowSize(), tick())
 }
 
+// windowResize refits the viewport to a terminal size and grows the grid to
+// fill it if needed. width/height must be the actual terminal size — the
+// viewport's own (already-halved) dimensions must never be passed back in
+// here, or each call would halve them again. Callers that need to redo the fit
+// without a fresh tea.WindowSizeMsg (a bank load, an undo/redo step) pass back
+// termWidth/termHeight, the last real size this was called with.
 func (m mainModel) windowResize(width, height int) mainModel {
+	m.termWidth, m.termHeight = width, height
 	m.help.SetWidth(width)
 	m.viewport.Width = width / 2
 	m.viewport.Height = height - controlsHeight - 1
