@@ -104,6 +104,15 @@ jobs:
           VERSION: ${{ github.ref_name }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
 
+      # goreleaser's scoops pipe can't run here either (same reason as the
+      # Homebrew step above), so generate the manifest by hand and push it to
+      # emprcl/scoop-bucket.
+      - name: Update Scoop bucket
+        run: .github/scripts/update-scoop-bucket.sh
+        env:
+          VERSION: ${{ github.ref_name }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+
       # Publish the same archives to itch.io (emprcl/signls), one channel per platform.
       - name: Push to itch.io
         run: .github/scripts/push-to-itchio.sh

@@ -43,6 +43,13 @@ brew trust emprcl/tap
 brew install signls
 ```
 
+### Scoop (Windows)
+
+```powershell
+scoop bucket add emprcl https://github.com/emprcl/scoop-bucket
+scoop install signls
+```
+
 ### Manual installation
 
 [Download the last release](https://github.com/emprcl/signls/releases) for your platform.
