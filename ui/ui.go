@@ -63,6 +63,7 @@ type mainModel struct {
 	cells         [][]field.Cell
 	saver         *saver
 	histories     map[int]*history
+	styles        styles
 	bankClipboard filesystem.Grid
 	mode          mode
 	version       string
@@ -80,21 +81,24 @@ type mainModel struct {
 // New creates a new mainModel that hols the ui state. It takes a new grid.
 // Check the core package.
 func New(config filesystem.Configuration, grid *field.Grid, bank *filesystem.Bank) tea.Model {
+	sty := newStyles(config.Palette())
+
 	ti := textinput.New()
 	ti.CharLimit = 10
 	ti.SetWidth(12)
 	// In bubbles v2 the input draws its own cursor; keep it inline (virtual) so
-	// it renders within the control bar layout, and color it like the v1 cursor.
+	// it renders within the control bar layout, and color it like the grid cursor.
 	ti.SetVirtualCursor(true)
-	styles := ti.Styles()
-	styles.Cursor.Color = lipgloss.Color("190")
-	ti.SetStyles(styles)
+	tiStyles := ti.Styles()
+	tiStyles.Cursor.Color = sty.inputCursor
+	ti.SetStyles(tiStyles)
 	model := mainModel{
 		bank:       bank,
 		grid:       grid,
 		keymap:     newKeyMap(config.KeyMap),
 		help:       help.New(),
 		input:      ti,
+		styles:     sty,
 		gridParams: param.NewParamsForGrid(grid),
 		saver:      newSaver(saveDebounce, func() { grid.Save(bank) }),
 		histories:  map[int]*history{bank.ActiveIndex(): newHistory(grid.Serialize())},

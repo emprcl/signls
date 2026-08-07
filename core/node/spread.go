@@ -40,8 +40,4 @@ func (e *SpreadEmitter) Name() string {
 	return "spread"
 }
 
-func (e *SpreadEmitter) Color() string {
-	return "56"
-}
-
 func (e *SpreadEmitter) Reset() {}

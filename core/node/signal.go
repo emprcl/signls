@@ -44,10 +44,6 @@ func (s *Signal) Name() string {
 	return "signal"
 }
 
-func (s *Signal) Color() string {
-	return "15"
-}
-
 func (s *Signal) updated(pulse uint64) bool {
 	return s.pulse == pulse
 }

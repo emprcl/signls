@@ -130,10 +130,6 @@ func (e *Emitter) Name() string {
 	return e.behavior.Name()
 }
 
-func (e *Emitter) Color() string {
-	return e.behavior.Color()
-}
-
 func (e *Emitter) Reset() {
 	e.pulse = 0
 	e.armed = e.behavior.ArmedOnStart()

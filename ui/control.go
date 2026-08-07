@@ -36,20 +36,6 @@ var (
 			MarginLeft(2)
 	cellStyle = lipgloss.NewStyle().
 			MarginRight(2)
-	activeCellStyle = cellStyle.
-			Foreground(lipgloss.Color("190"))
-	bankStyle = lipgloss.NewStyle().
-			MarginRight(1).
-			Background(lipgloss.Color("79")).
-			Foreground(lipgloss.Color("0"))
-	bankStyleOdd = lipgloss.NewStyle().
-			MarginRight(1).
-			Background(lipgloss.Color("85")).
-			Foreground(lipgloss.Color("0"))
-	activeBankStyle = lipgloss.NewStyle().
-			MarginRight(1).
-			Background(lipgloss.Color("15")).
-			Foreground(lipgloss.Color("0"))
 )
 
 func (m mainModel) renderControl() string {
@@ -90,13 +76,13 @@ func (m mainModel) bankSelection() string {
 	for i, g := range grids[:maxGrids] {
 		label := bankGridLabel(i, g)
 		if i == m.selectedGrid {
-			banks[i] = cursorStyle.MarginRight(1).Render(label)
+			banks[i] = m.styles.cursor.MarginRight(1).Render(label)
 		} else if i == active {
-			banks[i] = activeBankStyle.Render(label)
+			banks[i] = m.styles.activeBank.Render(label)
 		} else if (i < gridsPerLine && i%2 == 0) || (i >= gridsPerLine && i%2 == 1) {
-			banks[i] = bankStyle.Render(label)
+			banks[i] = m.styles.bank.Render(label)
 		} else {
-			banks[i] = bankStyleOdd.Render(label)
+			banks[i] = m.styles.bankOdd.Render(label)
 		}
 
 	}
@@ -116,7 +102,7 @@ func (m mainModel) bankSelection() string {
 		lipgloss.Left,
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			activeBankStyle.MarginRight(9).Render(bankGridLabel(active, m.bank.ActiveGrid())),
+			m.styles.activeBank.MarginRight(9).Render(bankGridLabel(active, m.bank.ActiveGrid())),
 			cellStyle.Render(m.modeName()),
 		),
 		pane,
@@ -147,7 +133,7 @@ func (m mainModel) gridInfo() string {
 			lipgloss.Left,
 			fmt.Sprintf(
 				"%s%s",
-				activeBankStyle.Render(bankGridLabel(m.bank.ActiveIndex(), m.bank.ActiveGrid())),
+				m.styles.activeBank.Render(bankGridLabel(m.bank.ActiveIndex(), m.bank.ActiveGrid())),
 				m.bank.Filename(),
 			),
 		),
@@ -171,7 +157,7 @@ func (m mainModel) paramEdit() string {
 	for k, p := range m.activeParamPage() {
 		style := cellStyle
 		if k == m.param {
-			style = activeCellStyle
+			style = m.styles.activeCell
 		}
 		params = append(
 			params,
@@ -239,9 +225,9 @@ func (m mainModel) selectedNodeName() string {
 	}
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
-		emitterStyle.
+		m.styles.emitter.
 			MarginRight(1).
-			Background(lipgloss.Color(nodes[0].Color())).
+			Background(m.styles.nodeColor(nodes[0].Name())).
 			Render(util.Normalize(nodes[0].Symbol())),
 		nodes[0].Name(),
 	)

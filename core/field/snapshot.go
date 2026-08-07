@@ -25,9 +25,11 @@ const (
 // holds everything the ui needs to render a cell, so the render path never
 // touches live node state.
 type Cell struct {
-	Kind      CellKind
-	Symbol    string
-	Color     string
+	Kind   CellKind
+	Symbol string
+	// ColorKey identifies the node type (its Name) so the ui can look up the
+	// themed color for it. Color is a pure ui concern; core carries only the key.
+	ColorKey  string
 	Activated bool
 	Muted     bool
 }
@@ -50,7 +52,7 @@ func (g *Grid) Snapshot() [][]Cell {
 			}
 			c := Cell{
 				Symbol:    n.Symbol(),
-				Color:     n.Color(),
+				ColorKey:  n.Name(),
 				Activated: n.Activated(),
 			}
 			// Mirror the type precedence used by the renderer.

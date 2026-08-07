@@ -89,7 +89,3 @@ func (s *HoleEmitter) Symbol() string {
 func (s *HoleEmitter) Name() string {
 	return "hole"
 }
-
-func (s *HoleEmitter) Color() string {
-	return "124"
-}

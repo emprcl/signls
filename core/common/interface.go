@@ -18,9 +18,6 @@ type Node interface {
 
 	// Name returns the name of the node..
 	Name() string
-
-	// Color returns a string representing the color code for the node.
-	Color() string
 }
 
 // EmitterBehavior defines the behavior of different types of emitters.
@@ -47,9 +44,6 @@ type EmitterBehavior interface {
 
 	// Name returns the name of the emitter type.
 	Name() string
-
-	// Color returns the color code associated with the emitter.
-	Color() string
 }
 
 // Movable represents an interface for nodes that can move within the grid.

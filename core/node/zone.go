@@ -40,8 +40,4 @@ func (e *ZoneEmitter) Name() string {
 	return "zone"
 }
 
-func (e *ZoneEmitter) Color() string {
-	return "197"
-}
-
 func (e *ZoneEmitter) Reset() {}
