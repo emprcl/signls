@@ -146,6 +146,7 @@ For qwerty keyboards, here's the default mapping:
  - `'` `;` **modify root note**
  - `"` `:` **modify scale**
  - `ctrl`+`c` `x` `v`  **copy, cut, paste selection**
+ - `ctrl`+`z` `y` **undo, redo**
  - `escape` **exit parameter edit or bank selection**
  - `f2` **edit midi configuration**
  - `f10` **fit grid to window**
@@ -172,6 +173,7 @@ macOS and some terminals reserve a few keys the default layout uses — `ctrl`+a
  - `'` `;` **modify root note**
  - `"` `:` **modify scale**
  - `ctrl`+`c` `x` `v`  **copy, cut, paste selection**
+ - `ctrl`+`z` `y` **undo, redo**
  - `escape` **exit parameter edit or bank selection**
  - `c` **edit midi configuration**
  - `f` **fit grid to window**
