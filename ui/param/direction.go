@@ -2,6 +2,7 @@ package param
 
 import (
 	"signls/core/common"
+	"signls/midi"
 )
 
 type Direction struct {
@@ -78,3 +79,5 @@ func (d Direction) SetFromKeyString(key string) {
 }
 
 func (d Direction) SetEditValue(value string) {}
+
+func (d Direction) SetFromMidiIn(msg midi.InMessage) {}

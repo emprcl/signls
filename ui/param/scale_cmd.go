@@ -5,6 +5,7 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+	"signls/midi"
 	"signls/ui/util"
 )
 
@@ -95,3 +96,5 @@ func (s ScaleCmd) SetAlt(value int) {
 }
 
 func (s ScaleCmd) SetEditValue(input string) {}
+
+func (s ScaleCmd) SetFromMidiIn(msg midi.InMessage) {}

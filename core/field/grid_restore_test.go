@@ -24,11 +24,11 @@ func (m *recordingMidi) SilenceAll() { m.silenceAll.Add(1) }
 func newRestoreGrid(t *testing.T) (*Grid, *recordingMidi) {
 	t.Helper()
 	m := &recordingMidi{Mock: &midi.Mock{}}
-	return NewGrid(8, 8, m, ""), m
+	return NewGrid(8, 8, m, "", "", ""), m
 }
 
 func addBang(grid *Grid, x, y int) {
-	device := grid.MidiDevice()
+	device := grid.MidiOutputDevice()
 	grid.AddNode(node.NewBangEmitter(grid.Midi(), &device, common.RIGHT, true), x, y)
 }
 

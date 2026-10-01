@@ -6,6 +6,7 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+	"signls/midi"
 	"signls/ui/util"
 )
 
@@ -110,3 +111,5 @@ func (l Length) SetEditValue(input string) {
 	}
 	l.Set(value)
 }
+
+func (l Length) SetFromMidiIn(msg midi.InMessage) {}

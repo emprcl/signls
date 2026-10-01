@@ -5,6 +5,7 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+	"signls/midi"
 )
 
 type Device struct {
@@ -34,7 +35,7 @@ func (d Device) Display() string {
 }
 
 func (d Device) Value() int {
-	return d.nodes[0].(music.Audible).Note().Device.Get()
+	return int(d.nodes[0].(music.Audible).Note().Device.Get())
 }
 
 func (d Device) AltValue() int {
@@ -42,11 +43,11 @@ func (d Device) AltValue() int {
 }
 
 func (d Device) Up() {
-	d.Set(d.nodes[0].(music.Audible).Note().Device.Get() + 1)
+	d.Set(int(d.nodes[0].(music.Audible).Note().Device.Device.Next().ID))
 }
 
 func (d Device) Down() {
-	d.Set(d.nodes[0].(music.Audible).Note().Device.Get() - 1)
+	d.Set(int(d.nodes[0].(music.Audible).Note().Device.Device.Prev().ID))
 }
 
 func (d Device) Left() {}
@@ -69,7 +70,7 @@ func (d Device) Set(value int) {
 	if !d.nodes[0].(music.Audible).Note().Device.Enabled {
 		return
 	}
-	device := d.nodes[0].(music.Audible).Note().Midi().GetDevice(value)
+	device := d.nodes[0].(music.Audible).Note().Midi().GetOutDevice(midi.MidiOutput(value))
 	for _, n := range d.nodes {
 		n.(music.Audible).Note().Device.Device = device
 	}
@@ -79,10 +80,12 @@ func (d Device) SetAlt(value int) {
 	enabled := !d.nodes[0].(music.Audible).Note().Device.Enabled
 	for _, n := range d.nodes {
 		if enabled {
-			n.(music.Audible).Note().Device.Device = d.nodes[0].(music.Audible).Note().Midi().GetDevice(value)
+			n.(music.Audible).Note().Device.Device = d.nodes[0].(music.Audible).Note().Midi().GetOutDevice(midi.MidiOutput(value))
 		}
 		n.(music.Audible).Note().Device.Enabled = enabled
 	}
 }
 
 func (c Device) SetEditValue(input string) {}
+
+func (c Device) SetFromMidiIn(msg midi.InMessage) {}

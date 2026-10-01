@@ -6,6 +6,7 @@ import (
 
 	"signls/core/field"
 	"signls/filesystem"
+	"signls/midi"
 	"signls/ui/param"
 	"signls/ui/util"
 
@@ -78,6 +79,7 @@ type mainModel struct {
 	paramPage     int
 	blink         bool
 	mute          bool
+	acceptMidiIn  bool
 }
 
 // New creates a new mainModel that hols the ui state. It takes a new grid.
@@ -356,6 +358,25 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.blink = !m.blink
 		return m, blink()
 
+	case midi.InMessage:
+		if !m.grid.IsListeningFor(msg) {
+			return m, nil
+		}
+		m.grid.MaybeSendMidiThru(msg)
+		if m.acceptMidiIn && m.mode == EDIT {
+			m.grid.Write(func() {
+				if m.grid.MidiEditAllParams {
+					for _, param := range m.activeParamPage() {
+						param.SetFromMidiIn(msg)
+					}
+				} else {
+					m.activeParam().SetFromMidiIn(msg)
+				}
+			})
+			m.commit(gestureNone)
+		}
+		return m, nil
+
 	case tea.KeyPressMsg:
 		if m.input.Focused() {
 			var cmd tea.Cmd
@@ -385,6 +406,9 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.input.Focus()
 			m.input.Reset()
+			return m, nil
+		case key.Matches(msg, m.keymap.ToggleAcceptMidiIn):
+			m.acceptMidiIn = !m.acceptMidiIn
 			return m, nil
 		case key.Matches(msg, m.keymap.Play):
 			m.grid.TogglePlay()
@@ -590,7 +614,6 @@ func (m mainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Sequence(save(m), tea.Quit)
 		}
 	}
-
 	return m, nil
 }
 

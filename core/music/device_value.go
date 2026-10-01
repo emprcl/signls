@@ -5,12 +5,12 @@ import (
 )
 
 type DeviceValue struct {
-	Device     midi.Device
-	GridDevice *midi.Device
+	Device     midi.OutputDevice
+	GridDevice *midi.OutputDevice
 	Enabled    bool
 }
 
-func (d DeviceValue) Get() int {
+func (d DeviceValue) Get() midi.MidiOutput {
 	if d.Enabled {
 		return d.Device.ID
 	}

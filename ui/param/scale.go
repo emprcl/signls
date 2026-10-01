@@ -3,6 +3,7 @@ package param
 import (
 	"signls/core/field"
 	"signls/core/theory"
+	"signls/midi"
 )
 
 type Scale struct {
@@ -62,3 +63,5 @@ func (s Scale) Set(value int) {
 func (s Scale) SetAlt(value int) {}
 
 func (s Scale) SetEditValue(input string) {}
+
+func (s Scale) SetFromMidiIn(msg midi.InMessage) {}

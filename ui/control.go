@@ -168,6 +168,19 @@ func (m mainModel) paramEdit() string {
 			),
 		)
 	}
+	if m.acceptMidiIn {
+		text := []string{m.styles.activeCell.Render("MIDI IN")}
+		if m.grid.MidiEditAllParams {
+			text = append(text, m.styles.activeCell.Render("ALL"))
+		}
+		params = append(
+			params,
+			lipgloss.JoinVertical(
+				lipgloss.Left,
+				text...,
+			),
+		)
+	}
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		params...,

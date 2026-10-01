@@ -27,6 +27,8 @@ type keyMap struct {
 
 	EditInput key.Binding
 
+	ToggleAcceptMidiIn key.Binding
+
 	Bank key.Binding
 
 	AddBang   key.Binding
@@ -194,6 +196,10 @@ func newKeyMap(keys filesystem.KeyMap) keyMap {
 		EditInput: key.NewBinding(
 			key.WithKeys(keys.EditInput),
 			key.WithHelp(keys.EditInput, "modify parameter"),
+		),
+		ToggleAcceptMidiIn: key.NewBinding(
+			key.WithKeys(keys.ToggleAcceptMidiIn),
+			key.WithHelp(keys.ToggleAcceptMidiIn, "toggle accept midi input"),
 		),
 		Bank: key.NewBinding(
 			key.WithKeys(keys.Bank),

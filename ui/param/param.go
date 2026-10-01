@@ -6,6 +6,7 @@ import (
 	"signls/core/music"
 	"signls/core/node"
 	"signls/core/theory"
+	"signls/midi"
 )
 
 const (
@@ -21,6 +22,7 @@ type Param interface {
 	Set(value int)
 	SetAlt(value int)
 	SetEditValue(input string)
+	SetFromMidiIn(msg midi.InMessage)
 
 	Up()
 	Down()
@@ -149,6 +151,13 @@ func NewParamsForMidi(grid *field.Grid) [][]Param {
 			ClockSend{grid: grid},
 			TransportSend{grid: grid},
 			DefaultDevice{grid: grid},
+		},
+		{
+			InputDevice{grid: grid},
+			InputParamEdit{grid: grid},
+		},
+		{
+			ThruDevice{grid: grid},
 		},
 	}
 }

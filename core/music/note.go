@@ -50,7 +50,7 @@ type Note struct {
 }
 
 // NewNote initializes a new Note with default settings and the provided MIDI interface.
-func NewNote(midi midi.Midi, device *midi.Device) *Note {
+func NewNote(midi midi.Midi, device *midi.OutputDevice) *Note {
 	source := rand.NewSource(time.Now().UnixNano())
 	ccs := make([]*CC, defaultCCNumbers)
 	for i := range ccs {

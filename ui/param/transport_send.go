@@ -2,6 +2,7 @@ package param
 
 import (
 	"signls/core/field"
+	"signls/midi"
 )
 
 type TransportSend struct {
@@ -56,3 +57,5 @@ func (t TransportSend) Set(value int) {}
 func (t TransportSend) SetAlt(value int) {}
 
 func (t TransportSend) SetEditValue(input string) {}
+
+func (t TransportSend) SetFromMidiIn(msg midi.InMessage) {}

@@ -19,7 +19,7 @@ type cell struct {
 }
 
 func NewFromBank(bankIndex int, grid filesystem.Grid, midi midi.Midi) *Grid {
-	newGrid := NewGrid(grid.Width, grid.Height, midi, grid.Device)
+	newGrid := NewGrid(grid.Width, grid.Height, midi, grid.Device, grid.InDevice, grid.ThruDevice)
 	newGrid.Load(bankIndex, grid)
 	return newGrid
 }
@@ -61,9 +61,12 @@ func (g *Grid) RestoreNodes(fsGrid filesystem.Grid) {
 		liveNodes[cell{n.X, n.Y}] = n
 	}
 
-	g.device = g.midi.NewDevice(fsGrid.Device, "")
+	g.outDevice = g.midi.NewOutDevice(fsGrid.Device, "")
+	g.inDevice = g.midi.NewInDevice(fsGrid.InDevice, "")
+	g.thruDevice = g.midi.NewOutDevice(fsGrid.ThruDevice, "")
 	g.SendClock = fsGrid.SendClock
 	g.SendTransport = fsGrid.SendTransport
+	g.MidiEditAllParams = fsGrid.MidiEditAllParams
 	g.Width, g.Height = fsGrid.Width, fsGrid.Height
 
 	kept := make(map[cell]bool, len(liveNodes))
@@ -114,15 +117,18 @@ func (g *Grid) Save(bank *filesystem.Bank) {
 // caller must hold the lock.
 func (g *Grid) snapshotForSave() filesystem.Grid {
 	return filesystem.Grid{
-		Nodes:         g.snapshotNodes(),
-		Tempo:         g.Tempo(),
-		Height:        g.Height,
-		Width:         g.Width,
-		Device:        g.device.Name,
-		Key:           uint8(g.Key),
-		Scale:         uint16(g.Scale),
-		SendClock:     g.SendClock,
-		SendTransport: g.SendTransport,
+		Nodes:             g.snapshotNodes(),
+		Tempo:             g.Tempo(),
+		Height:            g.Height,
+		Width:             g.Width,
+		Device:            g.outDevice.Name,
+		InDevice:          g.inDevice.Name,
+		ThruDevice:        g.thruDevice.Name,
+		Key:               uint8(g.Key),
+		Scale:             uint16(g.Scale),
+		SendClock:         g.SendClock,
+		SendTransport:     g.SendTransport,
+		MidiEditAllParams: g.MidiEditAllParams,
 	}
 }
 
@@ -199,12 +205,15 @@ func (g *Grid) Load(index int, grid filesystem.Grid) {
 	defer g.mu.Unlock()
 
 	g.BankIndex = index
-	g.device = g.midi.NewDevice(grid.Device, "")
+	g.outDevice = g.midi.NewOutDevice(grid.Device, "")
+	g.inDevice = g.midi.NewInDevice(grid.InDevice, "")
+	g.thruDevice = g.midi.NewOutDevice(grid.ThruDevice, "")
 	g.clock.SetTempo(grid.Tempo)
 	g.Key = theory.Key(grid.Key)
 	g.Scale = theory.Scale(grid.Scale)
 	g.SendClock = grid.SendClock
 	g.SendTransport = grid.SendTransport
+	g.MidiEditAllParams = grid.MidiEditAllParams
 	g.Width, g.Height = grid.Width, grid.Height
 	g.nodes = g.buildNodes(grid, nil)
 }
@@ -244,9 +253,9 @@ func (g *Grid) newNode(n filesystem.Node) common.Node {
 	var newNode common.Node
 	switch n.Type {
 	case "bang":
-		newNode = node.NewBangEmitter(g.midi, &g.device, common.Direction(n.Direction), true)
+		newNode = node.NewBangEmitter(g.midi, &g.outDevice, common.Direction(n.Direction), true)
 	case "euclid":
-		newNode = node.NewEuclidEmitter(g.midi, &g.device, common.Direction(n.Direction))
+		newNode = node.NewEuclidEmitter(g.midi, &g.outDevice, common.Direction(n.Direction))
 		newNode.(*node.EuclidEmitter).Steps.Set(n.Params["steps"].Value)
 		newNode.(*node.EuclidEmitter).Steps.SetRandomAmount(n.Params["steps"].Amount)
 		newNode.(*node.EuclidEmitter).Triggers.Set(n.Params["triggers"].Value)
@@ -254,23 +263,23 @@ func (g *Grid) newNode(n filesystem.Node) common.Node {
 		newNode.(*node.EuclidEmitter).Offset.Set(n.Params["offset"].Value)
 		newNode.(*node.EuclidEmitter).Offset.SetRandomAmount(n.Params["offset"].Amount)
 	case "pass":
-		newNode = node.NewPassEmitter(g.midi, &g.device, common.Direction(n.Direction))
+		newNode = node.NewPassEmitter(g.midi, &g.outDevice, common.Direction(n.Direction))
 	case "spread":
-		newNode = node.NewSpreadEmitter(g.midi, &g.device, common.Direction(n.Direction))
+		newNode = node.NewSpreadEmitter(g.midi, &g.outDevice, common.Direction(n.Direction))
 	case "cycle":
-		newNode = node.NewCycleEmitter(g.midi, &g.device, common.Direction(n.Direction))
+		newNode = node.NewCycleEmitter(g.midi, &g.outDevice, common.Direction(n.Direction))
 		newNode.(common.Behavioral).Behavior().(*node.CycleEmitter).Repeat().Set(n.Params["repeat"].Value)
 		newNode.(common.Behavioral).Behavior().(*node.CycleEmitter).Repeat().SetRandomAmount(n.Params["repeat"].Amount)
 	case "dice":
-		newNode = node.NewDiceEmitter(g.midi, &g.device, common.Direction(n.Direction))
+		newNode = node.NewDiceEmitter(g.midi, &g.outDevice, common.Direction(n.Direction))
 		newNode.(common.Behavioral).Behavior().(*node.DiceEmitter).Repeat().Set(n.Params["repeat"].Value)
 		newNode.(common.Behavioral).Behavior().(*node.DiceEmitter).Repeat().SetRandomAmount(n.Params["repeat"].Amount)
 	case "toll":
-		newNode = node.NewTollEmitter(g.midi, &g.device, common.Direction(n.Direction))
+		newNode = node.NewTollEmitter(g.midi, &g.outDevice, common.Direction(n.Direction))
 		newNode.(common.Behavioral).Behavior().(*node.TollEmitter).Threshold.Set(n.Params["threshold"].Value)
 		newNode.(common.Behavioral).Behavior().(*node.TollEmitter).Threshold.SetRandomAmount(n.Params["threshold"].Amount)
 	case "zone":
-		newNode = node.NewZoneEmitter(g.midi, &g.device, common.Direction(n.Direction))
+		newNode = node.NewZoneEmitter(g.midi, &g.outDevice, common.Direction(n.Direction))
 	case "hole":
 		newNode = node.NewHoleEmitter(common.Direction(n.Direction), n.X, n.Y, g.Width, g.Height)
 		newNode.(*node.HoleEmitter).DestinationX.Set(n.Params["destinationX"].Value)
@@ -295,7 +304,7 @@ func (g *Grid) newNode(n filesystem.Node) common.Node {
 		a.Note().Length.SetRandomAmount(n.Note.Length.Amount)
 		a.Note().Probability = uint8(n.Note.Probability)
 
-		device := g.midi.NewDevice(n.Device, g.device.Name)
+		device := g.midi.NewOutDevice(n.Device, g.outDevice.Name)
 		a.Note().Device.Device = device
 		a.Note().Device.Enabled = device.Enabled()
 

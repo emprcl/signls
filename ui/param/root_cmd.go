@@ -5,6 +5,7 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+	"signls/midi"
 	"signls/ui/util"
 )
 
@@ -101,3 +102,5 @@ func (r RootCmd) SetEditValue(input string) {
 	}
 	r.Set(midiKey)
 }
+
+func (r RootCmd) SetFromMidiIn(msg midi.InMessage) {}

@@ -82,7 +82,7 @@ func (c *CC) SetType(t int) {
 	}
 }
 
-func (c CC) Send(device int, channel uint8) {
+func (c CC) Send(device midi.MidiOutput, channel uint8) {
 	switch c.Type {
 	case SilentControlType:
 		return

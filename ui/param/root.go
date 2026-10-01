@@ -3,6 +3,7 @@ package param
 import (
 	"signls/core/field"
 	"signls/core/theory"
+	"signls/midi"
 )
 
 const (
@@ -63,3 +64,5 @@ func (r Root) Set(value int) {
 func (r Root) SetAlt(value int) {}
 
 func (r Root) SetEditValue(input string) {}
+
+func (r Root) SetFromMidiIn(msg midi.InMessage) {}

@@ -7,6 +7,7 @@ import (
 	"signls/core/common"
 	"signls/core/music"
 	"signls/core/theory"
+	"signls/midi"
 	"signls/ui/util"
 )
 
@@ -149,5 +150,12 @@ func (k *Key) SetEditValue(input string) {
 	for _, n := range k.nodes {
 		n.(music.Audible).Note().SetKey(key, k.root)
 		n.(music.Audible).Note().Transpose(k.root, k.scale)
+	}
+}
+
+func (k *Key) SetFromMidiIn(msg midi.InMessage) {
+	switch msg := msg.Message.(type) {
+	case *midi.NoteStart:
+		k.Set(int(msg.Note))
 	}
 }

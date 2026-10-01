@@ -2,6 +2,7 @@ package param
 
 import (
 	"signls/core/field"
+	"signls/midi"
 )
 
 type ClockSend struct {
@@ -56,3 +57,5 @@ func (c ClockSend) Set(value int) {}
 func (c ClockSend) SetAlt(value int) {}
 
 func (c ClockSend) SetEditValue(input string) {}
+
+func (c ClockSend) SetFromMidiIn(msg midi.InMessage) {}

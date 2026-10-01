@@ -6,6 +6,7 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+	"signls/midi"
 )
 
 const (
@@ -74,3 +75,5 @@ func (p Probability) SetEditValue(input string) {
 	}
 	p.Set(value)
 }
+
+func (p Probability) SetFromMidiIn(msg midi.InMessage) {}

@@ -20,8 +20,8 @@ import (
 // index-out-of-range when Resize shrank the grid mid-Update.
 func TestGridConcurrentAccess(t *testing.T) {
 	m := &midi.Mock{}
-	grid := NewGrid(32, 32, m, "")
-	device := m.NewDevice("", "")
+	grid := NewGrid(32, 32, m, "", "", "")
+	device := m.NewOutDevice("", "")
 	grid.AddNode(node.NewBangEmitter(m, &device, common.DOWN|common.RIGHT, true), 7, 7)
 	grid.AddNode(node.NewSpreadEmitter(m, &device, common.DOWN), 11, 7)
 	grid.AddNode(node.NewSpreadEmitter(m, &device, common.LEFT), 11, 11)

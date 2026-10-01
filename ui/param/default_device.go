@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"signls/core/field"
+	"signls/midi"
 )
 
 type DefaultDevice struct {
@@ -11,27 +12,27 @@ type DefaultDevice struct {
 }
 
 func (d DefaultDevice) Name() string {
-	return "device"
+	return "out device"
 }
 
 func (d DefaultDevice) Help() string {
-	if !d.grid.MidiDevice().Enabled() {
+	if !d.grid.MidiOutputDevice().Enabled() {
 		return ""
-	} else if d.grid.MidiDevice().Fallback {
-		return fmt.Sprintf("disconnected: %s", d.grid.MidiDevice().Name)
+	} else if d.grid.MidiOutputDevice().Fallback {
+		return fmt.Sprintf("disconnected: %s", d.grid.MidiOutputDevice().Name)
 	}
-	return d.grid.MidiDevice().Name
+	return d.grid.MidiOutputDevice().Name
 }
 
 func (d DefaultDevice) Display() string {
-	if d.grid.MidiDevice().Fallback {
+	if d.grid.MidiOutputDevice().Fallback {
 		return "??"
 	}
-	return fmt.Sprintf("%d", d.grid.MidiDevice().ID)
+	return fmt.Sprintf("%d", d.grid.MidiOutputDevice().ID)
 }
 
 func (d DefaultDevice) Value() int {
-	return d.grid.MidiDevice().ID
+	return int(d.grid.MidiOutputDevice().ID)
 }
 
 func (d DefaultDevice) AltValue() int {
@@ -39,11 +40,11 @@ func (d DefaultDevice) AltValue() int {
 }
 
 func (d DefaultDevice) Up() {
-	d.grid.SetMidiDevice(d.grid.Midi().GetDevice(d.Value() + 1))
+	d.grid.SetMidiOutputDevice(d.grid.MidiOutputDevice().Next())
 }
 
 func (d DefaultDevice) Down() {
-	d.grid.SetMidiDevice(d.grid.Midi().GetDevice(d.Value() - 1))
+	d.grid.SetMidiOutputDevice(d.grid.MidiOutputDevice().Prev())
 }
 
 func (d DefaultDevice) Left() {}
@@ -63,3 +64,5 @@ func (d DefaultDevice) Set(value int) {}
 func (d DefaultDevice) SetAlt(value int) {}
 
 func (d DefaultDevice) SetEditValue(input string) {}
+
+func (d DefaultDevice) SetFromMidiIn(msg midi.InMessage) {}

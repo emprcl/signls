@@ -43,13 +43,17 @@ type Grid struct {
 	Height int `json:"height"`
 	Width  int `json:"width"`
 
-	Device string `json:"device"`
+	Device     string `json:"device"`
+	InDevice   string `json:"in_device"`
+	ThruDevice string `json:"thru_device"`
 
 	Key   uint8  `json:"key"`
 	Scale uint16 `json:"scale"`
 
 	SendClock     bool `json:"send_clock"`
 	SendTransport bool `json:"send_transport"`
+
+	MidiEditAllParams bool `json:"midi_edit_all_params"`
 }
 
 // NewGrid creates a new grid with default values.

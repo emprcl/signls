@@ -30,13 +30,15 @@ const (
 type Grid struct {
 	mu sync.RWMutex
 
-	midi      midi.Midi
-	device    midi.Device
-	clock     *common.Clock
-	nodes     [][]common.Node
-	Height    int
-	Width     int
-	BankIndex int
+	midi       midi.Midi
+	outDevice  midi.OutputDevice
+	inDevice   midi.InputDevice
+	thruDevice midi.OutputDevice
+	clock      *common.Clock
+	nodes      [][]common.Node
+	Height     int
+	Width      int
+	BankIndex  int
 
 	Key   theory.Key
 	Scale theory.Scale
@@ -46,22 +48,29 @@ type Grid struct {
 	SendClock     bool
 	SendTransport bool
 
+	MidiEditAllParams bool
+
 	pulse uint64 // Global pulse counter for timing events
 
 	clipboard [][]common.Node
 }
 
 // NewGrid initializes and returns a new Grid with the given dimensions and MIDI interface.
-func NewGrid(width, height int, midi midi.Midi, device string) *Grid {
-	d := midi.NewDevice(device, "")
+func NewGrid(width, height int, midi midi.Midi, outDevice, inDevice, thruDevice string) *Grid {
+	out := midi.NewOutDevice(outDevice, "")
+	in := midi.NewInDevice(inDevice, "")
+	thru := midi.NewOutDevice(thruDevice, "")
+	thru.Nullable = true
 	grid := &Grid{
-		midi:   midi,
-		device: d,
-		nodes:  make([][]common.Node, height),
-		Height: height,
-		Width:  width,
-		Key:    defaultRootKey,
-		Scale:  defaultScale,
+		midi:       midi,
+		outDevice:  out,
+		inDevice:   in,
+		thruDevice: thru,
+		nodes:      make([][]common.Node, height),
+		Height:     height,
+		Width:      width,
+		Key:        defaultRootKey,
+		Scale:      defaultScale,
 	}
 	for i := range grid.nodes {
 		grid.nodes[i] = make([]common.Node, width)
@@ -124,9 +133,9 @@ func (g *Grid) TogglePlay() {
 	}
 
 	if g.Playing {
-		g.midi.TransportStart(g.device.ID)
+		g.midi.TransportStart(g.outDevice.ID)
 	} else {
-		g.midi.TransportStop(g.device.ID)
+		g.midi.TransportStop(g.outDevice.ID)
 	}
 }
 
@@ -201,16 +210,46 @@ func (g *Grid) ShiftScale(delta int) {
 	g.transpose()
 }
 
-// MidiDevice returns the name of the currently active MIDI device.
-func (g *Grid) MidiDevice() midi.Device {
-	return g.device
+// Returns whether or not an incoming MIDI message is applicable to the grid
+func (g *Grid) IsListeningFor(msg midi.InMessage) bool {
+	return msg.Device == g.inDevice.ID
 }
 
-// SetMidiDevice sets the midi device.
-func (g *Grid) SetMidiDevice(device midi.Device) {
+// MidiDevice returns the name of the currently active MIDI output device.
+func (g *Grid) MidiOutputDevice() midi.OutputDevice {
+	return g.outDevice
+}
+
+// SetMidiDevice sets the midi output device.
+func (g *Grid) SetMidiOutputDevice(device midi.OutputDevice) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	g.device = device
+	g.outDevice = device
+}
+
+// MidiInputDevice returns the name of the currently active MIDI input device.
+func (g *Grid) MidiInputDevice() midi.InputDevice {
+	return g.inDevice
+}
+
+// SetMidiInputDevice sets the midi input device
+func (g *Grid) SetMidiInputDevice(device midi.InputDevice) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.inDevice = device
+}
+
+// MidiThruDevice returns the name of the currently active MIDI thru device.
+func (g *Grid) MidiThruDevice() midi.OutputDevice {
+	return g.thruDevice
+}
+
+// SetMidiThruDevice sets the midi input device
+func (g *Grid) SetMidiThruDevice(device midi.OutputDevice) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	device.Nullable = true
+	g.thruDevice = device
 }
 
 // SetSendClock sets whether the grid sends midi clock to its device.
@@ -225,6 +264,14 @@ func (g *Grid) SetSendTransport(send bool) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	g.SendTransport = send
+}
+
+// SetMidiEditAllParams sets whether receipt of a midi message should update
+// all (displayed) parameters or just the selected one.
+func (g *Grid) SetMidiEditAllParams(all bool) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.MidiEditAllParams = all
 }
 
 // Midi returns the Midi interface.
@@ -306,21 +353,21 @@ func (g *Grid) AddNodeFromSymbol(symbol string, x, y int) {
 	defer g.mu.Unlock()
 	switch symbol {
 	case "b":
-		g.addNode(node.NewBangEmitter(g.midi, &g.device, common.NONE, !g.Playing), x, y)
+		g.addNode(node.NewBangEmitter(g.midi, &g.outDevice, common.NONE, !g.Playing), x, y)
 	case "s":
-		g.addNode(node.NewSpreadEmitter(g.midi, &g.device, common.NONE), x, y)
+		g.addNode(node.NewSpreadEmitter(g.midi, &g.outDevice, common.NONE), x, y)
 	case "c":
-		g.addNode(node.NewCycleEmitter(g.midi, &g.device, common.NONE), x, y)
+		g.addNode(node.NewCycleEmitter(g.midi, &g.outDevice, common.NONE), x, y)
 	case "d":
-		g.addNode(node.NewDiceEmitter(g.midi, &g.device, common.NONE), x, y)
+		g.addNode(node.NewDiceEmitter(g.midi, &g.outDevice, common.NONE), x, y)
 	case "t":
-		g.addNode(node.NewTollEmitter(g.midi, &g.device, common.NONE), x, y)
+		g.addNode(node.NewTollEmitter(g.midi, &g.outDevice, common.NONE), x, y)
 	case "e":
-		g.addNode(node.NewEuclidEmitter(g.midi, &g.device, common.NONE), x, y)
+		g.addNode(node.NewEuclidEmitter(g.midi, &g.outDevice, common.NONE), x, y)
 	case "z":
-		g.addNode(node.NewZoneEmitter(g.midi, &g.device, common.NONE), x, y)
+		g.addNode(node.NewZoneEmitter(g.midi, &g.outDevice, common.NONE), x, y)
 	case "p":
-		g.addNode(node.NewPassEmitter(g.midi, &g.device, common.NONE), x, y)
+		g.addNode(node.NewPassEmitter(g.midi, &g.outDevice, common.NONE), x, y)
 	case "h":
 		g.addNode(node.NewHoleEmitter(common.NONE, x, y, g.Width, g.Height), x, y)
 	}
@@ -416,7 +463,7 @@ func (g *Grid) Update() {
 		return
 	}
 	if g.SendClock {
-		g.midi.SendClock(g.device.ID)
+		g.midi.SendClock(g.outDevice.ID)
 	}
 	if g.pulse%uint64(common.PulsesPerStep) != 0 {
 		g.tick()
@@ -664,4 +711,10 @@ func (g *Grid) resize(newWidth, newHeight int) {
 // outOfBounds checks if the specified coordinates are outside the grid dimensions.
 func (g *Grid) outOfBounds(x, y int) bool {
 	return x >= g.Width || y >= g.Height || x < 0 || y < 0
+}
+
+func (g *Grid) MaybeSendMidiThru(msg midi.InMessage) {
+	if g.thruDevice.Enabled() {
+		g.midi.Send(g.thruDevice.ID, msg.Raw)
+	}
 }

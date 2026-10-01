@@ -24,8 +24,8 @@ func BenchmarkGrid(b *testing.B) {
 	midi := &midi.Mock{}
 	for _, v := range benchmarks {
 		b.Run(fmt.Sprintf("grid_size_%dx%d", v.size, v.size), func(b *testing.B) {
-			grid := NewGrid(v.size, v.size, midi, "")
-			device := midi.NewDevice("", "")
+			grid := NewGrid(v.size, v.size, midi, "", "", "")
+			device := midi.NewOutDevice("", "")
 			grid.AddNode(node.NewBangEmitter(midi, &device, common.DOWN|common.RIGHT, true), 7, 7)
 			grid.AddNode(node.NewSpreadEmitter(midi, &device, common.DOWN), 11, 7)
 			grid.AddNode(node.NewSpreadEmitter(midi, &device, common.LEFT), 11, 11)

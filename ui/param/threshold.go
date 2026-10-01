@@ -7,6 +7,7 @@ import (
 
 	"signls/core/common"
 	"signls/core/node"
+	"signls/midi"
 	"signls/ui/util"
 )
 
@@ -93,3 +94,5 @@ func (t Threshold) SetEditValue(input string) {
 	}
 	t.Set(value)
 }
+
+func (t Threshold) SetFromMidiIn(msg midi.InMessage) {}

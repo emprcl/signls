@@ -21,6 +21,8 @@ type KeyMap struct {
 
 	EditInput string `json:"edit_input"`
 
+	ToggleAcceptMidiIn string `json:"toggle_accept_midi_in"`
+
 	Bank string `json:"bank"`
 
 	AddBang   string `json:"add_bang"`
@@ -84,6 +86,8 @@ func NewDefaultAzertyKeyMap() KeyMap {
 		EditLeft:  "ctrl+left",
 
 		EditInput: ":",
+
+		ToggleAcceptMidiIn: "ctrl+:",
 
 		Bank: "tab",
 
@@ -156,6 +160,8 @@ func NewDefaultAzertyMacKeyMap() KeyMap {
 
 		EditInput: ":",
 
+		ToggleAcceptMidiIn: "alt+:",
+
 		Bank: "tab",
 
 		AddBang:   "&",
@@ -222,6 +228,8 @@ func NewDefaultQwertyKeyMap() KeyMap {
 		EditLeft:  "ctrl+left",
 
 		EditInput: ".",
+
+		ToggleAcceptMidiIn: "ctrl+.",
 
 		Bank: "tab",
 
@@ -293,6 +301,8 @@ func NewDefaultQwertyMacKeyMap() KeyMap {
 		EditLeft:  "shift+left",
 
 		EditInput: ".",
+
+		ToggleAcceptMidiIn: "alt+.",
 
 		Bank: "tab",
 

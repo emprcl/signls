@@ -6,6 +6,7 @@ import (
 
 	"signls/core/common"
 	"signls/core/node"
+	"signls/midi"
 	"signls/ui/util"
 )
 
@@ -95,3 +96,5 @@ func (t Triggers) SetEditValue(input string) {
 	}
 	t.Set(value)
 }
+
+func (t Triggers) SetFromMidiIn(msg midi.InMessage) {}

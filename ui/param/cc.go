@@ -133,3 +133,5 @@ func (c CC) SetEditValue(input string) {
 	}
 	c.Set(value)
 }
+
+func (c CC) SetFromMidiIn(msg midi.InMessage) {}

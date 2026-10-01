@@ -7,6 +7,7 @@ import (
 
 	"signls/core/common"
 	"signls/core/node"
+	"signls/midi"
 )
 
 type Destination struct {
@@ -116,3 +117,5 @@ func (d Destination) SetEditValue(input string) {
 		n.(*node.HoleEmitter).SetDestination(x, y)
 	}
 }
+
+func (d Destination) SetFromMidiIn(msg midi.InMessage) {}

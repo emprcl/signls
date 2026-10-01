@@ -6,6 +6,7 @@ import (
 
 	"signls/core/common"
 	"signls/core/music"
+	"signls/midi"
 	"signls/ui/util"
 )
 
@@ -84,4 +85,11 @@ func (v Velocity) SetEditValue(input string) {
 		return
 	}
 	v.Set(value)
+}
+
+func (v Velocity) SetFromMidiIn(msg midi.InMessage) {
+	switch msg := msg.Message.(type) {
+	case *midi.NoteStart:
+		v.Set(int(msg.Velocity))
+	}
 }

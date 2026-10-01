@@ -50,11 +50,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	midi, err := midi.New()
+	midiIfc, err := midi.New()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer midi.Close()
+	defer midiIfc.Close()
 
 	if *debug {
 		f, err := tea.LogToFile("debug.log", "debug")
@@ -65,9 +65,17 @@ func main() {
 	}
 
 	bank := filesystem.New(bankPath)
-	grid := field.NewFromBank(bank.Active, bank.ActiveGrid(), midi)
+	grid := field.NewFromBank(bank.Active, bank.ActiveGrid(), midiIfc)
 
 	p := tea.NewProgram(ui.New(config, grid, bank))
+
+	err = midiIfc.Listen(func(msg midi.InMessage) {
+		p.Send(msg)
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
